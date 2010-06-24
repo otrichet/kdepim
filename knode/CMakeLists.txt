@@ -5,6 +5,7 @@ add_subdirectory( tests )
 add_subdirectory( pics )
 add_subdirectory( filters )
 add_subdirectory( kconf_update )
+add_subdirectory( update )
 
 include_directories(
   ${KDE4_INCLUDE_DIR}

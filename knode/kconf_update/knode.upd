@@ -13,3 +13,9 @@ RemoveKey=SortAscending
 RemoveKey=SortColumn
 RemoveKey=UnreadColumn
 
+Id=002
+# Change the placement of the list of updaters identifier
+File=knoderc,knode-migrationrc
+Group=GENERAL,Update
+Key=KNode::Utilities::Startup::updateId,updateIds
+

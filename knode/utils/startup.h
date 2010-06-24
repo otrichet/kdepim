@@ -25,9 +25,6 @@
 
 #include "knode_export.h"
 
-#include <KConfigGroup>
-
-
 namespace KNode {
 namespace Utilities {
 
@@ -48,18 +45,6 @@ class KNODE_EXPORT Startup
     */
     void updateDataAndConfiguration() const;
 
-  private:
-    /**
-      Convert KNode-specific Identity objects stored in configuration of KNode and accounts and groups
-      to KPIMIdentities::Identity.
-      @since 4.5
-    */
-    void convertPre45Identities() const;
-    /**
-      Convert a KNode-specific identity from a group of a (global, account or group) configuration as
-      stored in KNode up to version 4.4.x (included).
-    */
-    void convertPre45Identity( KConfigGroup &cg ) const;
 };
 
 
