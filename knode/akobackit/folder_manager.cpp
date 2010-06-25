@@ -236,6 +236,7 @@ void FolderManager::foldersResourceCreated( const Akonadi::AgentInstance &resour
   KConfig *config = KNGlobals::self()->config();
   KConfigGroup group = config->group( "Akonadi" ).group( "Folders" );
   group.writeEntry( "resource", resource.identifier() );
+  group.sync(); // ensure this is written to disk
 }
 
 

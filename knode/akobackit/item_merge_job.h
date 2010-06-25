@@ -24,10 +24,11 @@
 #define KNODE_AKOBACKIT_ITEMSMERGEJOB_H
 
 #include "akobackit/item_local_article.h"
+#include "knode_export.h"
 
 #include <Akonadi/Collection>
 #include <Akonadi/Item>
-#include <KJob>
+#include <Akonadi/TransactionSequence>
 
 
 namespace KNode {
@@ -40,8 +41,10 @@ namespace Akobackit {
  * Akonadi::ItemModifyJob to do its works.
  * Any invalid item is treated as a new item and created and
  * any valid item is treated as an existing item and just modified.
+ *
+ * @see Akonadi::TransactionSequence
  */
-class ItemsMergeJob : public KJob
+class KNODE_EXPORT ItemsMergeJob : public Akonadi::TransactionSequence
 {
   Q_OBJECT
 
@@ -65,50 +68,17 @@ class ItemsMergeJob : public KJob
      */
     virtual ~ItemsMergeJob();
 
-    /**
-     * Reimplemented from KJob::start().
-     */
-    virtual void start();
 
-
-  private slots:
+  protected:
     /**
-     * Called by start() to initialize the job asynchronously.
+     * @reimp
      */
     void doStart();
 
-    /**
-     * Result slot of sub-job.
-     */
-    virtual void slotResult( KJob *job );
-
   private:
-    /**
-     * Enqueue the sub-job @p job for the item @p i.
-     */
-    void addSubjob( KJob *job, const Akonadi::Item &i );
-
     LocalArticle::List mArticles;
     Akonadi::Collection mDestination;
 
-    QHash<KJob*, Akonadi::Item> mSubjobs;
-
-    /**
-     * Subjobs' errors code.
-     */
-    QHash<Akonadi::Item, int> mErrors;
-    /**
-     * Subjobs' error string.
-     */
-    QHash<Akonadi::Item, QString> mErrorStrings;
-    /**
-     * Number of sucessfull item creation.
-     */
-    int mCreationCount;
-    /**
-     * Number of sucessfull item update.
-     */
-    int mModificationCount;
 };
 
 }

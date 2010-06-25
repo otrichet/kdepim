@@ -22,6 +22,7 @@
 
 #include "aboutdata.h"
 #include "legacy_identity.h"
+#include "akonadi_migrator.h"
 
 #include <KApplication>
 #include <KCmdLineArgs>
@@ -83,6 +84,7 @@ int main( int argc, char *argv[] )
   knodeConf.checkUpdate( "002", "knode.upd" );
 
   run( new LegacyIdentity() );
+  run( new AkonadiMigrator() );
 
   return 0;
 }

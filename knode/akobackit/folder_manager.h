@@ -24,6 +24,7 @@
 #define KNODE_AKOBACKIT_FOLDERMANAGER_H
 
 #include "akobackit/item_local_article.h"
+#include "knode_export.h"
 
 #include <QtCore/QObject>
 
@@ -38,7 +39,7 @@ namespace Akobackit {
 
 class AkoManager;
 
-class FolderManager : public QObject
+class KNODE_EXPORT FolderManager : public QObject
 {
   Q_OBJECT
 
@@ -114,16 +115,19 @@ class FolderManager : public QObject
      */
     void folderCreated( const Akonadi::Collection &folder );
 
+  public slots:
+    /**
+     * Connected to the signal emitted when the resource is created.
+     * This store in the config the identifier of this resource.
+     * @note public for the Akonadi migrator.
+     */
+    void foldersResourceCreated( const Akonadi::AgentInstance &resource );
+
   private slots:
     /**
      * Result slot for the job setting up the local folders resource.
      */
     void foldersResourceSetupResult( KJob *job );
-    /**
-     * Connected to the signal emitted when the resource is created.
-     * This store in the config the identifier of this resource.
-     */
-    void foldersResourceCreated( const Akonadi::AgentInstance &resource );
     /**
      * Result slot for the job that creates a new folder.
      * It emits the createNewFolder() signals.

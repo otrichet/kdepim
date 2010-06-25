@@ -14,10 +14,8 @@
 
 #include "knarticlecollection.h"
 
-#include "knarticle.h"
-
-#include <KDebug>
-#include <QByteArray>
+// #include <KDebug>
+// #include <QByteArray>
 
 
 KNArticleVector::KNArticleVector(KNArticleVector *master, SortingType sorting)
@@ -36,13 +34,13 @@ void KNArticleVector::append( KNArticle::Ptr a )
     mList.append( a );
   }
 }
-
-void KNArticleVector::remove( int pos )
-{
-  if ( pos >= 0 && pos < mList.size() ) {
-    mList.removeAt( pos );
-  }
-}
+//
+// void KNArticleVector::remove( int pos )
+// {
+//   if ( pos >= 0 && pos < mList.size() ) {
+//     mList.removeAt( pos );
+//   }
+// }
 
 
 void KNArticleVector::clear()
@@ -50,126 +48,126 @@ void KNArticleVector::clear()
   mList.clear();
 }
 
-void KNArticleVector::syncWithMaster()
-{
-  if (!m_aster) return;
-
-  mList = m_aster->mList;
-  sort();
-}
-
-
-void KNArticleVector::sort()
-{
-  bool (*cmp)( KNArticle::Ptr, KNArticle::Ptr ) = 0;
-
-  switch(s_ortType) {
-    case STid:
-      cmp=compareById;
-    break;
-    case STmsgId:
-      cmp=compareByMsgId;
-    break;
-    default:
-      cmp=0;
-    break;
-  }
-
-  if(cmp) {
-    qSort( mList.begin(), mList.end(), cmp );
-  }
-}
-
-
-bool KNArticleVector::compareById( KNArticle::Ptr a1, KNArticle::Ptr a2 )
-{
-  return ( a1->id() < a2->id() );
-}
-
-
-bool KNArticleVector::compareByMsgId( KNArticle::Ptr a1, KNArticle::Ptr a2 )
-{
-  QByteArray mid1 = a1->messageID( true )->as7BitString( false );
-  QByteArray mid2 = a2->messageID( true )->as7BitString( false );
-  return ( mid1 < mid2 );
-}
-
-
-KNArticle::Ptr KNArticleVector::bsearch( int id )
-{
-  return at( indexForId( id ) );
-}
-
-
-KNArticle::Ptr KNArticleVector::bsearch( const QByteArray &id )
-{
-  return at ( indexForMsgId( id ) );
-}
-
-
-int KNArticleVector::indexForId(int id)
-{
-  if(s_ortType!=STid) return -1;
-
-  int start = 0, mid = 0, currentId = 0;
-  int end = mList.size();
-  bool found=false;
-
-  while(start!=end && !found) {
-    mid=(start+end)/2;
-    currentId = mList[ mid ]->id();
-
-    if(currentId==id)
-      found=true;
-    else if(currentId < id)
-      start=mid+1;
-    else
-      end=mid;
-  }
-
-  if(found)
-    return mid;
-  else {
-    return -1;
-  }
-}
-
-
-int KNArticleVector::indexForMsgId( const QByteArray &id )
-{
-  if(s_ortType!=STmsgId) return -1;
-
-  int start = 0, mid = 0;
-  int end = mList.size();
-  QByteArray currentMid;
-  bool found=false;
-  int cnt=0;
-
-  while(start!=end && !found) {
-    mid=(start+end)/2;
-    currentMid = mList[ mid ]->messageID( true )->as7BitString( false );
-
-    if(currentMid==id)
-      found=true;
-    else if( currentMid < id )
-      start=mid+1;
-    else
-      end=mid;
-
-    cnt++;
-  }
-
-  if(found) {
-    return mid;
-  } else {
-    return -1;
-  }
-}
-
-
-
-// -------------------------------------------------------------------------------------------
-
+// void KNArticleVector::syncWithMaster()
+// {
+//   if (!m_aster) return;
+//
+//   mList = m_aster->mList;
+//   sort();
+// }
+//
+//
+// void KNArticleVector::sort()
+// {
+//   bool (*cmp)( KNArticle::Ptr, KNArticle::Ptr ) = 0;
+//
+//   switch(s_ortType) {
+//     case STid:
+//       cmp=compareById;
+//     break;
+//     case STmsgId:
+//       cmp=compareByMsgId;
+//     break;
+//     default:
+//       cmp=0;
+//     break;
+//   }
+//
+//   if(cmp) {
+//     qSort( mList.begin(), mList.end(), cmp );
+//   }
+// }
+//
+//
+// bool KNArticleVector::compareById( KNArticle::Ptr a1, KNArticle::Ptr a2 )
+// {
+//   return ( a1->id() < a2->id() );
+// }
+//
+//
+// bool KNArticleVector::compareByMsgId( KNArticle::Ptr a1, KNArticle::Ptr a2 )
+// {
+//   QByteArray mid1 = a1->messageID( true )->as7BitString( false );
+//   QByteArray mid2 = a2->messageID( true )->as7BitString( false );
+//   return ( mid1 < mid2 );
+// }
+//
+//
+// KNArticle::Ptr KNArticleVector::bsearch( int id )
+// {
+//   return at( indexForId( id ) );
+// }
+//
+//
+// KNArticle::Ptr KNArticleVector::bsearch( const QByteArray &id )
+// {
+//   return at ( indexForMsgId( id ) );
+// }
+//
+//
+// int KNArticleVector::indexForId(int id)
+// {
+//   if(s_ortType!=STid) return -1;
+//
+//   int start = 0, mid = 0, currentId = 0;
+//   int end = mList.size();
+//   bool found=false;
+//
+//   while(start!=end && !found) {
+//     mid=(start+end)/2;
+//     currentId = mList[ mid ]->id();
+//
+//     if(currentId==id)
+//       found=true;
+//     else if(currentId < id)
+//       start=mid+1;
+//     else
+//       end=mid;
+//   }
+//
+//   if(found)
+//     return mid;
+//   else {
+//     return -1;
+//   }
+// }
+//
+//
+// int KNArticleVector::indexForMsgId( const QByteArray &id )
+// {
+//   if(s_ortType!=STmsgId) return -1;
+//
+//   int start = 0, mid = 0;
+//   int end = mList.size();
+//   QByteArray currentMid;
+//   bool found=false;
+//   int cnt=0;
+//
+//   while(start!=end && !found) {
+//     mid=(start+end)/2;
+//     currentMid = mList[ mid ]->messageID( true )->as7BitString( false );
+//
+//     if(currentMid==id)
+//       found=true;
+//     else if( currentMid < id )
+//       start=mid+1;
+//     else
+//       end=mid;
+//
+//     cnt++;
+//   }
+//
+//   if(found) {
+//     return mid;
+//   } else {
+//     return -1;
+//   }
+// }
+//
+//
+//
+// // -------------------------------------------------------------------------------------------
+//
 
 KNArticleCollection::KNArticleCollection( KNCollection::Ptr p )
   : KNCollection(p), l_astID(0), l_ockedArticles(0), n_otUnloadable(false)
@@ -191,11 +189,11 @@ void KNArticleCollection::append( KNArticle::Ptr a )
   }
 }
 
-void KNArticleCollection::remove( const KNArticle::Ptr &art )
-{
-  a_rticles.remove( a_rticles.indexForId( art->id() ) );
-}
-
+// void KNArticleCollection::remove( const KNArticle::Ptr &art )
+// {
+//   a_rticles.remove( a_rticles.indexForId( art->id() ) );
+// }
+//
 
 void KNArticleCollection::clear()
 {
@@ -205,26 +203,26 @@ void KNArticleCollection::clear()
 }
 
 
-void KNArticleCollection::compact()
-{
-  m_idIndex.clear();
-}
-
-
-KNArticle::Ptr KNArticleCollection::byId( int id )
-{
-  return a_rticles.bsearch(id);
-}
-
-
-KNArticle::Ptr KNArticleCollection::byMessageId( const QByteArray &mid )
-{
-  if(m_idIndex.isEmpty()) {
-    m_idIndex.syncWithMaster();
-    kDebug(5003) <<"KNArticleCollection::byMessageId() : created index";
-  }
-  return m_idIndex.bsearch(mid);
-}
+// void KNArticleCollection::compact()
+// {
+//   m_idIndex.clear();
+// }
+//
+//
+// KNArticle::Ptr KNArticleCollection::byId( int id )
+// {
+//   return a_rticles.bsearch(id);
+// }
+//
+//
+// KNArticle::Ptr KNArticleCollection::byMessageId( const QByteArray &mid )
+// {
+//   if(m_idIndex.isEmpty()) {
+//     m_idIndex.syncWithMaster();
+//     kDebug(5003) <<"KNArticleCollection::byMessageId() : created index";
+//   }
+//   return m_idIndex.bsearch(mid);
+// }
 
 
 void KNArticleCollection::setLastID()
@@ -236,8 +234,8 @@ void KNArticleCollection::setLastID()
   }
 }
 
-
-void KNArticleCollection::syncSearchIndex()
-{
-  m_idIndex.syncWithMaster();
-}
+//
+// void KNArticleCollection::syncSearchIndex()
+// {
+//   m_idIndex.syncWithMaster();
+// }

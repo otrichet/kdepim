@@ -13,38 +13,13 @@
 */
 
 #include "kncollection.h"
-#include "kncollectionviewitem.h"
 
 KNCollection::KNCollection( KNCollection::Ptr p )
 {
   p_arent=p;
-  l_istItem=0;
   c_ount=0;
 }
 
-
-
 KNCollection::~KNCollection()
 {
-  delete l_istItem;
-}
-
-
-
-void KNCollection::setListItem(KNCollectionViewItem *i)
-{
-  l_istItem=i;
-  if(i) {
-    i->setCollection( selfPtr() );
-    i->setLabelText( name() );
-  }
-}
-
-
-
-void KNCollection::updateListItem()
-{
-  if ( l_istItem ) {
-    l_istItem->setLabelText( name() );
-  }
 }

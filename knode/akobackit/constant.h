@@ -23,6 +23,7 @@
 #ifndef KNODE_AKOBACKIT_CONSTANT_H
 #define KNODE_AKOBACKIT_CONSTANT_H
 
+#include <Akonadi/Item>
 #include <QtCore/QLatin1String>
 
 namespace KNode {
@@ -52,6 +53,15 @@ namespace Akobackit {
    * Prefix of the identifier of an Akonadi NNTP resource.
    */
   static const QLatin1String NNTP_RESOURCE_AGENTTYPE( "akonadi_nntp_resource" );
+
+
+  static const Akonadi::Item::Flag ARTICLE_FLAG_DO_POST( "knode-doPost" );
+  static const Akonadi::Item::Flag ARTICLE_FLAG_POSTED( "knode-posted" );
+  static const Akonadi::Item::Flag ARTICLE_FLAG_DO_MAIL( "knode-doMail" );
+  static const Akonadi::Item::Flag ARTICLE_FLAG_MAILED( "knode-mailed" );
+  static const Akonadi::Item::Flag ARTICLE_FLAG_EDIT_DISABLED( "knode-editDisabled" );
+  static const Akonadi::Item::Flag ARTICLE_FLAG_CANCELED( "knode-canceled" );
+
 }
 }
 

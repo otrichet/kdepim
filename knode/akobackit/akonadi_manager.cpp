@@ -66,10 +66,6 @@ AkoManager::AkoManager( QObject *parent )
 
 AkoManager::~AkoManager()
 {
-  delete mFolderManager;
-  delete mMonitor;
-  delete mBaseModel;
-  delete mSession;
 }
 
 

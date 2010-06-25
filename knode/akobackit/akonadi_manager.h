@@ -24,6 +24,7 @@
 #define KNODE_AKOBACKIT_AKOMANAGER_H
 
 #include "akobackit/constant.h"
+#include "knode_export.h"
 
 #include <QtCore/QObject>
 
@@ -44,7 +45,7 @@ class GroupManager;
 /**
  * Returns the single AkoManager instance.
  */
-AkoManager * manager();
+KNODE_EXPORT AkoManager * manager();
 
 
 /**

@@ -17,8 +17,9 @@
 
 #include "knarticle.h"
 #include "kncollection.h"
-
-#include <QByteArray>
+//
+// #include <QByteArray>
+#include <QList>
 
 
 /** Article storage used by KNArticleCollection.
@@ -42,28 +43,28 @@ class KNArticleVector {
       Appends an article to this store.
     */
     void append( KNArticle::Ptr a );
-    /**
-      Remove the element at position @p pos in this store.
-    */
-    void remove( int pos );
+//     /**
+//       Remove the element at position @p pos in this store.
+//     */
+//     void remove( int pos );
     void clear();
-    void syncWithMaster();
+//     void syncWithMaster();
 
     // sorting
     void setSortMode(SortingType s)   { s_ortType=s; }
-    static bool compareById( KNArticle::Ptr a1, KNArticle::Ptr a2 );
-    static bool compareByMsgId( KNArticle::Ptr a1, KNArticle::Ptr a2 );
+//     static bool compareById( KNArticle::Ptr a1, KNArticle::Ptr a2 );
+//     static bool compareByMsgId( KNArticle::Ptr a1, KNArticle::Ptr a2 );
 
     // article access
     KNArticle::Ptr at( int i )  { return mList.value( i ); }
-    KNArticle::Ptr bsearch( int id );
-    KNArticle::Ptr bsearch( const QByteArray &id );
-
-    int indexForId(int id);
-    int indexForMsgId( const QByteArray &id );
+//     KNArticle::Ptr bsearch( int id );
+//     KNArticle::Ptr bsearch( const QByteArray &id );
+//
+//     int indexForId(int id);
+//     int indexForMsgId( const QByteArray &id );
 
   private:
-    void sort();
+//     void sort();
 
     KNArticleVector *m_aster;
     QList<KNArticle::Ptr> mList;
@@ -89,31 +90,31 @@ class KNArticleCollection : public KNCollection {
     KNArticleCollection( KNCollection::Ptr p = KNCollection::Ptr() );
     ~KNArticleCollection();
 
-    /** Returns true if this collection doesn't contain any article. */
-    bool isEmpty()                { return a_rticles.isEmpty(); }
+//     /** Returns true if this collection doesn't contain any article. */
+//     bool isEmpty()                { return a_rticles.isEmpty(); }
     bool isLoaded()               { return ( c_ount==0 || !a_rticles.isEmpty() ); }
     int length()                  { return a_rticles.size(); }
 
-    // cache behavior
-    bool isNotUnloadable()               { return n_otUnloadable; }
-    void setNotUnloadable(bool b=true)   { n_otUnloadable = b; }
-
-    // locking
-    unsigned int lockedArticles() { return l_ockedArticles; }
-    void articleLocked()          { l_ockedArticles++; }
-    void articleUnlocked()        { l_ockedArticles--; }
+//     // cache behavior
+//     bool isNotUnloadable()        //     /// Returns the drafts folder.
+//     void setNotUnloadable(bool b=true)   { n_otUnloadable = b; }
+//
+//     // lockin
+//     unsigned int lockedArticles() { return l_ockedArticles; }
+//     void articleLocked()          { l_ockedArticles++; }
+//     void articleUnlocked()        { l_ockedArticles--; }
 
     // list-handling
     /**
       Appends an article to this collection.
     */
     void append( KNArticle::Ptr a );
-    /**
-     * Remove the article @p art from this collection.
-     */
-    void remove( const KNArticle::Ptr &art );
+//     /**
+//      * Remove the article @p art from this collection.
+//      */
+//     void remove( const KNArticle::Ptr &art );
     void clear();
-    void compact();
+//     void compact();
     void setLastID();
 
     // article access
@@ -121,17 +122,17 @@ class KNArticleCollection : public KNCollection {
       Returns the article at index @p i in this collection, or an empty KNArticle::Ptr if it is not found.
     */
     KNArticle::Ptr at( int i )    { return a_rticles.at(i); }
-    /**
-      Returns the article whose id is @p id, or an empty KNArticle::Ptr if it is not found.
-    */
-    KNArticle::Ptr byId( int id );
-    /**
-      Returns the article whose message-id is @p mid, or an empty KNArticle::Ptr if it is not found.
-    */
-    KNArticle::Ptr byMessageId( const QByteArray &mid );
-
-    // search index
-    void syncSearchIndex();
+//     /**
+//       Returns the article whose id is @p id, or an empty KNArticle::Ptr if it is not found.
+//     */
+//     KNArticle::Ptr byId( int id );
+//     /**
+//       Returns the article whose message-id is @p mid, or an empty KNArticle::Ptr if it is not found.
+//     */
+//     KNArticle::Ptr byMessageId( const QByteArray &mid );
+//
+//     // search index
+//     void syncSearchIndex();
 
   private:
     int l_astID;

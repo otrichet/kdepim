@@ -1,16 +1,18 @@
 
 ###### Migration tool ######
 
-include_directories(
-  ${knode_SOURCE_DIR}
-  ${KDE4_INCLUDE_DIR}
-)
-
 set( knode_updaters_SRCS
   main.cpp
 
   updater_base.cpp
+  akonadi_migrator.cpp
   legacy_identity.cpp
+
+  legacy/knarticle.cpp
+  legacy/knarticlecollection.cpp
+  legacy/kncollection.cpp
+  legacy/knfolder.cpp
+  legacy/knfoldermanager.cpp
 )
 
 kde4_add_executable( knode-migrator

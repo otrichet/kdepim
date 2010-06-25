@@ -23,7 +23,9 @@
 #ifndef KNODE_ITEMLOCALARTICLE_H
 #define KNODE_ITEMLOCALARTICLE_H
 
-#include <Akonadi/Item>
+#include "akobackit/constant.h"
+#include "knode_export.h"
+
 #include <KMime/NewsArticle>
 
 namespace Akonadi {
@@ -35,7 +37,7 @@ namespace KNode {
 /**
  * Wrapper around an Akonadi::Item for message contains in local folder.
  */
-class LocalArticle : public KMime::NewsArticle
+class KNODE_EXPORT LocalArticle : public KMime::NewsArticle
 {
   public:
     /// Shared pointer to a LocalArticle.
@@ -69,6 +71,38 @@ class LocalArticle : public KMime::NewsArticle
   private:
     Akonadi::Item mItem;
 
+
+  public:
+#ifdef __GNUC__
+  #warning AKONADI PORT: is this code still usefull after the port?
+#endif
+#define LOCAL_ITEM_FLAG_METHOD( getter, setter, flag ) \
+    bool getter() \
+    { \
+      return mItem.hasFlag( flag ); \
+    } \
+    void setter( bool b ) \
+    { \
+      if ( b ) { \
+        mItem.setFlag( flag ); \
+      } else { \
+        mItem.clearFlag( flag ); \
+      } \
+    }
+
+    /** Does the article need to be posted? */
+    LOCAL_ITEM_FLAG_METHOD( doPost, setDoPost, Akobackit::ARTICLE_FLAG_DO_POST )
+    /** Already posted? */
+    LOCAL_ITEM_FLAG_METHOD( posted, setPosted, Akobackit::ARTICLE_FLAG_POSTED )
+    /** Does the article need be mailed? */
+    LOCAL_ITEM_FLAG_METHOD( doMail, setDoMail, Akobackit::ARTICLE_FLAG_DO_MAIL )
+    /** Already mailed? */
+    LOCAL_ITEM_FLAG_METHOD( mailed, setMailed, Akobackit::ARTICLE_FLAG_MAILED )
+    /** Can the article be edited? */
+    LOCAL_ITEM_FLAG_METHOD( editDisabled, setEditDisabled, Akobackit::ARTICLE_FLAG_EDIT_DISABLED )
+    /** The article was canceled? */
+    LOCAL_ITEM_FLAG_METHOD( canceled, setCanceled, Akobackit::ARTICLE_FLAG_CANCELED )
+#undef LOCAL_ITEM_FLAG_METHOD
 };
 
 }

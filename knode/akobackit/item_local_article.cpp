@@ -43,6 +43,7 @@ Akonadi::Item LocalArticle::item()
   mItem.setMimeType( "message/news" );
   assemble(); // mandated by encodedContent()
   mItem.setPayloadFromData( encodedContent() );
+
   return mItem;
 }
 

@@ -248,11 +248,11 @@ void LocalFoldersSetupJob::ensureSpecialCollectionExists()
   // Find existing collection with suitable name and reused them
   foreach ( const Akonadi::Collection &c, mCollections ) {
     Akonadi::SpecialMailCollections::Type type = Akonadi::SpecialMailCollections::Invalid;
-    if ( c.remoteId() == "outbox" ) {
+    if ( c.remoteId().compare( "outbox", Qt::CaseInsensitive ) ) {
       type = Akonadi::SpecialMailCollections::Outbox;
-    } else if ( c.remoteId() == "sent-mail" ) {
+    } else if ( c.remoteId().compare( "sent-mail", Qt::CaseInsensitive ) ) {
       type = Akonadi::SpecialMailCollections::SentMail;
-    } else if ( c.remoteId() == "drafts" ) {
+    } else if ( c.remoteId().compare( "drafts", Qt::CaseInsensitive ) ) {
       type = Akonadi::SpecialMailCollections::Drafts;
     }
 
@@ -273,11 +273,20 @@ void LocalFoldersSetupJob::ensureSpecialCollectionExists()
   foreach ( Akonadi::SpecialMailCollections::Type type, specialCollections ) {
     job->requestCollection( type, mResource );
   }
+  connect( job, SIGNAL( result( KJob * ) ), this, SLOT( ensureSpecialCollectionExistsResult( KJob * ) ) );
   job->start();
-  // Note: error not handled
+}
+
+void LocalFoldersSetupJob::ensureSpecialCollectionExistsResult( KJob *job )
+{
+  if ( job->error() ) {
+    setError( SpecialCollectionSetupError );
+    setErrorText( i18n( "Unable to setup some local folders correctly." ) );
+  }
 
   emitResult();
 }
+
 
 
 }

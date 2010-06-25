@@ -24,6 +24,7 @@
 
 #include <Akonadi/ItemModifyJob>
 #include <Akonadi/ItemCreateJob>
+#include <KDebug>
 #include <QtCore/QTimer>
 
 namespace KNode {
@@ -31,11 +32,9 @@ namespace Akobackit {
 
 ItemsMergeJob::ItemsMergeJob( const LocalArticle::List &articles,
                               const Akonadi::Collection &destination, QObject *parent )
-  : KJob( parent ),
+  : Akonadi::TransactionSequence( parent ),
     mArticles( articles ),
-    mDestination( destination ),
-    mCreationCount( 0 ),
-    mModificationCount( 0 )
+    mDestination( destination )
 {
 }
 
@@ -43,60 +42,29 @@ ItemsMergeJob::~ItemsMergeJob()
 {
 }
 
-
-void ItemsMergeJob::start()
-{
-  QTimer::singleShot( 0, this, SLOT( doStart() ) );
-}
-
 void ItemsMergeJob::doStart()
 {
+  if ( mArticles.isEmpty() ) {
+    kError() << "Empty article list: aborting job without error";
+    emitResult();
+  }
+
   foreach ( LocalArticle::Ptr art, mArticles ) {
-    const Akonadi::Item item = art->item();
+    Akonadi::Item item = art->item();
     if ( item.isValid() ) {
-      // TODO: Change parent collection to move the item
+      if ( mDestination.isValid() ) {
+        item.setParentCollection( mDestination );
+      }
       Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( item, this );
-      addSubjob( job, item );
+      addSubjob( job );
     } else {
       Q_ASSERT( mDestination.isValid() );
       Akonadi::ItemCreateJob *job = new Akonadi::ItemCreateJob( item, mDestination, this );
-      addSubjob( job, item );
+      addSubjob( job );
     }
   }
 
-  setTotalAmount( KJob::Files, mSubjobs.size() );
-}
-
-void ItemsMergeJob::addSubjob( KJob *job, const Akonadi::Item &i )
-{
-  connect( job, SIGNAL( result( KJob * ) ),
-           this, SLOT( slotResult( KJob * ) ) );
-  mSubjobs.insert( job, i );
-}
-
-
-
-
-void ItemsMergeJob::slotResult( KJob *job )
-{
-  Q_ASSERT( mSubjobs.contains( job ) );
-  Akonadi::Item item = mSubjobs.take( job );
-
-  if ( job->error() ) {
-    mErrors.insert( item, job->error() );
-    mErrorStrings.insert( item , job->errorString() );
-  } else {
-    if ( qobject_cast<Akonadi::ItemModifyJob*>( job ) ) {
-      ++mModificationCount;
-    } else if ( qobject_cast<Akonadi::ItemCreateJob*>( job ) ) {
-      ++mCreationCount;
-    }
-  }
-
-  setProcessedAmount( KJob::Files, ( totalAmount( KJob::Files ) - mSubjobs.size() ) );
-  if ( mSubjobs.isEmpty() ) {
-    emitResult();
-  }
+  TransactionSequence::doStart();
 }
 
 

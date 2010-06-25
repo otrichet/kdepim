@@ -23,13 +23,12 @@
 #ifndef KNODE_AKOBACKIT_LOCALFOLDERSSETUPJOB_H
 #define KNODE_AKOBACKIT_LOCALFOLDERSSETUPJOB_H
 
+#include "knode_export.h"
+
 #include <Akonadi/AgentInstance>
 #include <Akonadi/Collection>
 #include <KJob>
 
-namespace Akonadi {
-  class AgentInstance;
-}
 
 namespace KNode {
 namespace Akobackit {
@@ -43,7 +42,7 @@ namespace Akobackit {
  * are recover based on their name if the folder exists but it does not have its special
  * flags in Akonadi.
  */
-class LocalFoldersSetupJob : public KJob
+class KNODE_EXPORT LocalFoldersSetupJob : public KJob
 {
   Q_OBJECT
 
@@ -143,9 +142,13 @@ class LocalFoldersSetupJob : public KJob
      */
     void synchronizationFinished( KJob *job );
     /**
-     * Result slot the for the collections fetch.
+     * Result slot for the collections fetch.
      */
     void collectionsFetched( KJob *job );
+    /**
+     * Result slot for the special collection creation.
+     */
+    void ensureSpecialCollectionExistsResult( KJob *job );
 
 };
 

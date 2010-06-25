@@ -14,37 +14,33 @@
 
 #include "knfolder.h"
 
-#include "articlewidget.h"
-#include "knarticlefactory.h"
-#include "knarticlemanager.h"
-#include "knarticlewindow.h"
-#include "kncollectionviewitem.h"
+// #include "knarticlemanager.h"
 #include "knfoldermanager.h"
-#include "knglobals.h"
-#include "knhdrviewitem.h"
-#include "knmainwidget.h"
-#include "utilities.h"
-#include "utils/scoped_cursor_override.h"
-
+// #include "knglobals.h"
+//
 #include <QFileInfo>
 #include <kconfig.h>
+#include <KConfigGroup>
 #include <kstandarddirs.h>
 #include <kdebug.h>
-#include <klocale.h>
+// #include <klocale.h>
+//
+// using namespace KNode;
 
-using namespace KNode;
-using namespace KNode::Utilities;
 
-
-KNFolder::KNFolder()
+KNFolder::KNFolder( KNFolderManager *manager )
   : KNArticleCollection( KNArticleCollection::Ptr() ),
-    i_d(-1), p_arentId(-1), i_ndexDirty(false), w_asOpen(true)
+    i_d( -1 ),
+    p_arentId( -1 ), i_ndexDirty(false),
+    mManager( manager )
 {
 }
 
 
-KNFolder::KNFolder( int id, const QString &name, KNFolder::Ptr parent )
-  : KNArticleCollection(parent), i_d(id), i_ndexDirty(false), w_asOpen(true)
+KNFolder::KNFolder( KNFolderManager *manager, int id, const QString &name, KNFolder::Ptr parent )
+  : KNArticleCollection( parent ),
+    i_d( id ), i_ndexDirty(false),
+    mManager( manager )
 {
   QString fname=path()+QString("custom_%1").arg(i_d);
 
@@ -62,8 +58,10 @@ KNFolder::KNFolder( int id, const QString &name, KNFolder::Ptr parent )
 }
 
 
-KNFolder::KNFolder( int id, const QString &name, const QString &prefix, KNFolder::Ptr parent )
-  : KNArticleCollection(parent), i_d(id), i_ndexDirty(false), w_asOpen(true)
+KNFolder::KNFolder( KNFolderManager *manager, int id, const QString &name, const QString &prefix, KNFolder::Ptr parent )
+  : KNArticleCollection( parent ),
+    i_d( id ), i_ndexDirty(false),
+    mManager( manager )
 {
   QString fname=path()+QString("%1_%2").arg(prefix).arg(i_d);
 
@@ -85,17 +83,6 @@ KNFolder::~KNFolder()
 {
   closeFiles();
 }
-
-
-void KNFolder::updateListItem()
-{
-  if(l_istItem) {
-    l_istItem->setLabelText( n_ame );
-    if (!isRootFolder())
-      l_istItem->setTotalCount( c_ount );
-  }
-}
-
 
 QString KNFolder::path()
 {
@@ -120,7 +107,6 @@ bool KNFolder::readInfo(const QString &infoPath)
     i_d=grp.readEntry("id", -1);
     p_arentId=grp.readEntry("parentId", -1);
   }
-  w_asOpen=grp.readEntry("wasOpen", true);
 
   if(i_d>-1) {
     QFileInfo fi(infoPath);
@@ -142,22 +128,20 @@ bool KNFolder::readInfo()
   return readInfo(i_nfoPath);
 }
 
-
-void KNFolder::writeConfig()
-{
-  if(!i_nfoPath.isEmpty()) {
-    KConfig info(i_nfoPath, KConfig::SimpleConfig);
-    KConfigGroup grp(&info, QString());
-    if (!isRootFolder() && !isStandardFolder()) {
-      grp.writeEntry("name", n_ame);
-      grp.writeEntry("id", i_d);
-      grp.writeEntry("parentId", p_arentId);
-    }
-    if(l_istItem)
-      grp.writeEntry("wasOpen", l_istItem->isExpanded());
-  }
-}
-
+//
+// void KNFolder::writeConfig()
+// {
+//   if(!i_nfoPath.isEmpty()) {
+//     KConfig info(i_nfoPath, KConfig::SimpleConfig);
+//     KConfigGroup grp(&info, QString());
+//     if (!isRootFolder() && !isStandardFolder()) {
+//       grp.writeEntry("name", n_ame);
+//       grp.writeEntry("id", i_d);
+//       grp.writeEntry("parentId", p_arentId);
+//     }
+//   }
+// }
+//
 
 void KNFolder::setParent( KNCollection::Ptr p )
 {
@@ -169,18 +153,18 @@ void KNFolder::setParent( KNCollection::Ptr p )
 bool KNFolder::loadHdrs()
 {
   if(isLoaded()) {
-    kDebug(5003) <<"KNFolder::loadHdrs() : already loaded";
+    kDebug() <<"already loaded";
     return true;
   }
 
   if(!i_ndexFile.open(QIODevice::ReadOnly)) {
-    kError(5003) <<"KNFolder::loadHdrs() : cannot open index-file!";
+    kError() << "cannot open index-file!";
     closeFiles();
     return false;
   }
 
   if(!m_boxFile.open(QIODevice::ReadOnly)) {
-    kError(5003) <<"KNFolder::loadHdrs() : cannot open mbox-file!";
+    kError() << "cannot open mbox-file!";
     closeFiles();
     return false;
   }
@@ -190,21 +174,17 @@ bool KNFolder::loadHdrs()
   DynData dynamic;
   int pos1=0, pos2=0, cnt=0, byteCount;
 
-  ScopedCursorOverride cursor( Qt::WaitCursor );
-  knGlobals.setStatusMsg(i18n(" Loading folder..."));
-  knGlobals.top->secureProcessEvents();
-
   while(!i_ndexFile.atEnd()) {
 
     //read index-data
     byteCount=i_ndexFile.read((char*)(&dynamic), sizeof(DynData));
     if(byteCount!=sizeof(DynData)) {
       if( i_ndexFile.error() == QFile::NoError ) {
-        kWarning(5003) <<"KNFolder::loadHeaders() : found broken entry in index-file: Ignored!";
+        kWarning() <<"KNFolder::loadHeaders() : found broken entry in index-file: Ignored!";
         continue;
       }
       else {
-        kError(5003) <<"KNFolder::loadHeaders() : corrupted index-file, IO-error!";
+        kError() <<"KNFolder::loadHeaders() : corrupted index-file, IO-error!";
         closeFiles();
         clear();
         return false;
@@ -218,7 +198,7 @@ bool KNFolder::loadHdrs()
 
     //read overview
     if ( !m_boxFile.seek( art->startOffset() ) ) {
-      kError(5003) <<"KNFolder::loadHdrs() : cannot set mbox file-pointer!";
+      kError() <<"KNFolder::loadHdrs() : cannot set mbox file-pointer!";
       closeFiles();
       clear();
       return false;
@@ -228,11 +208,11 @@ bool KNFolder::loadHdrs()
       tmp.resize( tmp.length() - 1 );
     if(tmp.isEmpty()) {
       if( m_boxFile.error() == QFile::NoError ) {
-        kWarning(5003) <<"found broken entry in mbox-file: Ignored!";
+        kWarning() <<"found broken entry in mbox-file: Ignored!";
         continue;
       }
       else {
-        kError(5003) <<"KNFolder::loadHdrs() : corrupted mbox-file, IO-error!";
+        kError() <<"KNFolder::loadHdrs() : corrupted mbox-file, IO-error!";
         closeFiles();
         clear();
         return false;
@@ -282,34 +262,31 @@ bool KNFolder::loadHdrs()
   closeFiles();
   setLastID();
   c_ount=cnt;
-  updateListItem();
-
-  knGlobals.setStatusMsg( QString() );
 
   return true;
 }
 
-
-bool KNFolder::unloadHdrs(bool force)
-{
-  if ( lockedArticles() > 0 ) {
-    return false;
-  }
-
-  if (!force && isNotUnloadable())
-    return false;
-
-  KNLocalArticle::Ptr a;
-  for(int idx=0; idx<length(); idx++) {
-    a=at(idx);
-    if (a->hasContent() && !knGlobals.articleManager()->unloadArticle(a, force))
-      return false;
-  }
-  syncIndex();
-  clear();
-
-  return true;
-}
+//
+// bool KNFolder::unloadHdrs(bool force)
+// {
+//   if ( lockedArticles() > 0 ) {
+//     return false;
+//   }
+//
+//   if (!force && isNotUnloadable())
+//     return false;
+//
+//   KNLocalArticle::Ptr a;
+//   for(int idx=0; idx<length(); idx++) {
+//     a=at(idx);
+//     if (a->hasContent() && !knGlobals.articleManager()->unloadArticle(a, force))
+//       return false;
+//   }
+//   syncIndex();
+//   clear();
+//
+//   return true;
+// }
 
 bool KNFolder::loadArticle( KNLocalArticle::Ptr a )
 {
@@ -351,188 +328,187 @@ bool KNFolder::loadArticle( KNLocalArticle::Ptr a )
   return true;
 }
 
-
-bool KNFolder::saveArticles( KNLocalArticle::List &l )
-{
-  if(!isLoaded())  // loading should not be done here - keep the StorageManager in sync !!
-    return false;
-
-  if(!m_boxFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
-    kError(5003) <<"KNFolder::saveArticles() : cannot open mbox-file!";
-    closeFiles();
-    return false;
-  }
-
-  int addCnt=0;
-  bool ret=true;
-  bool clear=false;
-  QTextStream ts(&m_boxFile);
-  ts.setCodec( "ISO 8859-1" );
-
-  for ( KNLocalArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
-
-    clear=false;
-    if ( (*it)->id() == -1 || (*it)->collection().get() != this ) {
-      if ( (*it)->id() != -1 ) {
-        KNFolder::Ptr oldFolder = boost::static_pointer_cast<KNFolder>( (*it)->collection() );
-        if ( !(*it)->hasContent() )
-          if( !( clear = oldFolder->loadArticle( (*it) ) ) ) {
-            ret = false;
-            continue;
-          }
-
-        KNLocalArticle::List l;
-        l.append( (*it) );
-        oldFolder->removeArticles( l, false );
-      }
-      append( (*it) );
-      (*it)->setCollection( thisFolderPtr() );
-      addCnt++;
-    }
-
-    if ( byId( (*it)->id() ) == (*it) ) {
-
-      //MBox
-      ts << "From aaa@aaa Mon Jan 01 00:00:00 1997\n";
-      ts.flush();
-      (*it)->setStartOffset( m_boxFile.pos() ); //save offset
-
-      //write overview information
-      ts << "X-KNode-Overview: ";
-      ts << (*it)->subject()->as7BitString(false) << '\t';
-
-      KMime::Headers::Base* h;
-      if( ( h = (*it)->newsgroups( false ) ) !=0 )
-        ts << h->as7BitString(false);
-      ts << '\t';
-
-      if( (h = (*it)->to( false ) ) != 0 )
-        ts << h->as7BitString(false);
-      ts << '\t';
-
-      ts << (*it)->lines()->as7BitString(false) << '\n';
-
-      //write article
-      (*it)->toStream( ts );
-      ts << "\n";
-      ts.flush();
-
-      (*it)->setEndOffset( m_boxFile.pos() ); //save offset
-
-      //update
-      ArticleWidget::articleChanged( (*it) );
-      i_ndexDirty=true;
-
-    }
-    else {
-      kError(5003) <<"KNFolder::saveArticle() : article not in folder!";
-      ret=false;
-    }
-
-    if ( clear )
-      (*it)->KNLocalArticle::Content::clear();
-  }
-
-  closeFiles();
-  syncIndex();
-
-  if(addCnt>0) {
-    c_ount=length();
-    updateListItem();
-    knGlobals.articleManager()->updateViewForCollection( thisFolderPtr() );
-  }
-
-  return ret;
-}
-
-
-void KNFolder::removeArticles( KNLocalArticle::List &l, bool del )
-{
-  if( !isLoaded() || l.isEmpty() )
-    return;
-
-  int delCnt = 0;
-  for ( int idx = 0; idx < l.count(); ++idx ) {
-    KNLocalArticle::Ptr a = l[ idx ];
-    if ( a->isLocked() ) {
-      continue;
-    }
-
-    // check if this article belongs to this folder
-    a = byId( a->id() );
-    if ( !a ) {
-      continue;
-    }
-
-    //update
-    KNGlobals::self()->articleFactory()->deleteComposerForArticle(a);
-    ArticleWindow::closeAllWindowsForArticle( a );
-    ArticleWidget::articleRemoved( a );
-    delete a->listItem();
-
-    //delete article
-    remove( a );
-    delCnt++;
-    if(!del)
-      a->setId(-1);
-  }
-
-  if(delCnt>0) {
-    compact();
-    c_ount-=delCnt;
-    updateListItem();
-    i_ndexDirty=true;
-  }
-}
-
-
-void KNFolder::deleteAll()
-{
-  if ( lockedArticles() > 0 ) {
-    return;
-  }
-
-  if (!unloadHdrs(true))
-    return;
-
-  clear();
-  c_ount=0;
-  syncIndex(true);
-  updateListItem();
-}
-
-
-void KNFolder::deleteFiles()
-{
-  m_boxFile.remove();
-  i_ndexFile.remove();
-  QFile::remove(i_nfoPath);
-}
-
-
-void KNFolder::syncIndex(bool force)
-{
-  if(!i_ndexDirty && !force)
-    return;
-
-  if(!i_ndexFile.open(QIODevice::WriteOnly)) {
-    kError(5003) <<"KNFolder::syncIndex(bool force) : cannot open index-file!";
-    closeFiles();
-    return;
-  }
-
-  KNLocalArticle::Ptr a;
-  DynData d;
-  for(int idx=0; idx<length(); idx++) {
-    a=at(idx);
-    d.setData(a);
-    i_ndexFile.write((char*)(&d), sizeof(DynData));
-  }
-  closeFiles();
-
-  i_ndexDirty=false;
-}
-
+//
+// bool KNFolder::saveArticles( KNLocalArticle::List &l )
+// {
+//   if(!isLoaded())  // loading should not be done here - keep the StorageManager in sync !!
+//     return false;
+//
+//   if(!m_boxFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+//     kError(5003) <<"KNFolder::saveArticles() : cannot open mbox-file!";
+//     closeFiles();
+//     return false;
+//   }
+//
+//   int addCnt=0;
+//   bool ret=true;
+//   bool clear=false;
+//   QTextStream ts(&m_boxFile);
+//   ts.setCodec( "ISO 8859-1" );
+//
+//   for ( KNLocalArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
+//
+//     clear=false;
+//     if ( (*it)->id() == -1 || (*it)->collection().get() != this ) {
+//       if ( (*it)->id() != -1 ) {
+//         KNFolder::Ptr oldFolder = boost::static_pointer_cast<KNFolder>( (*it)->collection() );
+//         if ( !(*it)->hasContent() )
+//           if( !( clear = oldFolder->loadArticle( (*it) ) ) ) {
+//             ret = false;
+//             continue;
+//           }
+//
+//         KNLocalArticle::List l;
+//         l.append( (*it) );
+//         oldFolder->removeArticles( l, false );
+//       }
+//       append( (*it) );
+//       (*it)->setCollection( thisFolderPtr() );
+//       addCnt++;
+//     }
+//
+//     if ( byId( (*it)->id() ) == (*it) ) {
+//
+//       //MBox
+//       ts << "From aaa@aaa Mon Jan 01 00:00:00 1997\n";
+//       ts.flush();
+//       (*it)->setStartOffset( m_boxFile.pos() ); //save offset
+//
+//       //write overview information
+//       ts << "X-KNode-Overview: ";
+//       ts << (*it)->subject()->as7BitString(false) << '\t';
+//
+//       KMime::Headers::Base* h;
+//       if( ( h = (*it)->newsgroups( false ) ) !=0 )
+//         ts << h->as7BitString(false);
+//       ts << '\t';
+//
+//       if( (h = (*it)->to( false ) ) != 0 )
+//         ts << h->as7BitString(false);
+//       ts << '\t';
+//
+//       ts << (*it)->lines()->as7BitString(false) << '\n';
+//
+//       //write article
+//       (*it)->toStream( ts );
+//       ts << "\n";
+//       ts.flush();
+//
+//       (*it)->setEndOffset( m_boxFile.pos() ); //save offset
+//
+//       //update
+//       ArticleWidget::articleChanged( (*it) );
+//       i_ndexDirty=true;
+//
+//     }
+//     else {
+//       kError(5003) <<"KNFolder::saveArticle() : article not in folder!";
+//       ret=false;
+//     }
+//
+//     if ( clear )
+//       (*it)->KNLocalArticle::Content::clear();
+//   }
+//
+//   closeFiles();
+//   syncIndex();
+//
+//   if(addCnt>0) {
+//     c_ount=length();
+//     updateListItem();
+//     knGlobals.articleManager()->updateViewForCollection( thisFolderPtr() );
+//   }
+//
+//   return ret;
+// }
+//
+//
+// void KNFolder::removeArticles( KNLocalArticle::List &l, bool del )
+// {
+//   if( !isLoaded() || l.isEmpty() )
+//     return;
+//
+//   int delCnt = 0;
+//   for ( int idx = 0; idx < l.count(); ++idx ) {
+//     KNLocalArticle::Ptr a = l[ idx ];
+//     if ( a->isLocked() ) {
+//       continue;
+//     }
+//
+//     // check if this article belongs to this folder
+//     a = byId( a->id() );
+//     if ( !a ) {
+//       continue;
+//     }
+//
+//     //update
+//     KNGlobals::self()->articleFactory()->deleteComposerForArticle(a);
+//     ArticleWindow::closeAllWindowsForArticle( a );
+//     ArticleWidget::articleRemoved( a );
+//     delete a->listItem();
+//
+//     //delete article
+//     remove( a );
+//     delCnt++;
+//     if(!del)
+//       a->setId(-1);
+//   }
+//
+//   if(delCnt>0) {
+//     compact();
+//     c_ount-=delCnt;
+//     updateListItem();
+//     i_ndexDirty=true;
+//   }
+// }
+//
+//
+// void KNFolder::deleteAll()
+// {
+//   if ( lockedArticles() > 0 ) {
+//     return;
+//   }
+//
+//   if (!unloadHdrs(true))
+//     return;
+//
+//   clear();
+//   c_ount=0;
+//   syncIndex(true);
+// }
+//
+//
+// void KNFolder::deleteFiles()
+// {
+//   m_boxFile.remove();
+//   i_ndexFile.remove();
+//   QFile::remove(i_nfoPath);
+// }
+//
+//
+// void KNFolder::syncIndex(bool force)
+// {
+//   if(!i_ndexDirty && !force)
+//     return;
+//
+//   if(!i_ndexFile.open(QIODevice::WriteOnly)) {
+//     kError(5003) <<"KNFolder::syncIndex(bool force) : cannot open index-file!";
+//     closeFiles();
+//     return;
+//   }
+//
+//   KNLocalArticle::Ptr a;
+//   DynData d;
+//   for(int idx=0; idx<length(); idx++) {
+//     a=at(idx);
+//     d.setData(a);
+//     i_ndexFile.write((char*)(&d), sizeof(DynData));
+//   }
+//   closeFiles();
+//
+//   i_ndexDirty=false;
+// }
+//
 
 void KNFolder::closeFiles()
 {
@@ -546,21 +522,21 @@ void KNFolder::closeFiles()
 //==============================================================================
 
 
-void KNFolder::DynData::setData( KNLocalArticle::Ptr a )
-{
-  id=a->id();
-  so=a->startOffset();
-  eo=a->endOffset();
-  sId=a->serverId();
-  ti=a->date()->dateTime().toTime_t();
-
-  flags[0]=a->doMail();
-  flags[1]=a->mailed();
-  flags[2]=a->doPost();
-  flags[3]=a->posted();
-  flags[4]=a->canceled();
-  flags[5]=a->editDisabled();
-}
+// void KNFolder::DynData::setData( KNLocalArticle::Ptr a )
+// {
+//   id=a->id();
+//   so=a->startOffset();
+//   eo=a->endOffset();
+//   sId=a->serverId();
+//   ti=a->date()->dateTime().toTime_t();
+//
+//   flags[0]=a->doMail();
+//   flags[1]=a->mailed();
+//   flags[2]=a->doPost();
+//   flags[3]=a->posted();
+//   flags[4]=a->canceled();
+//   flags[5]=a->editDisabled();
+// }
 
 
 void KNFolder::DynData::getData( KNLocalArticle::Ptr a )
@@ -583,17 +559,5 @@ void KNFolder::DynData::getData( KNLocalArticle::Ptr a )
 
 KNFolder::Ptr KNFolder::thisFolderPtr()
 {
-  return KNGlobals::self()->folderManager()->folder( id() );
+  return mManager->folder( id() );
 }
-
-
-
-
-
-
-
-
-
-
-
-
