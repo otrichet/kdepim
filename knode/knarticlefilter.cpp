@@ -29,7 +29,6 @@ static const char *defFil[] = { "all","unread","new","watched","threads with unr
                                 "threads with new","own articles","threads with own articles", 0 };
 void dummyFilter()
 {
-#if 0
   i18nc("default filter name","all");
   i18nc("default filter name","unread");
   i18nc("default filter name","new");
@@ -38,9 +37,7 @@ void dummyFilter()
   i18nc("default filter name","threads with new");
   i18nc("default filter name","own articles");
   i18nc("default filter name","threads with own articles");
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+
 }
 
 
@@ -58,7 +55,6 @@ KNArticleFilter::KNArticleFilter(int id)
 KNArticleFilter::KNArticleFilter(const KNArticleFilter& org)
 : i_d(-1), c_ount(0), l_oaded(false), e_nabled(org.e_nabled), translateName(true), s_earchFilter(org.s_earchFilter), apon(org.apon)
 {
-#if 0
   status = org.status;
   score = org.score;
   age = org.age;
@@ -67,9 +63,6 @@ KNArticleFilter::KNArticleFilter(const KNArticleFilter& org)
   from = org.from;
   messageId = org.messageId;
   references = org.messageId;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -82,7 +75,6 @@ KNArticleFilter::~KNArticleFilter()
 
 bool KNArticleFilter::loadInfo()
 {
-#if 0
   if (i_d!=-1) {
     QString fname( KStandardDirs::locate( "data",
                                           QString( "knode/filters/%1.fltr" ).arg( i_d ) ) );
@@ -99,16 +91,12 @@ bool KNArticleFilter::loadInfo()
     return true;
   }
   return false;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNArticleFilter::load()
 {
-#if 0
   QString fname(KStandardDirs::locate( "data", QString( "knode/filters/%1.fltr" ).arg( i_d ) ) );
 
   if (fname.isNull())
@@ -142,17 +130,12 @@ void KNArticleFilter::load()
   l_oaded=true;
 
   kDebug(5003) <<"KNMessageFilter: filter loaded \"" << n_ame <<"\"";
-
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNArticleFilter::save()
 {
-#if 0
   if (i_d==-1)
     return;
   QString dir( KStandardDirs::locateLocal( "data", "knode/filters/" ) );
@@ -193,9 +176,6 @@ void KNArticleFilter::save()
   references.save(group);
 
   kDebug(5003) <<"KNMessageFilter: filter saved \"" << n_ame <<"\"";
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -333,7 +313,6 @@ void KNArticleFilter::doFilter( KNFolder::Ptr f )
 // *tries* to translate the name
 QString KNArticleFilter::translatedName()
 {
-#if 0
   if (translateName) {
     // major hack alert !!!
     if (!n_ame.isEmpty()) {
@@ -345,9 +324,6 @@ QString KNArticleFilter::translatedName()
       return QString();
   } else
     return n_ame;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -355,7 +331,6 @@ QString KNArticleFilter::translatedName()
 // *tries* to retranslate the name to english
 void KNArticleFilter::setTranslatedName(const QString &s)
 {
-#if 0
   bool retranslated = false;
   for (const char **c=defFil;(*c)!=0;c++)   // ok, try if it matches any of the standard filter names
     if (s==i18nc("default filter name",*c)) {
@@ -369,17 +344,14 @@ void KNArticleFilter::setTranslatedName(const QString &s)
     translateName = false;  // and don't try to translate it, so a german user *can* use the original english name
   } else
     translateName = true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 bool KNArticleFilter::applyFilter( KNRemoteArticle::Ptr a )
 {
-#if 0
   bool result=true;
+#if 0
 
   if(result) result=status.doFilter(a);
   if(result) result=score.doFilter(a->score());
@@ -399,17 +371,17 @@ bool KNArticleFilter::applyFilter( KNRemoteArticle::Ptr a )
   a->setFilterResult(result);
   a->setFiltered(true);
 
-  return result;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  return result;
 }
 
 
 bool KNArticleFilter::applyFilter( KNLocalArticle::Ptr a )
 {
-#if 0
   bool result=true;
+#if 0
 
   if (isSearchFilter()) {
     if(result) result=lines.doFilter(a->lines()->numberOfLines());
@@ -427,9 +399,9 @@ bool KNArticleFilter::applyFilter( KNLocalArticle::Ptr a )
   }
 
   a->setFilterResult(result);
-
-  return result;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+
+  return result;
 }

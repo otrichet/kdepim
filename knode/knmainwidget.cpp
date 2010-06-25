@@ -14,8 +14,12 @@
 
 #include "knmainwidget.h"
 
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/folder_manager.h"
+#include "collectiontree/widget.h"
 #include "headerview.h"
 
+#include <Akonadi/Collection>
 #include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
@@ -75,11 +79,10 @@ using namespace KNode;
 
 KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   KVBox( parent ),
-  c_olView( 0 ),
   b_lockui( false ),
-  m_GUIClient( client )
+  m_GUIClient( client ),
+  mCollectionWidget( 0 )
 {
-#if 0
   (void) new KnodeAdaptor( this );
   QDBusConnection::sessionBus().registerObject("/KNode", this);
   knGlobals.top=this;
@@ -106,16 +109,14 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   mSecondSplitter->setObjectName( "mSecondSplitter" );
 
   //article view
-  mArticleViewer = new ArticleWidget( mPrimarySplitter, client, actionCollection(), true/*main viewer*/ );
+  mArticleViewer = new ArticleWidget( mSecondSplitter, client, actionCollection(), true/*main viewer*/ );
 
   //collection view
-  c_olView = new KNCollectionView( mSecondSplitter );
+  mCollectionWidget = new CollectionTree::Widget( client, mPrimarySplitter );
 
-  connect( c_olView, SIGNAL(itemSelectionChanged()),
-           this, SLOT(slotCollectionSelected()) );
-  connect( c_olView, SIGNAL(contextMenu(QTreeWidgetItem*, const QPoint&)),
-           this, SLOT(slotCollectionRMB(QTreeWidgetItem*, const QPoint&)) );
-  connect( c_olView, SIGNAL(renamed(QTreeWidgetItem*)),
+  connect( mCollectionWidget, SIGNAL( selectedCollectionChanged( const Akonadi::Collection & ) ),
+           this, SLOT( slotCollectionSelected( const Akonadi::Collection & ) ) );
+  connect( mCollectionWidget, SIGNAL( renamed( QTreeWidgetItem * ) ),
            this, SLOT(slotCollectionRenamed(QTreeWidgetItem*)) );
 
   accel->connectItem( accel->insertItem(Qt::Key_Up), mArticleViewer, SLOT(scrollUp()) );
@@ -156,7 +157,7 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   initActions();
 
   // splitter setup
-  mPrimarySplitter->addWidget( c_olView );
+  mPrimarySplitter->addWidget( mCollectionWidget );
   mPrimarySplitter->addWidget( mSecondSplitter );
   mSecondSplitter->addWidget( dummy );
   mSecondSplitter->addWidget( mArticleViewer );
@@ -166,7 +167,11 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   //-------------------------------- <CORE> ------------------------------------
 
   //Network
+#if 0
   connect( knGlobals.scheduler(), SIGNAL(netActive(bool)), this, SLOT(slotNetworkActive(bool)) );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 
   //Filter Manager
   f_ilManager = knGlobals.filterManager();
@@ -175,15 +180,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   //Article Manager
   a_rtManager = knGlobals.articleManager();
   a_rtManager->setView(h_drView);
-
-  //Group Manager
-  g_rpManager = knGlobals.groupManager();
-
-  //Folder Manager
-  f_olManager = knGlobals.folderManager();
-
-  //Account Manager
-  a_ccManager = knGlobals.accountManager();
 
   //Article Factory
   a_rtFactory = KNGlobals::self()->articleFactory();
@@ -202,15 +198,7 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   //apply configuration
   configChanged();
 
-  // set the keyboard focus indicator on the first item in the Collection View
-  if( c_olView->firstItem() ) {
-    QTreeWidgetItem *i = c_olView->firstItem();
-    bool open = i->isExpanded();
-    c_olView->setActive( i );
-    i->setExpanded( open );
-  }
-
-  c_olView->setFocus();
+  mCollectionWidget->setFocus();
 
   setStatusMsg();
 
@@ -222,9 +210,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   actionCollection()->addAssociatedWidget( this );
   foreach (QAction* action, actionCollection()->actions())
     action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 KNMainWidget::~KNMainWidget()
@@ -233,13 +218,13 @@ KNMainWidget::~KNMainWidget()
   // Avoid that removals of items from c_olView call this object back and lead to a crash.
   disconnect( c_olView, SIGNAL(itemSelectionChanged()),
               this, SLOT(slotCollectionSelected()) );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 
   //delete a_ccel;
 
   h_drView->clear(); //avoid some random crashes in KNHdrViewItem::~KNHdrViewItem()
-
-  delete knGlobals.scheduler();
-  kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Scheduler deleted";
 
   delete a_rtManager;
   kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Article Manager deleted";
@@ -247,32 +232,15 @@ KNMainWidget::~KNMainWidget()
   delete a_rtFactory;
   kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Article Factory deleted";
 
-  delete g_rpManager;
-  kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Group Manager deleted";
-
-  delete f_olManager;
-  kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Folder Manager deleted";
-
   delete f_ilManager;
   kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Filter Manager deleted";
 
-  delete a_ccManager;
-  kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Account Manager deleted";
-
   delete c_fgManager;
   kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Config deleted";
-
-  delete knGlobals.memoryManager();
-  kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Memory Manager deleted";
-
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNMainWidget::initStatusBar()
 {
-#if 0
   //statusbar
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KStatusBar *sb =  mainWin ? mainWin->statusBar() : 0;
@@ -282,16 +250,12 @@ void KNMainWidget::initStatusBar()
   s_tatusGroup = new KSqueezedTextLabel( QString(), sb );
   s_tatusGroup->setTextElideMode( Qt::ElideRight );
   s_tatusGroup->setAlignment( Qt::AlignLeft | Qt::AlignVCenter );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //================================== GUI =================================
 
 void KNMainWidget::setStatusMsg(const QString& text, int id)
 {
-#if 0
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
   if ( !bar )
@@ -309,22 +273,15 @@ void KNMainWidget::setStatusMsg(const QString& text, int id)
         s_tatusFilter->setText(text); break;
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::setStatusHelpMsg(const QString& text)
 {
-#if 0
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
   if ( bar )
     bar->showMessage(text, 2000);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -349,7 +306,6 @@ void KNMainWidget::updateCaption()
 
 void KNMainWidget::disableAccels(bool b)
 {
-#if 0
 #ifdef __GNUC__
 #warning Port me!
 #endif
@@ -362,16 +318,12 @@ void KNMainWidget::disableAccels(bool b)
     installEventFilter(this);
   else
     removeEventFilter(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 // processEvents with some blocking
 void KNMainWidget::secureProcessEvents()
 {
-#if 0
   b_lockui = true;
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KMenuBar *mbar =  mainWin ? mainWin->menuBar() : 0;
@@ -398,29 +350,18 @@ void KNMainWidget::secureProcessEvents()
 //   if ( naccel )
 //     naccel->setEnabled(true);
   removeEventFilter(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 QSize KNMainWidget::sizeHint() const
 {
-#if 0
   return QSize(759,478);    // default optimized for 800x600
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::openURL(const QString &url)
 {
-#if 0
   openURL(KUrl(url));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNMainWidget::openURL(const KUrl &url)
@@ -539,7 +480,6 @@ void KNMainWidget::configChanged()
 
 void KNMainWidget::initActions()
 {
-#if 0
   //a_ccel=new KAccel(this);
 
   //navigation
@@ -570,13 +510,13 @@ void KNMainWidget::initActions()
   a_ctNavNextGroup = actionCollection()->addAction("go_nextGroup");
   a_ctNavNextGroup->setIcon(KIcon("go-down"));
   a_ctNavNextGroup->setText(i18n("Ne&xt Group"));
-  connect(a_ctNavNextGroup, SIGNAL(triggered(bool)), c_olView, SLOT(nextGroup()));
+  connect(a_ctNavNextGroup, SIGNAL(triggered(bool)), mCollectionWidget, SLOT(nextGroup()));
   a_ctNavNextGroup->setShortcut(QKeySequence(Qt::Key_Plus));
 
   a_ctNavPrevGroup = actionCollection()->addAction("go_prevGroup");
   a_ctNavPrevGroup->setIcon(KIcon("go-up"));
   a_ctNavPrevGroup->setText(i18n("Pre&vious Group"));
-  connect(a_ctNavPrevGroup, SIGNAL(triggered(bool)), c_olView, SLOT(prevGroup()));
+  connect(a_ctNavPrevGroup, SIGNAL(triggered(bool)), mCollectionWidget, SLOT(prevGroup()));
   a_ctNavPrevGroup->setShortcut(QKeySequence(Qt::Key_Minus));
 
   a_ctNavReadThrough = actionCollection()->addAction("go_readThrough");
@@ -586,17 +526,17 @@ void KNMainWidget::initActions()
 
   KAction *action = actionCollection()->addAction("inc_current_folder");
   action->setText(i18n("Focus on Next Folder"));
-  connect(action, SIGNAL(triggered(bool) ), c_olView, SLOT(incCurrentFolder()));
+  connect( action, SIGNAL( triggered( bool ) ), mCollectionWidget, SLOT( incCurrentFolder() ) );
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Right));
 
   action = actionCollection()->addAction("dec_current_folder");
   action->setText(i18n("Focus on Previous Folder"));
-  connect(action, SIGNAL(triggered(bool) ), c_olView, SLOT(decCurrentFolder()));
+  connect( action, SIGNAL( triggered( bool ) ), mCollectionWidget, SLOT( decCurrentFolder() ) );
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Left));
 
   action = actionCollection()->addAction("select_current_folder");
   action->setText(i18n("Select Folder with Focus"));
-  connect(action, SIGNAL(triggered(bool) ), c_olView, SLOT(selectCurrentFolder()));
+  connect( action, SIGNAL( triggered( bool ) ), mCollectionWidget, SLOT( selectCurrentFolder() ) );
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
 
   action = actionCollection()->addAction("inc_current_article");
@@ -722,14 +662,6 @@ void KNMainWidget::initActions()
   a_ctFolRename->setIcon(KIcon("edit-rename"));
   a_ctFolRename->setText(i18n("&Rename Folder"));
   connect(a_ctFolRename, SIGNAL(triggered(bool)), SLOT(slotFolRename()));
-
-  a_ctFolCompact = actionCollection()->addAction("folder_compact");
-  a_ctFolCompact->setText(i18n("C&ompact Folder"));
-  connect(a_ctFolCompact, SIGNAL(triggered(bool)), SLOT(slotFolCompact()));
-
-  a_ctFolCompactAll = actionCollection()->addAction("folder_compact_all");
-  a_ctFolCompactAll->setText(i18n("Co&mpact All Folders"));
-  connect(a_ctFolCompactAll, SIGNAL(triggered(bool) ), SLOT(slotFolCompactAll()));
 
   a_ctFolEmpty = actionCollection()->addAction("folder_empty");
   a_ctFolEmpty->setText(i18n("&Empty Folder"));
@@ -900,14 +832,10 @@ void KNMainWidget::initActions()
   a_ctToggleQuickSearch = actionCollection()->add<KToggleAction>("settings_show_quickSearch");
   a_ctToggleQuickSearch->setText(i18n("Show Quick Search"));
   connect(a_ctToggleQuickSearch, SIGNAL(triggered(bool) ), SLOT(slotToggleQuickSearch()));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 bool KNMainWidget::firstStart()
 {
-#if 0
   KConfigGroup conf(knGlobals.config(), "GENERAL");
   QString ver = conf.readEntry("Version");
   if(!ver.isEmpty())
@@ -919,9 +847,6 @@ bool KNMainWidget::firstStart()
   conf.writeEntry("Version", KNODE_VERSION);
 
   return true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -983,10 +908,10 @@ articles.\nDo you want to quit anyway?"), QString(), KStandardGuiItem::quit(), K
   if(!a_rtFactory->closeComposeWindows())
     return false;
 
-  return true;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  return true;
 }
 
 
@@ -1031,7 +956,6 @@ void KNMainWidget::prepareShutdown()
 
 bool KNMainWidget::queryClose()
 {
-#if 0
   if(b_lockui)
     return false;
 
@@ -1041,38 +965,26 @@ bool KNMainWidget::queryClose()
   prepareShutdown();
 
   return true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::fontChange( const QFont & )
 {
-#if 0
   a_rtFactory->configChanged();
   ArticleWidget::configChanged();
   configChanged();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::paletteChange( const QPalette & )
 {
-#if 0
   ArticleWidget::configChanged();
   configChanged();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
 {
-#if 0
   if (((e->type() == QEvent::KeyPress) ||
        (e->type() == QEvent::KeyRelease) ||
        (e->type() == QEvent::Shortcut) ||
@@ -1080,9 +992,6 @@ bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
        b_lockui)
     return true;
   return QWidget::eventFilter(o, e);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1233,12 +1142,13 @@ void KNMainWidget::slotArticleSelectionChanged()
 }
 
 
-void KNMainWidget::slotCollectionSelected()
+void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotCollectionSelected(QListViewItem *i)";
+  kDebug() << "Enter";
   if(b_lockui)
     return;
+
+#if 0
   KNCollection::Ptr c;
   KNNntpAccount::Ptr selectedAccount;
   KNGroup::Ptr selectedGroup;
@@ -1347,8 +1257,7 @@ void KNMainWidget::slotCollectionSelected()
   }
 
   enabled=( selectedFolder!=0 &&  !selectedFolder->isRootFolder() );
-  if(a_ctFolCompact->isEnabled() != enabled) {
-    a_ctFolCompact->setEnabled(enabled);
+  if ( a_ctFolEmpty->isEnabled() != enabled ) {
     a_ctFolEmpty->setEnabled(enabled);
     a_ctFolMboxImport->setEnabled(enabled);
     a_ctFolMboxExport->setEnabled(enabled);
@@ -1395,35 +1304,6 @@ void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &
 
     if ( popup )
       popup->popup(p);
-  }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos )
-{
-#if 0
-  if(b_lockui)
-    return;
-
-  if(i) {
-    QMenu *popup = 0;
-    if( static_cast<KNCollectionViewItem*>( i )->collection()->type() == KNCollection::CTgroup ) {
-      popup = popupMenu( "group_popup" );
-    } else if ( static_cast<KNCollectionViewItem*>( i )->collection()->type() == KNCollection::CTfolder ) {
-      if ( boost::static_pointer_cast<KNFolder>( static_cast<KNCollectionViewItem*>( i )->collection() )->isRootFolder() ) {
-        popup = popupMenu( "root_folder_popup" );
-      } else {
-        popup = popupMenu( "folder_popup" );
-      }
-    } else {
-      popup = popupMenu( "account_popup" );
-    }
-    if ( popup ) {
-      popup->popup( pos );
-    }
   }
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
@@ -1740,125 +1620,102 @@ void KNMainWidget::slotGrpSetUnread()
 
 void KNMainWidget::slotFolNew()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolNew()";
-  KNFolder::Ptr f = f_olManager->newFolder( KNFolder::Ptr() );
+  kDebug();
 
-  if (f) {
-    f_olManager->setCurrentFolder(f);
-    c_olView->setActive( f->listItem() );
-    slotFolRename();
-  }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  Akobackit::FolderManager *folderManager = Akobackit::manager()->folderManager();
+  const Akonadi::Collection rootFolder = folderManager->rootFolder();
+  slotFolNewChild( rootFolder );
 }
 
 
-void KNMainWidget::slotFolNewChild()
+void KNMainWidget::slotFolNewChild( const Akonadi::Collection &parent )
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolNew()";
-  if(f_olManager->currentFolder()) {
-    KNFolder::Ptr f = f_olManager->newFolder( f_olManager->currentFolder() );
-
-    if (f) {
-      f_olManager->setCurrentFolder(f);
-      c_olView->setActive( f->listItem() );
-      slotFolRename();
+  kDebug();
+  Akobackit::FolderManager *folderManager = Akobackit::manager()->folderManager();
+  Akonadi::Collection parentFolder;
+  if ( folderManager->isFolder( parent ) ) {
+    parentFolder = parent;
+  } else {
+    parentFolder = mCollectionWidget->selectedCollection();
+    if ( !folderManager->isFolder( parentFolder) ) {
+      return;
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+
+  QString name = i18nc( "Default name of a newly created folder", "New folder" );
+  if ( folderManager->hasChild( parentFolder, name ) ) {
+    name = i18nc( "Default name of a newly created folder; %1=number", "New folder %1" );
+    int i = 1;
+    while ( folderManager->hasChild( parentFolder, name.arg( i ) ) ) {
+      ++i;
+    }
+    name = name.arg( i );
+  }
+  Akobackit::manager()->folderManager()->createNewFolder( parentFolder, name );
+  connect( Akobackit::manager()->folderManager(), SIGNAL( folderCreated( const Akonadi::Collection & ) ),
+            this, SLOT( slotFolRename( const Akonadi::Collection & ) ),
+            Qt::UniqueConnection );
 }
 
 
 void KNMainWidget::slotFolDelete()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolDelete()";
+  kDebug();
 
-  if(!f_olManager->currentFolder() || f_olManager->currentFolder()->isRootFolder())
+  const Akonadi::Collection f = mCollectionWidget->selectedCollection();
+  if ( !f.isValid() ) {
     return;
-
-  if(f_olManager->currentFolder()->isStandardFolder())
-    KMessageBox::sorry(knGlobals.topWidget, i18n("You cannot delete a standard folder."));
-
-  else if( KMessageBox::Continue==KMessageBox::warningContinueCancel(knGlobals.topWidget,
-      i18n("Do you really want to delete this folder and all its children?"),"",KGuiItem(i18n("&Delete"),"edit-delete")) ) {
-
-    if(!f_olManager->deleteFolder(f_olManager->currentFolder()))
-      KMessageBox::sorry(knGlobals.topWidget,
-      i18n("This folder cannot be deleted because some of\n its articles are currently in use.") );
-    else
-      slotCollectionSelected();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  Akobackit::CollectionType type = Akobackit::manager()->type( f );
+  if ( type != Akobackit::UserFolder ) {
+    return;
+  }
+
+  int res = KMessageBox::warningContinueCancel( this, i18n( "Do you really want to delete this folder and all its children?" ),
+                                                "", KGuiItem( i18nc( "@action:button", "&Delete" ), "edit-delete" ) );
+  if( KMessageBox::Continue == res ) {
+    Akobackit::manager()->folderManager()->removeFolder( f );
+  }
 }
 
 
-void KNMainWidget::slotFolRename()
+void KNMainWidget::slotFolRename( const Akonadi::Collection &col )
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolRename()";
+  kDebug() << col.id() << col.name();
 
-  if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder()) {
-    if(f_olManager->currentFolder()->isStandardFolder())
-      KMessageBox::sorry(knGlobals.topWidget, i18n("You cannot rename a standard folder."));
-    else {
-//       disableAccels(true);   // hack: global accels break the inplace renaming
-      c_olView->editItem( f_olManager->currentFolder()->listItem(), c_olView->labelColumnIndex() );
+  Akobackit::FolderManager *folderManager = Akobackit::manager()->folderManager();
+  Akonadi::Collection folder;
+  if ( folderManager->isFolder( col ) ) {
+    folder = col;
+  } else {
+    const Akonadi::Collection selection = mCollectionWidget->selectedCollection();
+    if ( folderManager->isFolder( selection ) ) {
+      folder = selection;
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
 
+  if ( !folder.isValid() ) {
+    return;
+  }
 
-void KNMainWidget::slotFolCompact()
-{
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolCompact()";
-  if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder())
-    f_olManager->compactFolder(f_olManager->currentFolder());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::slotFolCompactAll()
-{
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolCompactAll()";
-  f_olManager->compactAll();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mCollectionWidget->renameCollection( folder );
 }
 
 
 void KNMainWidget::slotFolEmpty()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotFolEmpty()";
-  if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder()) {
-    if(f_olManager->currentFolder()->lockedArticles()>0) {
-      KMessageBox::sorry(this,
-      i18n("This folder cannot be emptied at the moment\nbecause some of its articles are currently in use.") );
-      return;
-    }
-    if( KMessageBox::Continue == KMessageBox::warningContinueCancel(
-        this, i18n("Do you really want to delete all articles in %1?", f_olManager->currentFolder()->name()),"",KGuiItem(i18n("&Delete"),"edit-delete")) )
-      f_olManager->emptyFolder(f_olManager->currentFolder());
+  kDebug();
+  const Akonadi::Collection col = mCollectionWidget->selectedCollection();
+  Akobackit::FolderManager *folderManager = Akobackit::manager()->folderManager();
+  if ( !folderManager->isFolder( col ) ) {
+    return;
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+
+  int res = KMessageBox::warningContinueCancel( this, i18n( "Do you really want to delete all articles in %1?", col.name() ),
+                                                "", KGuiItem( i18nc( "@action:button", "&Delete" ), "edit-delete" ) );
+  if( KMessageBox::Continue == res ) {
+    folderManager->emptyFolder( col );
+  }
 }
 
 
@@ -1890,77 +1747,53 @@ void KNMainWidget::slotFolMBoxExport()
 
 void KNMainWidget::slotArtSortHeaders(int i)
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeaders(int i)";
   h_drView->setSorting( i );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtSortHeadersKeyb()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeadersKeyb()";
 
   int newCol = KNHelper::selectDialog(this, i18n("Select Sort Column"), a_ctArtSortHeaders->items(), a_ctArtSortHeaders->currentItem());
   if (newCol != -1)
     h_drView->setSorting( newCol );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtSearch()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSearch()";
   a_rtManager->search();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtRefreshList()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtRefreshList()";
   a_rtManager->showHdrs(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtCollapseAll()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtCollapseAll()";
 
   closeCurrentThread();
   a_rtManager->setAllThreadsOpen(false);
   if (h_drView->currentItem())
     h_drView->ensureItemVisible(h_drView->currentItem());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtExpandAll()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtExpandAll()";
 
   a_rtManager->setAllThreadsOpen(true);
   if (h_drView->currentItem())
     h_drView->ensureItemVisible(h_drView->currentItem());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -2065,12 +1898,8 @@ void KNMainWidget::slotArtSetThreadUnread()
 
 void KNMainWidget::slotScoreEdit()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotScoreEdit()";
   s_coreManager->configure();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -2166,7 +1995,6 @@ void KNMainWidget::slotArtToggleWatched()
 
 void KNMainWidget::slotArtOpenNewWindow()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtOpenNewWindow()";
 
   if( mArticleViewer->article() ) {
@@ -2175,20 +2003,13 @@ void KNMainWidget::slotArtOpenNewWindow()
       win->show();
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtSendOutbox()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSendOutbox()";
   a_rtFactory->sendOutbox();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -2292,44 +2113,28 @@ void KNMainWidget::slotFetchArticleWithID()
 
 void KNMainWidget::slotToggleQuickSearch()
 {
-#if 0
   if (q_uicksearch->isHidden())
     q_uicksearch->show();
   else
     q_uicksearch->hide();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotSettings()
 {
-#if 0
   c_fgManager->configure();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 KActionCollection* KNMainWidget::actionCollection() const
 {
-#if 0
   return m_GUIClient->actionCollection();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 QMenu * KNMainWidget::popupMenu( const QString &name ) const
 {
-#if 0
   Q_ASSERT( m_GUIClient );
   Q_ASSERT( m_GUIClient->factory() );
   return static_cast<QMenu*>( m_GUIClient->factory()->container( name, m_GUIClient ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //--------------------------------
@@ -2338,7 +2143,6 @@ QMenu * KNMainWidget::popupMenu( const QString &name ) const
 KNode::FetchArticleIdDlg::FetchArticleIdDlg( QWidget *parent ) :
     KDialog( parent )
 {
-#if 0
   setCaption( i18n("Fetch Article with ID") );
   setButtons( KDialog::Ok | KDialog::Cancel );
   setModal( true );
@@ -2353,27 +2157,16 @@ KNode::FetchArticleIdDlg::FetchArticleIdDlg( QWidget *parent ) :
   setButtonText( KDialog::Ok, i18n("&Fetch") );
   connect( edit, SIGNAL(textChanged( const QString & )), this, SLOT(slotTextChanged(const QString & )));
   KNHelper::restoreWindowSize("fetchArticleWithID", this, QSize(325,66));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 QString KNode::FetchArticleIdDlg::messageId() const
 {
-#if 0
     return edit->text();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 {
-#if 0
     enableButtonOk( !_text.isEmpty() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -2382,41 +2175,25 @@ void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 // Move to the next article
 void KNMainWidget::nextArticle()
 {
-#if 0
   h_drView->nextArticle();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Move to the previous article
 void KNMainWidget::previousArticle()
 {
-#if 0
   h_drView->prevArticle();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Move to the next unread article
 void KNMainWidget::nextUnreadArticle()
 {
-#if 0
   slotNavNextUnreadArt();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Move to the next unread thread
 void KNMainWidget::nextUnreadThread()
 {
-#if 0
   slotNavNextUnreadThread();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Move to the next group
@@ -2441,156 +2218,95 @@ void KNMainWidget::previousGroup()
 
 void KNMainWidget::fetchHeaders()
 {
-#if 0
   // Simply call the slot
   slotAccGetNewHdrs();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNMainWidget::expireArticles()
 {
-#if 0
   slotAccExpireAll();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Open the editor to post a new article in the selected group
 void KNMainWidget::postArticle()
 {
-#if 0
   slotAccPostNewArticle();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Fetch the new headers in the selected groups
 void KNMainWidget::fetchHeadersInCurrentGroup()
 {
-#if 0
   slotGrpGetNewHdrs();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Expire the articles in the current group
 void KNMainWidget::expireArticlesInCurrentGroup()
 {
-#if 0
   slotGrpExpire();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Mark all the articles in the current group as read
 void KNMainWidget::markAllAsRead()
 {
-#if 0
   slotGrpSetAllRead();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Mark all the articles in the current group as unread
 void KNMainWidget::markAllAsUnread()
 {
-#if 0
   slotGrpSetAllUnread();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Mark the current article as read
 void KNMainWidget::markAsRead()
 {
-#if 0
   slotArtSetArtRead();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Mark the current article as unread
 void KNMainWidget::markAsUnread()
 {
-#if 0
   slotArtSetArtUnread();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Mark the current thread as read
 void KNMainWidget::markThreadAsRead()
 {
-#if 0
   slotArtSetThreadRead();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Mark the current thread as unread
 void KNMainWidget::markThreadAsUnread()
 {
-#if 0
   slotArtSetThreadUnread();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Send the pending articles
 void KNMainWidget::sendPendingMessages()
 {
-#if 0
   slotArtSendOutbox();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Delete the current article
 void KNMainWidget::deleteArticle()
 {
-#if 0
   slotArtDelete();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Send the current article
 void KNMainWidget::sendNow()
 {
-#if 0
   slotArtSendNow();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // Edit the current article
 void KNMainWidget::editArticle()
 {
-#if 0
   slotArtEdit();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 bool KNMainWidget::handleCommandLine()
 {
-#if 0
   bool doneSomething = false;
   KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
   if (args->count()>0) {
@@ -2600,9 +2316,6 @@ bool KNMainWidget::handleCommandLine()
   }
   args->clear();
   return doneSomething;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //////////////////////// end D-Bus implementation

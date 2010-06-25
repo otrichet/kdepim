@@ -38,7 +38,6 @@ using namespace KNode::Utilities;
 
 QString Locale::toMimeCharset( const QString &charset )
 {
-#if 0
   QString c = charset;
 
   // First, get the user preferred encoding
@@ -69,9 +68,6 @@ QString Locale::toMimeCharset( const QString &charset )
   c = c.toUpper();
 
   return c;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -82,6 +78,7 @@ QByteArray Locale::defaultCharset()
   return toMimeCharset( knGlobals.settings()->charset() ).toLatin1();
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return "UTF-8";
 #endif
 }
 
@@ -95,6 +92,7 @@ QByteArray Locale::defaultCharset( KNGroup::Ptr g )
   }
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return "UTF-8";
 #endif
 }
 
@@ -138,7 +136,6 @@ void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QBy
 
 QStringList Locale::encodings()
 {
-#if 0
   QStringList encodings = KGlobal::charsets()->availableEncodingNames();
   QStringList ret;
   QStringList seenEncs;
@@ -165,8 +162,5 @@ QStringList Locale::encodings()
 
   ret.sort();
   return ret;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 

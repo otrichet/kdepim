@@ -18,6 +18,7 @@
 #include "legacy_include.h"
 #include "resource.h"
 
+#include <Akonadi/Collection>
 #include <kdialog.h>
 #include <kvbox.h>
 #include <QList>
@@ -39,9 +40,6 @@ class KXMLGUIClient;
 class KNHeaderView;
 class KNCollectionView;
 class KNConfigManager;
-class KNAccountManager;
-class KNGroupManager;
-class KNFolderManager;
 class KNArticleManager;
 class KNArticleFactory;
 class KNFilterManager;
@@ -49,6 +47,9 @@ class KNScoringManager;
 class KNFilterSelectAction;
 namespace KNode {
   class ArticleWidget;
+  namespace CollectionTree {
+    class Widget;
+  }
 }
 class KActionCollection;
 
@@ -82,8 +83,8 @@ public:
   /** update fonts and colors */
   void configChanged();
 
-  /** Returns the folder tree widget. */
-  KNCollectionView* collectionView()const  { return c_olView; }
+  /** Returns the collection tree widget. */
+  KNode::CollectionTree::Widget * collectionView() const { return mCollectionWidget; }
   /** Returns the article list view. */
   KNHeaderView*       headerView()const      { return h_drView; }
   /** Returns the article viewer. */
@@ -186,7 +187,6 @@ protected:
   //GUI
   //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
-  KNCollectionView *c_olView;
   KNHeaderView      *h_drView;
   bool b_lockui;
   KToolBar        *q_uicksearch;
@@ -194,11 +194,8 @@ protected:
 
   //Core
   KNConfigManager   *c_fgManager;
-  KNAccountManager  *a_ccManager;
-  KNGroupManager    *g_rpManager;
   KNArticleManager  *a_rtManager;
   KNArticleFactory  *a_rtFactory;
-  KNFolderManager   *f_olManager;
   KNFilterManager   *f_ilManager;
   KNScoringManager  *s_coreManager;
 
@@ -206,13 +203,15 @@ protected slots:
   //listview slots
   void slotArticleSelected(Q3ListViewItem*);
   void slotArticleSelectionChanged();
-  /** Called when the selection collection changed. */
-  void slotCollectionSelected();
+
+  /**
+   * Called when the selected collection changed.
+   * @param col the new selected collection.
+   */
+  void slotCollectionSelected( const Akonadi::Collection &col = Akonadi::Collection() );
   /** Called when a collection is renamed. */
   void slotCollectionRenamed( QTreeWidgetItem *i );
   void slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p);
-  /** Display a menu on items of the collections view. */
-  void slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos );
   /** Open selected article in own composer/reader window */
   void slotOpenArticle(Q3ListViewItem *item);
   void slotHdrViewSortingChanged(int i);
@@ -259,8 +258,6 @@ protected:
     *a_ctFolNewChild,
     *a_ctFolDelete,
     *a_ctFolRename,
-    *a_ctFolCompact,
-    *a_ctFolCompactAll,
     *a_ctFolEmpty,
     *a_ctFolMboxImport,
     *a_ctFolMboxExport;
@@ -330,12 +327,23 @@ protected slots:
   void slotGrpSetAllUnread();
   void slotGrpSetUnread();
 
+  /**
+   * Create a new folder under the root folder and request a name.
+   */
   void slotFolNew();
-  void slotFolNewChild();
+  /**
+   * Create a new folder under the folder f if is it valid
+   * or under the currently selected folder.
+   */
+  void slotFolNewChild( const Akonadi::Collection &parent = Akonadi::Collection() );
   void slotFolDelete();
-  void slotFolRename();
-  void slotFolCompact();
-  void slotFolCompactAll();
+  /**
+   * Request a new name of a folder to the user.
+   * @param col The folder to rename. If the folder is valid, it is
+   * selected and a new name is requested, otherwise if the currently
+   * selected collection is a folder, it is renamed.
+   */
+  void slotFolRename( const Akonadi::Collection &col = Akonadi::Collection() );
   void slotFolEmpty();
   void slotFolMBoxImport();
   void slotFolMBoxExport();
@@ -381,6 +389,7 @@ private:
   KSqueezedTextLabel *s_tatusFilter;
   KXMLGUIClient *m_GUIClient;
   QSplitter *mPrimarySplitter, *mSecondSplitter;
+  KNode::CollectionTree::Widget *mCollectionWidget;
 };
 
 

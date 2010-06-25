@@ -43,7 +43,6 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
   mShowingFolder( false ),
   mInitDone( false )
 {
-#if 0
   mPaintInfo.subCol    = addColumn( i18n("Subject"), 310 );
   mPaintInfo.senderCol = addColumn( i18n("From"), 115 );
   mPaintInfo.scoreCol  = addColumn( i18n("Score"), 42 );
@@ -90,26 +89,18 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
 //   new KNHeaderViewToolTip( this );
 
   installEventFilter( this );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNHeaderView::~KNHeaderView()
 {
-#if 0
   // ### crash because KNConfigManager is already deleted here
   // writeConfig();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::readConfig()
 {
-#if 0
   if ( !mInitDone ) {
     KConfigGroup conf(knGlobals.config(), "HeaderView" );
     mSortByThreadChangeDate = conf.readEntry( "sortByThreadChangeDate", false );
@@ -130,15 +121,11 @@ void KNHeaderView::readConfig()
   setPalette( p );
   setAlternateBackground( knGlobals.settings()->alternateBackgroundColor() );
   setFont( knGlobals.settings()->articleListFont() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::writeConfig()
 {
-#if 0
   KConfigGroup conf(knGlobals.config(), "HeaderView" );
   conf.writeEntry( "sortByThreadChangeDate", mSortByThreadChangeDate );
   saveLayout( knGlobals.config(), "HeaderView" );
@@ -146,15 +133,11 @@ void KNHeaderView::writeConfig()
   knGlobals.settings()->setShowLines( mPaintInfo.showSize );
   if ( !mShowingFolder ) // score column is always hidden when showing a folder
     knGlobals.settings()->setShowScore( mPaintInfo.showScore );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::setActive( Q3ListViewItem *i )
 {
-#if 0
   KNHdrViewItem *item = static_cast<KNHdrViewItem*>( i );
 
   if ( !item || item->isActive() )
@@ -172,26 +155,18 @@ void KNHeaderView::setActive( Q3ListViewItem *i )
   ensureItemVisibleWithMargin( i );
   mActiveItem = item;
   emit( itemSelected(item) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::clear()
 {
-#if 0
   mActiveItem = 0;
   Q3ListView::clear();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::ensureItemVisibleWithMargin( const Q3ListViewItem *i )
 {
-#if 0
   if ( !i )
     return;
 
@@ -216,26 +191,18 @@ void KNHeaderView::ensureItemVisibleWithMargin( const Q3ListViewItem *i )
   } else {
     ensureVisible( contentsX(), y + h/2, 0, h/2 );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::slotCenterDelayed()
 {
-#if 0
   if ( mDelayedCenter != -1 )
     ensureVisible( contentsX(), mDelayedCenter, 0, visibleHeight() / 2 );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::setSorting( int column, bool ascending )
 {
-#if 0
   if ( column == mSortCol ) {
     mSortAsc = ascending;
     if ( mInitDone && column == mPaintInfo.dateCol && ascending )
@@ -254,15 +221,11 @@ void KNHeaderView::setSorting( int column, bool ascending )
     setColumnText( mPaintInfo.dateCol , i18n("Date (thread changed)") );
   else
     setColumnText( mPaintInfo.dateCol, i18n("Date") );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::nextArticle()
 {
-#if 0
   KNHdrViewItem *it = static_cast<KNHdrViewItem*>( currentItem() );
 
   if (it) {
@@ -279,15 +242,11 @@ void KNHeaderView::nextArticle()
     setActive( it );
     setSelectionAnchor( currentItem() );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::prevArticle()
 {
-#if 0
   KNHdrViewItem *it = static_cast<KNHdrViewItem*>( currentItem() );
 
   if (it && it->isActive()) {  // take current article, if not selected
@@ -296,15 +255,11 @@ void KNHeaderView::prevArticle()
     setActive( it );
     setSelectionAnchor( currentItem() );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::incCurrentArticle()
 {
-#if 0
   Q3ListViewItem *lvi = currentItem();
   if ( lvi && lvi->isExpandable() )
     lvi->setOpen( true );
@@ -313,14 +268,10 @@ void KNHeaderView::incCurrentArticle()
     ensureItemVisible( currentItem() );
     setFocus();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNHeaderView::decCurrentArticle()
 {
-#if 0
   Q3ListViewItem *lvi = currentItem();
   if ( lvi && lvi->itemAbove() ) {
     if ( lvi->itemAbove()->isExpandable() )
@@ -329,20 +280,13 @@ void KNHeaderView::decCurrentArticle()
     ensureItemVisible( currentItem() );
     setFocus();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::selectCurrentArticle()
 {
-#if 0
   clearSelection();
   setActive( currentItem() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -449,7 +393,6 @@ bool KNHeaderView::nextUnreadThread()
 
 void KNHeaderView::toggleColumn( int column, int mode )
 {
-#if 0
   bool *show = 0;
   int  *col  = 0;
   int  width = 0;
@@ -489,53 +432,37 @@ void KNHeaderView::toggleColumn( int column, int mode )
 
   if ( mode == -1 ) // save config when toggled
     writeConfig();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::prepareForGroup()
 {
-#if 0
   mShowingFolder = false;
   header()->setLabel( mPaintInfo.senderCol, i18n("From") );
   toggleColumn( KPaintInfo::COL_SCORE, knGlobals.settings()->showScore() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::prepareForFolder()
 {
-#if 0
   mShowingFolder = true;
   header()->setLabel( mPaintInfo.senderCol, i18n("Newsgroups / To") );
   toggleColumn( KPaintInfo::COL_SCORE, false ); // local folders have no score
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 bool KNHeaderView::event( QEvent *e )
 {
-#if 0
   // we don't want to have the alternate list background restored
   // to the system defaults!
   if (e->type() == QEvent::ApplicationPaletteChange)
     return Q3ListView::event(e);
   else
     return K3ListView::event(e);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNHeaderView::contentsMousePressEvent( QMouseEvent *e )
 {
-#if 0
   if (!e) return;
 
   bool selectMode=(( e->modifiers() & Qt::ShiftModifier ) || ( e->modifiers() & Qt::ControlModifier ));
@@ -555,15 +482,11 @@ void KNHeaderView::contentsMousePressEvent( QMouseEvent *e )
     if( !selectMode && i->isSelected() && !rootDecoClicked )
       setActive( i );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::contentsMouseDoubleClickEvent( QMouseEvent *e )
 {
-#if 0
   if (!e) return;
 
   Q3ListViewItem *i = itemAt( contentsToViewport(e->pos()) );
@@ -573,15 +496,11 @@ void KNHeaderView::contentsMouseDoubleClickEvent( QMouseEvent *e )
   }
 
   K3ListView::contentsMouseDoubleClickEvent( e );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::keyPressEvent(QKeyEvent *e)
 {
-#if 0
   if (!e) return;
 
   Q3ListViewItem *i = currentItem();
@@ -600,9 +519,6 @@ void KNHeaderView::keyPressEvent(QKeyEvent *e)
     default:
       K3ListView::keyPressEvent (e);
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -611,31 +527,22 @@ void KNHeaderView::keyPressEvent(QKeyEvent *e)
 #endif
 Q3DragObject* KNHeaderView::dragObject()
 {
-#if 0
   KNHdrViewItem *item = static_cast<KNHdrViewItem*>( itemAt(viewport()->mapFromGlobal(QCursor::pos())) );
   if (item)
     return item->dragObject();
   else
     return 0;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderView::slotSizeChanged( int section, int, int newSize )
 {
-#if 0
   viewport()->repaint( header()->sectionPos(section), 0, newSize, visibleHeight() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 bool KNHeaderView::eventFilter(QObject *o, QEvent *e)
 {
-#if 0
   // right click on header
   if ( e->type() == QEvent::MouseButtonPress &&
        static_cast<QMouseEvent*>(e)->button() == Qt::RightButton &&
@@ -646,9 +553,6 @@ bool KNHeaderView::eventFilter(QObject *o, QEvent *e)
   }
 
   return K3ListView::eventFilter(o, e);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -662,16 +566,11 @@ KNHeaderViewToolTip::KNHeaderViewToolTip( KNHeaderView *parent ) :
   QToolTip( parent->viewport() ),
   listView( parent )
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNHeaderViewToolTip::maybeTip( const QPoint &p )
 {
-#if 0
   const KNHdrViewItem *item = static_cast<KNHdrViewItem*>( listView->itemAt( p ) );
   if ( !item )
     return;
@@ -691,9 +590,6 @@ void KNHeaderViewToolTip::maybeTip( const QPoint &p )
 
   tip( QRect( headerRect.left(), itemRect.top(), headerRect.width(), itemRect.height() ),
        Qt::escape( item->text( column ) ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 #endif
 

@@ -82,8 +82,6 @@
     <Action name="folder_MboxImport"/>
     <Action name="folder_MboxExport"/>
     <Separator/>
-    <Action name="folder_compact"/>
-    <Action name="folder_compact_all"/>
     <Action name="folder_empty"/>
     <Separator/>
     <Action name="folder_delete"/>
@@ -175,7 +173,6 @@
 
 <Menu name="root_folder_popup">
   <Action name="folder_newChild"/>
-  <Action name="folder_compact_all"/>
 </Menu>
 
 <Menu name="folder_popup">
@@ -185,7 +182,6 @@
   <Action name="folder_MboxImport"/>
   <Action name="folder_MboxExport"/>
   <Separator/>
-  <Action name="folder_compact"/>
   <Action name="folder_empty"/>
   <Separator/>
   <Action name="folder_delete"/>

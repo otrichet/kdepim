@@ -46,22 +46,14 @@ using namespace MailTransport;
 KNArticleFactory::KNArticleFactory( QObject *parent )
   : QObject( parent ), s_endErrDlg(0)
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNArticleFactory::~KNArticleFactory()
 {
-#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     delete (*it);
   delete s_endErrDlg;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -558,7 +550,6 @@ void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
 
 void KNArticleFactory::sendMailExternal(const QString &address, const QString &subject, const QString &body)
 {
-#if 0
   KUrl mailtoURL;
   QStringList queries;
   QString query;
@@ -584,9 +575,6 @@ void KNArticleFactory::sendMailExternal(const QString &address, const QString &s
     mailtoURL.setQuery(query);
 
   KToolInvocation::invokeMailer(mailtoURL);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -720,7 +708,6 @@ void KNArticleFactory::sendOutbox()
 
 bool KNArticleFactory::closeComposeWindows()
 {
-#if 0
   while ( !mCompList.isEmpty() ) {
     QList<KNComposer*>::Iterator it = mCompList.begin();
     if ( !(*it)->close() )
@@ -728,9 +715,6 @@ bool KNArticleFactory::closeComposeWindows()
   }
 
   return true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -750,25 +734,17 @@ void KNArticleFactory::deleteComposerForArticle( KNLocalArticle::Ptr a )
 
 KNComposer* KNArticleFactory::findComposer( KNLocalArticle::Ptr a )
 {
-#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     if ( (*it)->article() == a )
       return (*it);
   return 0;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNArticleFactory::configChanged()
 {
-#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     (*it)->setConfig( false );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -951,9 +927,9 @@ KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const Q
 
 bool KNArticleFactory::cancelAllowed( KNArticle::Ptr a )
 {
-#if 0
   if(!a)
     return false;
+#if 0
 
   if(a->type()==KNArticle::ATlocal) {
     KNLocalArticle::Ptr localArt = boost::static_pointer_cast<KNLocalArticle>( a );
@@ -1014,25 +990,21 @@ and cancel (or supersede) it there."));
 
     return true;
   }
-
-  return false;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+
+  return false;
 }
 
 
 void KNArticleFactory::showSendErrorDialog()
 {
-#if 0
   if(!s_endErrDlg) {
     s_endErrDlg=new KNSendErrorDialog();
     connect(s_endErrDlg, SIGNAL(closeClicked()), this, SLOT(slotSendErrorDialogDone()));
   }
   s_endErrDlg->show();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1102,12 +1074,8 @@ void KNArticleFactory::slotComposerDone(KNComposer *com)
 
 void KNArticleFactory::slotSendErrorDialogDone()
 {
-#if 0
   s_endErrDlg->deleteLater();
   s_endErrDlg=0;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1117,7 +1085,6 @@ void KNArticleFactory::slotSendErrorDialogDone()
 KNSendErrorDialog::KNSendErrorDialog()
   : KDialog( knGlobals.topWidget )
 {
-#if 0
   setCaption( i18n("Errors While Sending") );
   setButtons( Close );
   KVBox *page = new KVBox( this );
@@ -1133,46 +1100,31 @@ KNSendErrorDialog::KNSendErrorDialog()
   connect( mErrorList, SIGNAL( currentRowChanged( int ) ), SLOT( slotHighlighted( int ) ) );
 
   KNHelper::restoreWindowSize("sendDlg", this, QSize(320,250));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNSendErrorDialog::~KNSendErrorDialog()
 {
-#if 0
   KNHelper::saveWindowSize("sendDlg", size());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNSendErrorDialog::append(const QString &subject, const QString &error)
 {
-#if 0
   ErrorListItem *item = new ErrorListItem( subject, error );
   item->setIcon( UserIcon("snderr") );
   mErrorList->addItem( item );
   mErrorList->setCurrentItem( item );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNSendErrorDialog::slotHighlighted(int idx)
 {
-#if 0
   ErrorListItem *item = static_cast<ErrorListItem*>( mErrorList->item( idx ) );
   if ( item ) {
     QString tmp = i18n("<b>Error message:</b><br />") + item->error();
     mError->setText( tmp );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //-------------------------------

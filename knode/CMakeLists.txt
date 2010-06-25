@@ -57,6 +57,13 @@ set(knodecommon_LIB_SRCS
    knglobals.cpp
    articlewidget.cpp
    csshelper.cpp
+   akobackit/akonadi_manager.cpp
+   akobackit/folder_manager.cpp
+   akobackit/item_local_article.cpp
+   akobackit/item_merge_job.cpp
+   akobackit/localfolders_setup_job.cpp
+   collectiontree/widget.cpp
+   collectiontree/view.cpp
    composer/attachment_view.cpp
    composer/followupto_combobox.cpp
    configuration/identity_widget.cpp
