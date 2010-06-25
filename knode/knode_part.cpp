@@ -27,7 +27,6 @@
 #include "knglobals.h"
 #include "knmainwidget.h"
 #include "aboutdata.h"
-#include "kncollectionview.h"
 #include "utils/startup.h"
 
 

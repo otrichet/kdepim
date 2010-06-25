@@ -34,19 +34,28 @@ using namespace KNode;
 
 KNode::StatusFilter::StatusFilter()
 {
+#if 0
   data.fill(false,8);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNode::StatusFilter::~StatusFilter()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StatusFilter::load( const KConfigGroup &group )
 {
+#if 0
   data.setBit(EN_R, group.readEntry("EN_R", false));
   data.setBit(DAT_R, group.readEntry("DAT_R", false));
 
@@ -59,12 +68,16 @@ void KNode::StatusFilter::load( const KConfigGroup &group )
   data.setBit(EN_NS, group.readEntry("EN_NS", false));
   data.setBit(DAT_NS, group.readEntry("DAT_NS", false));
 
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StatusFilter::save( KConfigGroup &group )
 {
+#if 0
   group.writeEntry("EN_R", data.at(EN_R));
   group.writeEntry("DAT_R", data.at(DAT_R));
 
@@ -76,12 +89,16 @@ void KNode::StatusFilter::save( KConfigGroup &group )
 
   group.writeEntry("EN_NS", data.at(EN_NS));
   group.writeEntry("DAT_NS", data.at(DAT_NS));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 bool KNode::StatusFilter::doFilter( KNRemoteArticle::Ptr a )
 {
+#if 0
   bool ret=true;
 
   if(data.at(EN_R) && ret)
@@ -97,6 +114,9 @@ bool KNode::StatusFilter::doFilter( KNRemoteArticle::Ptr a )
     ret=(a->hasNewFollowUps() == data.at(DAT_NS));
 
   return ret;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -106,6 +126,7 @@ bool KNode::StatusFilter::doFilter( KNRemoteArticle::Ptr a )
 KNode::StatusFilterWidget::StatusFilterWidget( QWidget *parent ) :
   QWidget( parent )
 {
+#if 0
   enR=new QCheckBox(i18n("Is read:"), this);
   enN=new QCheckBox(i18n("Is new:"), this);
   enUS=new QCheckBox(i18n("Has unread followups:"), this);
@@ -129,18 +150,26 @@ KNode::StatusFilterWidget::StatusFilterWidget( QWidget *parent ) :
   connect( enN, SIGNAL(toggled(bool)), SLOT(slotEnabled()) );
   connect( enUS, SIGNAL(toggled(bool)), SLOT(slotEnabled()) );
   connect( enNS, SIGNAL(toggled(bool)), SLOT(slotEnabled()) );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNode::StatusFilterWidget::~StatusFilterWidget()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 StatusFilter KNode::StatusFilterWidget::filter()
 {
+#if 0
   StatusFilter f;
 
   f.data.setBit(EN_R, enR->isChecked());
@@ -156,12 +185,16 @@ StatusFilter KNode::StatusFilterWidget::filter()
   f.data.setBit(DAT_NS, nsCom->value());
 
   return f;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StatusFilterWidget::setFilter( StatusFilter &f )
 {
+#if 0
   enR->setChecked(f.data.at(EN_R));
   rCom->setValue(f.data.at(DAT_R));
 
@@ -175,11 +208,15 @@ void KNode::StatusFilterWidget::setFilter( StatusFilter &f )
   nsCom->setValue(f.data.at(DAT_NS));
 
   slotEnabled();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNode::StatusFilterWidget::clear()
 {
+#if 0
   enR->setChecked(false);
   enN->setChecked(false);
   enUS->setChecked(false);
@@ -190,16 +227,23 @@ void KNode::StatusFilterWidget::clear()
   usCom->setValue(true);
 
   slotEnabled();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StatusFilterWidget::slotEnabled()
 {
+#if 0
   rCom->setEnabled( enR->isChecked() );
   nCom->setEnabled( enN->isChecked() );
   usCom->setEnabled( enUS->isChecked() );
   nsCom->setEnabled( enNS->isChecked() );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -208,14 +252,22 @@ void KNode::StatusFilterWidget::slotEnabled()
 
 KNode::StatusFilterWidget::TFCombo::TFCombo( QWidget *parent ) : QComboBox( parent )
 {
+#if 0
   addItem(i18n("True"));
   addItem(i18n("False"));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNode::StatusFilterWidget::TFCombo::~TFCombo()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 

@@ -18,7 +18,6 @@
 #include "knconfigmanager.h"
 #include "knconfigwidgets.h"
 #include "knglobals.h"
-#include "kngroup.h"
 #include "utilities.h"
 #include "utils/locale.h"
 
@@ -40,6 +39,7 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
   : KPageDialog( parent ),
     g_rp(group), n_ickChanged(false)
 {
+#if 0
   setFaceType( Tabbed );
   setCaption( i18nc( "@title:window %1=newsgroup name", "Properties of %1", group->groupname() ) );
   setButtons( Ok|Cancel|Help );
@@ -173,19 +173,27 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
 
   KNHelper::restoreWindowSize("groupPropDLG", this, sizeHint());
   connect(this,SIGNAL(okClicked()),SLOT(slotOk()));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNGroupPropDlg::~KNGroupPropDlg()
 {
+#if 0
   KNHelper::saveWindowSize("groupPropDLG", size());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupPropDlg::slotOk()
 {
+#if 0
   if( !(g_rp->name()==n_ick->text()) ) {
     g_rp->setName(n_ick->text());
     n_ickChanged=true;
@@ -198,4 +206,7 @@ void KNGroupPropDlg::slotOk()
   g_rp->setDefaultCharset( KGlobal::charsets()->encodingForName( c_harset->currentText() ).toLatin1() );
 
   accept();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }

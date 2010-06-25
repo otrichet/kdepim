@@ -28,6 +28,7 @@
 KNGroupSelectDialog::KNGroupSelectDialog( QWidget *parent, KNNntpAccount::Ptr a, const QStringList &groups ) :
   KNGroupBrowser(parent, i18n("Select Destinations"), a)
 {
+#if 0
   selView=new Q3ListView(page);
   selView->addColumn( QString() );
   selView->header()->hide();
@@ -51,39 +52,55 @@ KNGroupSelectDialog::KNGroupSelectDialog( QWidget *parent, KNNntpAccount::Ptr a,
   connect(arrowBtn2, SIGNAL(clicked()), this, SLOT(slotArrowBtn2()));
 
   KNHelper::restoreWindowSize("groupSelDlg", this, QSize(659,364));  // optimized for 800x600
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNGroupSelectDialog::~KNGroupSelectDialog()
 {
+#if 0
   KNHelper::saveWindowSize("groupSelDlg", this->size());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupSelectDialog::itemChangedState(CheckItem *it, bool s)
 {
+#if 0
   if(s)
     new GroupItem(selView, it->info);
   else
     removeListItem(selView, it->info);
   arrowBtn1->setEnabled(!s);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupSelectDialog::updateItemState(CheckItem *it)
 {
+#if 0
   it->setChecked(itemInListView(selView, it->info));
   if(it->info.subscribed && it->pixmap(0)==0)
     it->setPixmap(0, pmGroup);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 QString KNGroupSelectDialog::selectedGroups()const
 {
+#if 0
   QString ret;
   Q3ListViewItemIterator it(selView);
   bool moderated=false;
@@ -105,12 +122,16 @@ QString KNGroupSelectDialog::selectedGroups()const
                               QString(),"crosspostModeratedWarning");
 
   return ret;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupSelectDialog::slotItemSelected(Q3ListViewItem *it)
 {
+#if 0
   const QObject *s=sender();
 
   if(s==groupView) {
@@ -126,20 +147,28 @@ void KNGroupSelectDialog::slotItemSelected(Q3ListViewItem *it)
     arrowBtn1->setEnabled(false);
     arrowBtn2->setEnabled((it!=0));
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupSelectDialog::slotSelectionChanged()
 {
+#if 0
   if (!groupView->selectedItem())
     arrowBtn1->setEnabled(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupSelectDialog::slotArrowBtn1()
 {
+#if 0
   CheckItem *i=static_cast<CheckItem*>(groupView->selectedItem());
 
   if(i) {
@@ -147,12 +176,16 @@ void KNGroupSelectDialog::slotArrowBtn1()
     arrowBtn1->setEnabled(false);
     i->setChecked(true);
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupSelectDialog::slotArrowBtn2()
 {
+#if 0
   GroupItem *i=static_cast<GroupItem*>(selView->selectedItem());
 
   if(i) {
@@ -160,6 +193,9 @@ void KNGroupSelectDialog::slotArrowBtn2()
     delete i;
     arrowBtn2->setEnabled(false);
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 

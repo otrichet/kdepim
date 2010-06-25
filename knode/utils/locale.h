@@ -24,7 +24,7 @@
 #define KNODE_UTILITIES_LOCALE_H
 
 #include "knode_export.h"
-#include "kngroup.h"
+#include "legacy_include.h"
 
 class QByteArray;
 class QString;

@@ -31,21 +31,14 @@
 #include "knglobals.h"
 #include "utilities.h"
 #include "knarticlemanager.h"
-#include "kngroupmanager.h"
 #include "knsearchdialog.h"
 #include "knfiltermanager.h"
-#include "knfolder.h"
 #include "knarticlefilter.h"
 #include "knhdrviewitem.h"
-#include "scheduler.h"
-#include "knnntpaccount.h"
 #include "knscoring.h"
-#include "knmemorymanager.h"
 #include "knarticlefactory.h"
 #include "knarticlewindow.h"
-#include "knfoldermanager.h"
 #include "headerview.h"
-#include "nntpjobs.h"
 #include "settings.h"
 
 using namespace KNode;
@@ -54,6 +47,7 @@ using namespace KNode::Utilities;
 
 KNArticleManager::KNArticleManager() : QObject(0)
 {
+#if 0
   f_ilterMgr = knGlobals.filterManager();
   f_ilter = f_ilterMgr->currentFilter();
   s_earchDlg=0;
@@ -61,26 +55,38 @@ KNArticleManager::KNArticleManager() : QObject(0)
 
   connect(f_ilterMgr, SIGNAL(filterChanged(KNArticleFilter*)), this,
     SLOT(slotFilterChanged(KNArticleFilter*)));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNArticleManager::~KNArticleManager()
 {
+#if 0
   delete s_earchDlg;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::deleteTempFiles()
 {
+#if 0
   for ( QList<KTemporaryFile*>::Iterator it = mTempFiles.begin(); it != mTempFiles.end(); ++it ) {
     delete (*it);
   }
   mTempFiles.clear();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::saveContentToFile(KMime::Content *c, QWidget *parent)
 {
+#if 0
   KNSaveHelper helper(c->contentType()->name(),parent);
 
   QFile *file = helper.getFile(i18n("Save Attachment"));
@@ -90,11 +96,15 @@ void KNArticleManager::saveContentToFile(KMime::Content *c, QWidget *parent)
     if (file->write(data.data(), data.size()) == -1 )
       KNHelper::displayExternalFileError( parent );
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
 {
+#if 0
   QString fName = a->subject()->asUnicodeString();
   QString s = "";
 
@@ -114,11 +124,15 @@ void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
     if ( file->write(tmp.data(), tmp.size()) == -1 )
       KNHelper::displayExternalFileError( parent );
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 QString KNArticleManager::saveContentToTemp(KMime::Content *c)
 {
+#if 0
   QString path;
   KTemporaryFile* tmpFile;
   KMime::Headers::Base *pathHdr=c->headerByType("X-KNode-Tempfile");  // check for existing temp file
@@ -157,11 +171,15 @@ QString KNArticleManager::saveContentToTemp(KMime::Content *c)
   c->setHeader(pathHdr);
 
   return path;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::openContent(KMime::Content *c)
 {
+#if 0
   QString path=saveContentToTemp(c);
   if(path.isNull()) return;
 
@@ -175,11 +193,15 @@ void KNArticleManager::openContent(KMime::Content *c)
     KRun::run(*offer, lst, knGlobals.top);
   else
     KRun::displayOpenWithDialog(lst, knGlobals.top);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::showHdrs(bool clear)
 {
+#if 0
   if(!g_roup && !f_older) return;
 
   bool setFirstChild=true;
@@ -330,18 +352,26 @@ void KNArticleManager::showHdrs(bool clear)
 
   knGlobals.setStatusMsg( QString() );
   updateStatusString();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::updateViewForCollection( KNArticleCollection::Ptr c )
 {
+#if 0
   if(g_roup==c || f_older==c)
     showHdrs(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::updateListViewItems()
 {
+#if 0
   if(!g_roup && !f_older) return;
 
   if(g_roup) {
@@ -361,11 +391,15 @@ void KNArticleManager::updateListViewItems()
         art->updateListItem();
     }
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::setAllThreadsOpen(bool b)
 {
+#if 0
   KNRemoteArticle::Ptr art;
   if(g_roup) {
     ScopedCursorOverride cursor( Qt::WaitCursor );
@@ -382,11 +416,15 @@ void KNArticleManager::setAllThreadsOpen(bool b)
     }
     d_isableExpander = false;
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::search()
 {
+#if 0
   if(s_earchDlg) {
     s_earchDlg->show();
 #ifdef Q_OS_UNIX
@@ -400,38 +438,54 @@ void KNArticleManager::search()
       SLOT(slotSearchDialogDone()));
     s_earchDlg->show();
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::setGroup( KNGroup::Ptr g )
 {
+#if 0
   g_roup = g;
   if ( g )
     emit aboutToShowGroup();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::setFolder( KNFolder::Ptr f )
 {
+#if 0
   f_older = f;
   if ( f )
     emit aboutToShowFolder();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNArticleCollection::Ptr KNArticleManager::collection()
 {
+#if 0
   if(g_roup)
     return g_roup;
   if(f_older)
    return f_older;
 
   return KNArticleCollection::Ptr();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleManager::loadArticle( KNArticle::Ptr a )
 {
+#if 0
   if (!a)
     return false;
 
@@ -460,11 +514,15 @@ bool KNArticleManager::loadArticle( KNArticle::Ptr a )
       return false;
   }
   return true;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleManager::unloadArticle( KNArticle::Ptr a, bool force )
 {
+#if 0
   if(!a || a->isLocked() )
     return false;
   if(!a->hasContent())
@@ -491,11 +549,15 @@ bool KNArticleManager::unloadArticle( KNArticle::Ptr a, bool force )
   knGlobals.memoryManager()->removeCacheEntry(a);
 
   return true;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::copyIntoFolder( KNArticle::List &l, KNFolder::Ptr f )
 {
+#if 0
   if(!f) return;
 
   KNLocalArticle::Ptr loc;
@@ -537,11 +599,15 @@ void KNArticleManager::copyIntoFolder( KNArticle::List &l, KNFolder::Ptr f )
 
     f->setNotUnloadable(false);
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::moveIntoFolder( KNLocalArticle::List &l, KNFolder::Ptr f )
 {
+#if 0
   if(!f) return;
   kDebug(5003) <<" Target folder:" << f->name();
 
@@ -564,11 +630,15 @@ void KNArticleManager::moveIntoFolder( KNLocalArticle::List &l, KNFolder::Ptr f 
   }
 
   f->setNotUnloadable(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleManager::deleteArticles(KNLocalArticle::List &l, bool ask)
 {
+#if 0
   if(ask) {
     QStringList lst;
     for ( KNLocalArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
@@ -598,11 +668,15 @@ bool KNArticleManager::deleteArticles(KNLocalArticle::List &l, bool ask)
   }
 
   return true;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::setAllRead( bool read, int lastcount )
 {
+#if 0
   if ( !g_roup )
     return;
 
@@ -644,11 +718,15 @@ void KNArticleManager::setAllRead( bool read, int lastcount )
 
   g_roup->updateListItem();
   showHdrs( true );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPosts)
 {
+#if 0
   if ( l.isEmpty() )
     return;
 
@@ -729,11 +807,15 @@ void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPos
     if(g==g_roup)
       updateStatusString();
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::setAllNotNew()
 {
+#if 0
   if ( !g_roup )
     return;
   KNRemoteArticle::Ptr a;
@@ -747,11 +829,15 @@ void KNArticleManager::setAllNotNew()
   g_roup->setFirstNewIndex( -1 );
   g_roup->setNewCount( 0 );
   g_roup->updateThreadInfo();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleManager::toggleWatched(KNRemoteArticle::List &l)
 {
+#if 0
   if(l.isEmpty())
     return true;
 
@@ -801,11 +887,15 @@ bool KNArticleManager::toggleWatched(KNRemoteArticle::List &l)
   }
 
   return watch;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
 {
+#if 0
   if(l.isEmpty())
     return true;
 
@@ -867,11 +957,15 @@ bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
   }
 
   return ignore;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void  KNArticleManager::rescoreArticles(KNRemoteArticle::List &l)
 {
+#if 0
   if ( l.isEmpty() )
     return;
 
@@ -897,11 +991,15 @@ void  KNArticleManager::rescoreArticles(KNRemoteArticle::List &l)
     if ( !read && (*it)->isRead() != read )
       g_roup->incReadCount();
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::processJob(KNJobData *j)
 {
+#if 0
   if(j->type()==KNJobData::JTfetchArticle && !j->canceled()) {
     KNRemoteArticle::Ptr a = boost::static_pointer_cast<KNRemoteArticle>( j->data() );
     if(j->success()) {
@@ -932,11 +1030,15 @@ void KNArticleManager::processJob(KNJobData *j)
   }
 
   delete j;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::createThread( KNRemoteArticle::Ptr a )
 {
+#if 0
   KNRemoteArticle::Ptr ref = a->displayedReference();
 
   if(ref) {
@@ -949,11 +1051,15 @@ void KNArticleManager::createThread( KNRemoteArticle::Ptr a )
 
   a->setThreadMode( knGlobals.settings()->showThreads() );
   a->initListItem();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::createCompleteThread( KNRemoteArticle::Ptr a )
 {
+#if 0
   KNRemoteArticle::Ptr ref = a->displayedReference();
   KNRemoteArticle::Ptr art, top;
   bool inThread=false;
@@ -991,11 +1097,15 @@ void KNArticleManager::createCompleteThread( KNRemoteArticle::Ptr a )
 
   if ( knGlobals.settings()->totalExpandThreads() )
     top->listItem()->expandChildren();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::updateStatusString()
 {
+#if 0
   int displCnt=0;
 
   if(g_roup) {
@@ -1028,25 +1138,37 @@ void KNArticleManager::updateStatusString()
     knGlobals.setStatusMsg( QString(), SB_GROUP );
     knGlobals.setStatusMsg( QString(), SB_FILTER );
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::slotFilterChanged(KNArticleFilter *f)
 {
+#if 0
   f_ilter=f;
   showHdrs();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::slotSearchDialogDone()
 {
+#if 0
   s_earchDlg->hide();
   slotFilterChanged(f_ilterMgr->currentFilter());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleManager::slotItemExpanded(Q3ListViewItem *p)
 {
+#if 0
   if (d_isableExpander)  // we don't want to call this method recursively
     return;
   d_isableExpander = true;
@@ -1090,15 +1212,23 @@ void KNArticleManager::slotItemExpanded(Q3ListViewItem *p)
     hdrItem->expandChildren();
 
   d_isableExpander = false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
-void KNArticleManager::setView(KNHeaderView* v) {
+void KNArticleManager::setView( KNHeaderView *v )
+{
+#if 0
   v_iew = v;
   if(v) {
     connect(v, SIGNAL(expanded(Q3ListViewItem*)), this,
       SLOT(slotItemExpanded(Q3ListViewItem*)));
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 //-----------------------------

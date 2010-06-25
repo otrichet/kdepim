@@ -16,15 +16,8 @@
 #include "knarticlefactory.h"
 
 #include "knglobals.h"
-#include "kngroupmanager.h"
-#include "knaccountmanager.h"
-#include "knfoldermanager.h"
 #include "knarticlemanager.h"
-#include "knfolder.h"
 #include "kncomposer.h"
-#include "knnntpaccount.h"
-#include "mailsendjob.h"
-#include "nntpjobs.h"
 #include "utilities.h"
 #include "resource.h"
 #include "settings.h"
@@ -53,19 +46,28 @@ using namespace MailTransport;
 KNArticleFactory::KNArticleFactory( QObject *parent )
   : QObject( parent ), s_endErrDlg(0)
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNArticleFactory::~KNArticleFactory()
 {
+#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     delete (*it);
   delete s_endErrDlg;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createPosting( KNNntpAccount::Ptr a )
 {
+#if 0
   if(!a)
     return;
 
@@ -82,11 +84,15 @@ void KNArticleFactory::createPosting( KNNntpAccount::Ptr a )
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createPosting( KNGroup::Ptr g )
 {
+#if 0
   if(!g)
     return;
 
@@ -104,11 +110,15 @@ void KNArticleFactory::createPosting( KNGroup::Ptr g )
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selectedText, bool post, bool mail )
 {
+#if 0
   if(!a)
     return;
 
@@ -271,11 +281,15 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createForward( KNArticle::Ptr a )
 {
+#if 0
   if(!a)
     return;
 
@@ -347,11 +361,15 @@ void KNArticleFactory::createForward( KNArticle::Ptr a )
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createCancel( KNArticle::Ptr a )
 {
+#if 0
   if(!cancelAllowed(a))
     return;
 
@@ -425,11 +443,15 @@ void KNArticleFactory::createCancel( KNArticle::Ptr a )
   KNLocalArticle::List lst;
   lst.append(art);
   sendArticles( lst, sendNow );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createSupersede( KNArticle::Ptr a )
 {
+#if 0
   if (!a)
     return;
 
@@ -500,11 +522,15 @@ void KNArticleFactory::createSupersede( KNArticle::Ptr a )
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
 {
+#if 0
   if ( knGlobals.settings()->useExternalMailer() ) {
     sendMailExternal(address->prettyAddress());
     return;
@@ -524,11 +550,15 @@ void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::sendMailExternal(const QString &address, const QString &subject, const QString &body)
 {
+#if 0
   KUrl mailtoURL;
   QStringList queries;
   QString query;
@@ -554,11 +584,15 @@ void KNArticleFactory::sendMailExternal(const QString &address, const QString &s
     mailtoURL.setQuery(query);
 
   KToolInvocation::invokeMailer(mailtoURL);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::edit( KNLocalArticle::Ptr a )
 {
+#if 0
   if(!a)
     return;
 
@@ -584,11 +618,15 @@ void KNArticleFactory::edit( KNLocalArticle::Ptr a )
   mCompList.append( com );
   connect(com, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   com->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::sendArticles( KNLocalArticle::List &l, bool now )
 {
+#if 0
   KNJobData *job=0;
   KNServerInfo::Ptr ser;
 
@@ -652,11 +690,15 @@ void KNArticleFactory::sendArticles( KNLocalArticle::List &l, bool now )
       emitJob(job);
     }
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::sendOutbox()
 {
+#if 0
   KNLocalArticle::List lst;
   KNFolder::Ptr ob;
 
@@ -670,11 +712,15 @@ void KNArticleFactory::sendOutbox()
     lst.append(ob->at(i));
 
   sendArticles( lst, true );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleFactory::closeComposeWindows()
 {
+#if 0
   while ( !mCompList.isEmpty() ) {
     QList<KNComposer*>::Iterator it = mCompList.begin();
     if ( !(*it)->close() )
@@ -682,37 +728,53 @@ bool KNArticleFactory::closeComposeWindows()
   }
 
   return true;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::deleteComposerForArticle( KNLocalArticle::Ptr a )
 {
+#if 0
   KNComposer *com = findComposer( a );
   if ( com ) {
     mCompList.removeAll( com );
     com->deleteLater();
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNComposer* KNArticleFactory::findComposer( KNLocalArticle::Ptr a )
 {
+#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     if ( (*it)->article() == a )
       return (*it);
   return 0;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::configChanged()
 {
+#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     (*it)->setConfig( false );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::processJob(KNJobData *j)
 {
+#if 0
   KNLocalArticle::Ptr art = boost::static_pointer_cast<KNLocalArticle>( j->data() );
   KNLocalArticle::List lst;
   lst.append(art);
@@ -765,11 +827,15 @@ void KNArticleFactory::processJob(KNJobData *j)
     //article has been sent successfully => move it to the "Sent-folder"
     knGlobals.articleManager()->moveIntoFolder(lst, knGlobals.folderManager()->sent());
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const QByteArray &defChset, bool withXHeaders, KNArticle::Ptr origPost )
 {
+#if 0
   if ( knGlobals.settings()->generateMessageID() && knGlobals.settings()->hostname().isEmpty() ) {
     KMessageBox::sorry(knGlobals.topWidget, i18n("Please set a hostname for the generation\nof the message-id or disable it."));
     return KNLocalArticle::Ptr();
@@ -877,11 +943,15 @@ KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const Q
   }
 
   return art;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNArticleFactory::cancelAllowed( KNArticle::Ptr a )
 {
+#if 0
   if(!a)
     return false;
 
@@ -946,21 +1016,29 @@ and cancel (or supersede) it there."));
   }
 
   return false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::showSendErrorDialog()
 {
+#if 0
   if(!s_endErrDlg) {
     s_endErrDlg=new KNSendErrorDialog();
     connect(s_endErrDlg, SIGNAL(closeClicked()), this, SLOT(slotSendErrorDialogDone()));
   }
   s_endErrDlg->show();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::slotComposerDone(KNComposer *com)
 {
+#if 0
   bool delCom=true;
   KNLocalArticle::List lst;
   lst.append(com->article());
@@ -1016,13 +1094,20 @@ void KNArticleFactory::slotComposerDone(KNComposer *com)
   else
     KWindowSystem::activateWindow(com->winId());
 #endif
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNArticleFactory::slotSendErrorDialogDone()
 {
+#if 0
   s_endErrDlg->deleteLater();
   s_endErrDlg=0;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -1032,6 +1117,7 @@ void KNArticleFactory::slotSendErrorDialogDone()
 KNSendErrorDialog::KNSendErrorDialog()
   : KDialog( knGlobals.topWidget )
 {
+#if 0
   setCaption( i18n("Errors While Sending") );
   setButtons( Close );
   KVBox *page = new KVBox( this );
@@ -1047,31 +1133,46 @@ KNSendErrorDialog::KNSendErrorDialog()
   connect( mErrorList, SIGNAL( currentRowChanged( int ) ), SLOT( slotHighlighted( int ) ) );
 
   KNHelper::restoreWindowSize("sendDlg", this, QSize(320,250));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNSendErrorDialog::~KNSendErrorDialog()
 {
+#if 0
   KNHelper::saveWindowSize("sendDlg", size());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNSendErrorDialog::append(const QString &subject, const QString &error)
 {
+#if 0
   ErrorListItem *item = new ErrorListItem( subject, error );
   item->setIcon( UserIcon("snderr") );
   mErrorList->addItem( item );
   mErrorList->setCurrentItem( item );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNSendErrorDialog::slotHighlighted(int idx)
 {
+#if 0
   ErrorListItem *item = static_cast<ErrorListItem*>( mErrorList->item( idx ) );
   if ( item ) {
     QString tmp = i18n("<b>Error message:</b><br />") + item->error();
     mError->setText( tmp );
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 //-------------------------------

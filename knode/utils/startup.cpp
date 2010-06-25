@@ -22,9 +22,7 @@
 
 #include "startup.h"
 
-#include "knaccountmanager.h"
 #include "knglobals.h"
-#include "knnntpaccount.h"
 
 #include <KDebug>
 #include <KIconLoader>

@@ -14,9 +14,7 @@
 #ifndef KNODE_ARTICLEWIDGET_H
 #define KNODE_ARTICLEWIDGET_H
 
-#include "knarticle.h"
-#include "knarticlecollection.h"
-#include "knjobdata.h"
+#include "legacy_include.h"
 
 #include <QByteArray>
 #include <QMap>
@@ -24,6 +22,7 @@
 #include <kurl.h>
 #include <kmime/kmime_content.h>
 
+class KNJobData;
 class QTimer;
 class KAction;
 class KActionCollection;
@@ -44,8 +43,8 @@ class CSSHelper;
 /**
   Widget to display a news article.
 */
-class ArticleWidget : public QWidget, public KNJobConsumer {
-
+class ArticleWidget : public QWidget//, public KNJobConsumer
+{
   Q_OBJECT
 
   public:

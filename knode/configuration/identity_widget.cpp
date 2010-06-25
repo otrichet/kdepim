@@ -23,8 +23,6 @@
 #include "identity_widget.h"
 
 #include "identity_edition_dialog.h"
-#include "kngroup.h"
-#include "knnntpaccount.h"
 #include "settings.h"
 #include "settings_container_interface.h"
 

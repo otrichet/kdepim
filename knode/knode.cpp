@@ -33,7 +33,6 @@
 
 //GUI
 #include "knmainwidget.h"
-#include "kncollectionviewitem.h"
 #include "knhdrviewitem.h"
 
 KNMainWindow::KNMainWindow( QWidget* parent )

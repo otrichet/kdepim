@@ -15,11 +15,9 @@
 #ifndef KNODE_KNARTICLEWINDOW_H
 #define KNODE_KNARTICLEWINDOW_H
 
-#include "knarticle.h"
-#include "knarticlecollection.h"
+#include "legacy_include.h"
 
 #include <kxmlguiwindow.h>
-
 #include <QByteArray>
 #include <QList>
 

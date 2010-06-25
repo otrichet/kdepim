@@ -22,7 +22,6 @@
 #include "knglobals.h"
 #include "knconfigmanager.h"
 #include "knhdrviewitem.h"
-#include "knarticle.h"
 #include "headerview.h"
 #include "settings.h"
 
@@ -30,28 +29,41 @@
 KNHdrViewItem::KNHdrViewItem( KNHeaderView *ref, KNArticle::Ptr a ) :
   K3ListViewItem( ref )
 {
+#if 0
   init( a );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNHdrViewItem::KNHdrViewItem( KNHdrViewItem *ref, KNArticle::Ptr a ) :
   K3ListViewItem( ref )
 {
+#if 0
   init( a );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNHdrViewItem::init( KNArticle::Ptr a )
 {
+#if 0
   art = a;
   mActive = false;
   for ( int i = 0; i < 5; ++i) // FIXME hardcoded column count
     mShowToolTip[i] = false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNHdrViewItem::~KNHdrViewItem()
 {
+#if 0
   if (mActive) {
     Q3ListView *lv = listView();
     if (lv)
@@ -61,22 +73,30 @@ KNHdrViewItem::~KNHdrViewItem()
   if (art) {
     art->setListItem( 0, art );
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNHdrViewItem::expandChildren()
 {
+#if 0
   Q3ListViewItemIterator it( firstChild() );
   for ( ; it.current(); ++it) {
     if (it.current()->depth() <= depth())
       break;
     it.current()->setOpen( true );
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 int KNHdrViewItem::compare( Q3ListViewItem *i, int col, bool ) const
 {
+#if 0
   KNArticle::Ptr otherArticle = static_cast<KNHdrViewItem*>( i )->art;
   int diff = 0;
   time_t date1 = 0, date2 = 0;
@@ -113,11 +133,15 @@ int KNHdrViewItem::compare( Q3ListViewItem *i, int col, bool ) const
     default:
        return 0;
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNHdrViewItem::paintCell( QPainter *p, const QColorGroup &cg, int column, int width, int alignment )
 {
+#if 0
   int xText = 0, xPM = 3, yPM = 0;
   QColor base;
   const KPaintInfo *paintInfo = static_cast<KNHeaderView*>( listView() )->paintInfo();
@@ -188,11 +212,15 @@ void KNHdrViewItem::paintCell( QPainter *p, const QColorGroup &cg, int column, i
       p->drawText( xText + QFontMetrics( orig ).width( t, -1 ), 0, width - xText - 5, height(), alignment | Qt::AlignVCenter,  t2 );
     }
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 int KNHdrViewItem::width( const QFontMetrics &fm, const Q3ListView *, int column ) const
 {
+#if 0
   int ret = fm.boundingRect( text(column) ).width();
   const KPaintInfo *paintInfo = static_cast<KNHeaderView*>( listView() )->paintInfo();
 
@@ -207,11 +235,15 @@ int KNHdrViewItem::width( const QFontMetrics &fm, const Q3ListView *, int column
   }
 
   return ret;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 QString KNHdrViewItem::text( int col ) const
 {
+#if 0
   if ( !art )
     return QString();
   KNHeaderView *hv = static_cast<KNHeaderView*>( listView() );
@@ -239,11 +271,15 @@ QString KNHdrViewItem::text( int col ) const
     return hv->mDateFormatter.dateString( art->date()->dateTime().toTime_t() );
   } else
     return K3ListViewItem::text( col );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 Q3DragObject* KNHdrViewItem::dragObject()
 {
+#if 0
 #ifdef __GNUC__
 #warning Enable this section again, once KNHdrView does not derive from K3ListView any more and can process QDrag (not Q3DragObject)
 #endif
@@ -266,11 +302,15 @@ return 0;
   drag->setPixmap( knGlobals.configManager()->appearance()->icon( KNode::Appearance::posting ) );
   return drag;
 #endif
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 int KNHdrViewItem::countUnreadInThread()
 {
+#if 0
   int count = 0;
   if ( knGlobals.settings()->showUnread() ) {
     if (art->type() == KNArticle::ATremote) {
@@ -278,39 +318,58 @@ int KNHdrViewItem::countUnreadInThread()
     }
   }
   return count;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNHdrViewItem::greyOut()
 {
+#if 0
   if (art->type() == KNArticle::ATremote) {
     return !boost::static_pointer_cast<KNRemoteArticle>( art )->hasUnreadFollowUps()
         && boost::static_pointer_cast<KNRemoteArticle>( art )->isRead();
   } else
     return false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNHdrViewItem::firstColBold()
 {
+#if 0
   if(art->type() == KNArticle::ATremote)
     return boost::static_pointer_cast<KNRemoteArticle>( art )->isNew();
   else
     return false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 QColor KNHdrViewItem::normalColor()
 {
+#if 0
   if (art->type()==KNArticle::ATremote)
     return boost::static_pointer_cast<KNRemoteArticle>( art )->color();
   else
     return knGlobals.settings()->unreadThreadColor();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 QColor KNHdrViewItem::greyColor()
 {
+#if 0
   return knGlobals.settings()->readThreadColor();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 

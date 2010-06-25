@@ -15,7 +15,7 @@
 #ifndef KNGROUPBROWSER_H
 #define KNGROUPBROWSER_H
 
-#include "kngroupmanager.h"
+#include "legacy_include.h"
 
 #include <kdialog.h>
 #include <q3listview.h>

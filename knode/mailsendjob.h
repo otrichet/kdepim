@@ -13,7 +13,6 @@
 #ifndef KNODE_MAILSENDJOB_H
 #define KNODE_MAILSENDJOB_H
 
-#include "knjobdata.h"
 
 class KJob;
 

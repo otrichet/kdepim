@@ -15,8 +15,8 @@
 #ifndef KNCONFIGWIDGETS_H
 #define KNCONFIGWIDGETS_H
 
-#include "knnntpaccount.h"
 #include "knode_export.h"
+#include "legacy_include.h"
 
 #include <kpagedialog.h>
 #include <kcmodule.h>

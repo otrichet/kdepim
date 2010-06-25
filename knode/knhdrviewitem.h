@@ -15,7 +15,7 @@
 #ifndef KNHDRVIEWITEM_H
 #define KNHDRVIEWITEM_H
 
-#include "knarticle.h"
+#include "legacy_include.h"
 
 #include <k3listview.h>
 

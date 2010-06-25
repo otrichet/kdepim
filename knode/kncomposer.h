@@ -15,7 +15,7 @@
 #ifndef KNCOMPOSER_H
 #define KNCOMPOSER_H
 
-#include "knarticle.h"
+#include "legacy_include.h"
 
 #include <kxmlguiwindow.h>
 #include <kdialog.h>

@@ -27,28 +27,12 @@ set(knodecommon_LIB_SRCS
    knconfig.cpp
    knconfigwidgets.cpp
    settings.cpp
-   scheduler.cpp
-   knjobdata.cpp
-   mailsendjob.cpp
-   nntpjobs.cpp
-   knaccountmanager.cpp
-   kncollection.cpp
-   kncollectionviewitem.cpp
-   knserverinfo.cpp
-   knnntpaccount.cpp
-   kngroupmanager.cpp
-   knarticlecollection.cpp
-   kngroup.cpp
    kngroupbrowser.cpp
    kngroupselectdialog.cpp
    kngroupdialog.cpp
    kngrouppropdlg.cpp
-   knfoldermanager.cpp
-   knfolder.cpp
-   knmemorymanager.cpp
    kncleanup.cpp
    knarticlemanager.cpp
-   knarticle.cpp
    kndisplayedheader.cpp
    knsourceviewwindow.cpp
    knarticlewindow.cpp
@@ -71,7 +55,6 @@ set(knodecommon_LIB_SRCS
    knmainwidget.cpp
    aboutdata.cpp
    knglobals.cpp
-   kncollectionview.cpp
    articlewidget.cpp
    csshelper.cpp
    composer/attachment_view.cpp
@@ -82,8 +65,6 @@ set(knodecommon_LIB_SRCS
    utils/startup.cpp
    kscoring.cpp
    kscoringeditor.cpp
-   treewidget.cpp
-   foldertreewidget.cpp
 )
 
 qt4_add_dbus_adaptor( knodecommon_LIB_SRCS org.kde.knode.xml knmainwidget.h KNMainWidget)
@@ -112,10 +93,12 @@ target_link_libraries(knodecommon
   ${KDE4_KDE3SUPPORT_LIBS} ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
   ${KDEPIMLIBS_KPIMUTILS_LIBS} ${KDEPIMLIBS_MAILTRANSPORT_LIBS}
   ${KDEPIMLIBS_KONTACTINTERFACE_LIBS}
+  ${KDEPIMLIBS_AKONADI_KMIME_LIBS}
   kleo
   kdepim kpgp
   messagecomposer
   messageviewer
+  akonadi_next
 )
 
 target_link_libraries(knodecommon LINK_INTERFACE_LIBRARIES ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KDE3SUPPORT_LIBS})

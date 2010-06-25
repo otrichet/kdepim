@@ -15,8 +15,7 @@
 #ifndef KNCLEANUP_H
 #define KNCLEANUP_H
 
-#include "knarticlecollection.h"
-#include "kngroup.h"
+#include "legacy_include.h"
 
 #include <QList>
 #include <KDialog>

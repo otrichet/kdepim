@@ -10,11 +10,7 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 
-#include "nntpjobs.h"
 
-#include "kngroup.h"
-#include "kngroupmanager.h"
-#include "knserverinfo.h"
 #include <kdebug.h>
 #include <klocale.h>
 #include <QDir>

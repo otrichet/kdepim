@@ -29,18 +29,13 @@
 
 class KComponentData;
 class KNConfigManager;
-class KNAccountManager;
-class KNGroupManager;
 class KNArticleManager;
 class KNArticleFactory;
-class KNFolderManager;
 class QWidget;
 class KNFilterManager;
 class KNMainWidget;
 class KNScoringManager;
-class KNMemoryManager;
 namespace KNode {
-  class Scheduler;
   class Settings;
 }
 namespace KPIMIdentities {
@@ -75,22 +70,12 @@ class KNODE_EXPORT KNGlobals
     void setComponentData( const KComponentData &inst ) { mInstance = inst; }
 
     KNConfigManager       *configManager();
-    /** Returns the scheduler. */
-    KNode::Scheduler      *scheduler();
-    /** Returns the account manager. */
-    KNAccountManager      *accountManager();
-    /** Returns the group manager. */
-    KNGroupManager        *groupManager();
     /** Returns the article manager.  */
     KNArticleManager      *articleManager();
     /** Returns the filter manager. */
     KNFilterManager       *filterManager();
-    /** Returns the folder manager. */
-    KNFolderManager       *folderManager();
     /** Returns the scoring manager. */
     KNScoringManager      *scoringManager();
-    /** Returns the memory manager. */
-    KNMemoryManager       *memoryManager();
     /** Returns the KConfigXT generated settings object. */
     KNode::Settings *settings();
     /** Returns the identity manager. */
@@ -109,15 +94,10 @@ class KNODE_EXPORT KNGlobals
     KSharedConfig::Ptr c_onfig;
 
     KComponentData mInstance;
-    KNode::Scheduler      *mScheduler;
     KNConfigManager       *mCfgManager;
-    KNAccountManager      *mAccManager;
-    KNGroupManager        *mGrpManager;
     KNArticleManager      *mArtManager;
     KNFilterManager       *mFilManager;
-    KNFolderManager       *mFolManager;
     KNScoringManager *mScoreManager;
-    KNMemoryManager       *mMemManager;
     KNode::Settings *mSettings;
     KNArticleFactory *mArticleFactory;
     KPIMIdentities::IdentityManager * mIdentityManager;

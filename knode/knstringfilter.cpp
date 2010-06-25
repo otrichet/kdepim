@@ -15,8 +15,6 @@
 #include "knstringfilter.h"
 
 #include "knglobals.h"
-#include "kngroup.h"
-#include "knnntpaccount.h"
 #include "settings.h"
 
 #include <QCheckBox>
@@ -33,17 +31,22 @@ using namespace KNode;
 
 StringFilter& KNode::StringFilter::operator=( const StringFilter &sf )
 {
+#if 0
   con=sf.con;
   data=sf.data;
   regExp=sf.regExp;
 
   return (*this);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 bool KNode::StringFilter::doFilter( const QString &s )
 {
+#if 0
   bool ret=true;
 
   if(!expanded.isEmpty()) {
@@ -57,6 +60,9 @@ bool KNode::StringFilter::doFilter( const QString &s )
   }
 
   return ret;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -64,6 +70,7 @@ bool KNode::StringFilter::doFilter( const QString &s )
 // replace placeholders
 void KNode::StringFilter::expand( KNGroup *g )
 {
+#if 0
   KPIMIdentities::Identity id;
   if ( g ) {
     if ( !g->identity().isNull() ) {
@@ -79,24 +86,34 @@ void KNode::StringFilter::expand( KNGroup *g )
   expanded = data;
   expanded.replace( QRegExp("%MYNAME"), id.fullName() );
   expanded.replace( QRegExp("%MYEMAIL"), id.primaryEmailAddress() );
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StringFilter::load( const KConfigGroup &group )
 {
+#if 0
   con=group.readEntry("contains", true);
   data=group.readEntry("Data");
   regExp=group.readEntry("regX", false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StringFilter::save( KConfigGroup &group )
 {
+#if 0
   group.writeEntry("contains", con);
   group.writeEntry("Data", data);
   group.writeEntry("regX", regExp);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -105,6 +122,7 @@ void KNode::StringFilter::save( KConfigGroup &group )
 KNode::StringFilterWidget::StringFilterWidget( const QString& title, QWidget *parent )
   : QGroupBox( title, parent )
 {
+#if 0
   fType=new QComboBox(this);
   fType->addItem(i18n("Does Contain"));
   fType->addItem(i18n("Does NOT Contain"));
@@ -119,49 +137,72 @@ KNode::StringFilterWidget::StringFilterWidget( const QString& title, QWidget *pa
   topL->addWidget( regExp, 0, 1 );
   topL->addWidget( fString, 1, 0, 1, 2 );
   topL->setColumnStretch( 2, 1 );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNode::StringFilterWidget::~StringFilterWidget()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNode::StringFilter StringFilterWidget::filter()
 {
+#if 0
   StringFilter ret;
   ret.con=(fType->currentIndex()==0);
   ret.data=fString->text();
   ret.regExp=regExp->isChecked();
 
   return ret;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StringFilterWidget::setFilter( StringFilter &f )
 {
+#if 0
   if(f.con) fType->setCurrentIndex(0);
   else fType->setCurrentIndex(1);
   fString->setText(f.data);
   regExp->setChecked(f.regExp);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNode::StringFilterWidget::clear()
 {
+#if 0
   fString->clear();
   fType->setCurrentIndex(0);
   regExp->setChecked(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNode::StringFilterWidget::setStartFocus()
 {
+#if 0
   fString->setFocus();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 

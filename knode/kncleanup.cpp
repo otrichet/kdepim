@@ -28,29 +28,34 @@
 #include <kseparator.h>
 #include <kdebug.h>
 
-#include "knfolder.h"
 #include "knglobals.h"
 #include "kncleanup.h"
 #include "knconfig.h"
-#include "knfoldermanager.h"
-#include "kngroupmanager.h"
 #include "knarticlemanager.h"
-#include "knnntpaccount.h"
 
 
 KNCleanUp::KNCleanUp() :  d_lg(0)
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNCleanUp::~KNCleanUp()
 {
+#if 0
   delete d_lg;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::start()
 {
+#if 0
   if ( mColList.isEmpty() )
     return;
 
@@ -74,19 +79,27 @@ void KNCleanUp::start()
 
   delete d_lg;
   d_lg=0;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::reset()
 {
+#if 0
   mColList.clear();
   delete d_lg;
   d_lg=0;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::expireGroup( KNGroup::Ptr g, bool showResult )
 {
+#if 0
   int expDays=0, idRef=0, foundId=-1, delCnt=0, leftCnt=0, newCnt=0, firstArtNr=g->firstNr(), firstNew=-1;
   bool unavailable=false;
   KNRemoteArticle::Ptr art, ref;
@@ -186,11 +199,15 @@ void KNCleanUp::expireGroup( KNGroup::Ptr g, bool showResult )
   if(showResult)
     KMessageBox::information(knGlobals.topWidget,
       i18n("<b>%1</b><br />expired: %2<br />left: %3", g->groupname(), delCnt, leftCnt));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::compactFolder( KNFolder::Ptr f )
 {
+#if 0
   KNLocalArticle::Ptr art;
 
   if (!f)
@@ -240,6 +257,9 @@ void KNCleanUp::compactFolder( KNFolder::Ptr f )
   }
 
   f->setNotUnloadable(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -249,6 +269,7 @@ void KNCleanUp::compactFolder( KNFolder::Ptr f )
 KNCleanUp::ProgressDialog::ProgressDialog( int steps, QWidget *parent ) :
   KDialog( parent )
 {
+#if 0
   const int w=400,
             h=160;
 
@@ -289,27 +310,46 @@ KNCleanUp::ProgressDialog::ProgressDialog( int steps, QWidget *parent ) :
     y+=knGlobals.topWidget->y();
     move(x,y);
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNCleanUp::ProgressDialog::~ProgressDialog()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::ProgressDialog::showMessage(const QString &s)
 {
+#if 0
   m_sg->setText(s);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::ProgressDialog::doProgress()
 {
+#if 0
   mProgressBar->setValue( mProgressBar->value() + 1 );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNCleanUp::ProgressDialog::closeEvent(QCloseEvent *)
 {
+#if 0
   // do nothing => prevent that the user closes the window
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }

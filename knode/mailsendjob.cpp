@@ -10,10 +10,7 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 
-#include "mailsendjob.h"
 
-#include "knarticle.h"
-#include "knserverinfo.h"
 
 #include <mailtransport/transportmanager.h>
 #include <mailtransport/transportjob.h>

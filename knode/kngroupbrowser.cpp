@@ -16,8 +16,6 @@
 
 #include "knconfigmanager.h"
 #include "knglobals.h"
-#include "knnntpaccount.h"
-#include "scheduler.h"
 
 #include <kseparator.h>
 #include <kdebug.h>
@@ -37,6 +35,7 @@ KNGroupBrowser::KNGroupBrowser(QWidget *parent, const QString &caption, KNNntpAc
   KDialog( parent ),
   incrementalFilter(false), a_ccount(a)
 {
+#if 0
   setCaption( caption );
   setButtons( buttons | Help | Ok | Cancel );
   setButtonGuiItem( User1, KGuiItem(user1) );
@@ -145,11 +144,15 @@ KNGroupBrowser::KNGroupBrowser(QWidget *parent, const QString &caption, KNNntpAc
   filterEdit->setFocus();
 
   QTimer::singleShot(2, this, SLOT(slotLoadList()));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNGroupBrowser::~KNGroupBrowser()
 {
+#if 0
 
   knGlobals.scheduler()->cancelJobs( KNJobData::JTLoadGroups );
   knGlobals.scheduler()->cancelJobs( KNJobData::JTFetchGroups );
@@ -157,11 +160,15 @@ KNGroupBrowser::~KNGroupBrowser()
   delete matchList;
   delete allList;
   delete refilterTimer;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotReceiveList( KNGroupListData::Ptr d )
 {
+#if 0
   enableButton(User1,true);
   enableButton(User2,true);
 
@@ -171,21 +178,29 @@ void KNGroupBrowser::slotReceiveList( KNGroupListData::Ptr d )
     incrementalFilter=false;
     slotRefilter();
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::changeItemState(const KNGroupInfo &gi, bool s)
 {
+#if 0
   Q3ListViewItemIterator it(groupView);
 
   for( ; it.current(); ++it)
     if (it.current()->isSelectable() && (static_cast<CheckItem*>(it.current())->info==gi))
       static_cast<CheckItem*>(it.current())->setChecked(s);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool KNGroupBrowser::itemInListView(Q3ListView *view, const KNGroupInfo &gi)
 {
+#if 0
   if(!view) return false;
   Q3ListViewItemIterator it(view);
 
@@ -194,11 +209,15 @@ bool KNGroupBrowser::itemInListView(Q3ListView *view, const KNGroupInfo &gi)
       return true;
 
   return false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::createListItems(Q3ListViewItem *parent)
 {
+#if 0
   QString prefix, tlgn, compare;
   Q3ListViewItem *it;
   CheckItem *cit;
@@ -253,11 +272,15 @@ void KNGroupBrowser::createListItems(Q3ListViewItem *parent)
       }
     }
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::removeListItem(Q3ListView *view, const KNGroupInfo &gi)
 {
+#if 0
   if(!view) return;
   Q3ListViewItemIterator it(view);
 
@@ -266,17 +289,25 @@ void KNGroupBrowser::removeListItem(Q3ListView *view, const KNGroupInfo &gi)
       delete it.current();
       break;
     }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotLoadList()
 {
+#if 0
   emit(loadList(a_ccount));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotItemExpand(Q3ListViewItem *it)
 {
+#if 0
   if(!it) return;
 
   if(it->childCount()) {
@@ -297,25 +328,37 @@ void KNGroupBrowser::slotItemExpand(Q3ListViewItem *it)
     delayedCenter = y+h/2;
     QTimer::singleShot(300, this, SLOT(slotCenterDelayed()));
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotCenterDelayed()
 {
+#if 0
   if (delayedCenter != -1)
     groupView->ensureVisible(groupView->contentsX(), delayedCenter, 0, groupView->visibleHeight()/2);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotItemDoubleClicked(Q3ListViewItem *it)
 {
+#if 0
   if (it && (it->childCount()==0)) static_cast<CheckItem*>(it)->setOn(!static_cast<CheckItem*>(it)->isOn());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 #define MIN_FOR_TREE 200
 void KNGroupBrowser::slotFilter(const QString &txt)
 {
+#if 0
   QString filtertxt = txt.toLower();
   QRegExp reg(filtertxt, Qt::CaseInsensitive, QRegExp::RegExp);
   CheckItem *cit=0;
@@ -370,52 +413,80 @@ void KNGroupBrowser::slotFilter(const QString &txt)
 
   arrowBtn1->setEnabled(false);
   arrowBtn2->setEnabled(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotTreeCBToggled()
 {
+#if 0
   incrementalFilter=false;
   slotRefilter();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotSubCBToggled()
 {
+#if 0
   incrementalFilter=subCB->isChecked();
   slotRefilter();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotNewCBToggled()
 {
+#if 0
   incrementalFilter=newCB->isChecked();
   slotRefilter();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotFilterTextChanged(const QString &)
 {
+#if 0
   if (subCB->isChecked() || newCB->isChecked())
     slotRefilter();
   else
     refilterTimer->start(200);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::slotRefilter()
 {
+#if 0
   refilterTimer->stop();
   slotFilter(filterEdit->text());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 //=======================================================================================
 
 
-KNGroupBrowser::CheckItem::CheckItem(Q3ListView *v, const KNGroupInfo &gi, KNGroupBrowser *b) :
-  Q3CheckListItem(v, gi.name, Q3CheckListItem::CheckBox), info(gi), browser(b)
+KNGroupBrowser::CheckItem::CheckItem(Q3ListView *v, const KNGroupInfo &gi, KNGroupBrowser *b)
+  : Q3CheckListItem(v, "DISABLED CODE", Q3CheckListItem::CheckBox), info(gi), browser(b)
+#ifdef __GNUC__
+//   : Q3CheckListItem(v, gi.name, Q3CheckListItem::CheckBox), info(gi), browser(b)
+#warning AKONADI PORT: Disabled code
+#endif
 {
+#if 0
   QString des(gi.description);
   if (gi.status == KNGroup::moderated) {
     setText(0,gi.name+" (m)");
@@ -423,12 +494,20 @@ KNGroupBrowser::CheckItem::CheckItem(Q3ListView *v, const KNGroupInfo &gi, KNGro
       des+=i18n(" (moderated)");
   }
   setText(1,des);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
-KNGroupBrowser::CheckItem::CheckItem(Q3ListViewItem *i, const KNGroupInfo &gi, KNGroupBrowser *b) :
-  Q3CheckListItem(i, gi.name, Q3CheckListItem::CheckBox), info(gi), browser(b)
+KNGroupBrowser::CheckItem::CheckItem(Q3ListViewItem *i, const KNGroupInfo &gi, KNGroupBrowser *b)
+  : Q3CheckListItem(i, "DISABLED CODE", Q3CheckListItem::CheckBox), info(gi), browser(b)
+#ifdef __GNUC__
+//   : Q3CheckListItem(i, gi.name, Q3CheckListItem::CheckBox), info(gi), browser(b)
+#warning AKONADI PORT: Disabled code
+#endif
 {
+#if 0
   QString des(gi.description);
   if (gi.status == KNGroup::moderated) {
     setText(0,gi.name+" (m)");
@@ -436,29 +515,44 @@ KNGroupBrowser::CheckItem::CheckItem(Q3ListViewItem *i, const KNGroupInfo &gi, K
       des+=i18n(" (moderated)");
   }
   setText(1,des);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNGroupBrowser::CheckItem::~CheckItem()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::CheckItem::setChecked(bool c)
 {
+#if 0
   KNGroupBrowser *b=browser;
   browser=0;
   Q3CheckListItem::setOn(c);
   browser=b;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupBrowser::CheckItem::stateChange(bool s)
 {
+#if 0
   if(browser) {
     kDebug(5003) <<"KNGroupBrowser::CheckItem::stateChange()";
     browser->itemChangedState(this, s);
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -466,21 +560,41 @@ void KNGroupBrowser::CheckItem::stateChange(bool s)
 
 
 KNGroupBrowser::GroupItem::GroupItem(Q3ListView *v, const KNGroupInfo &gi)
- : Q3ListViewItem(v, gi.name), info(gi)
+  : Q3ListViewItem(v, "DISABLED CODE"), info(gi)
+#ifdef __GNUC__
+//  : Q3ListViewItem(v, gi.name), info(gi)
+#warning AKONADI PORT: Disabled code
+#endif
 {
+#if 0
   if (gi.status == KNGroup::moderated)
     setText(0,gi.name+" (m)");
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNGroupBrowser::GroupItem::GroupItem(Q3ListViewItem *i, const KNGroupInfo &gi)
- : Q3ListViewItem(i, gi.name), info(gi)
+  : Q3ListViewItem(i, "DISABLED CODE"), info(gi)
+#ifdef __GNUC__
+//  : Q3ListViewItem(i, gi.name), info(gi)
+#warning AKONADI PORT: Disabled code
+#endif
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 KNGroupBrowser::GroupItem::~GroupItem()
 {
+#if 0
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 

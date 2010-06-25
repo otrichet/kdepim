@@ -15,7 +15,7 @@
 #ifndef KNODE_STATUSFILTER_H
 #define KNODE_STATUSFILTER_H
 
-#include "knarticle.h"
+#include "legacy_include.h"
 
 #include <KConfigGroup>
 #include <QComboBox>

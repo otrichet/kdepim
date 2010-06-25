@@ -15,7 +15,6 @@
 #ifndef KNJOBDATA_H
 #define KNJOBDATA_H
 
-#include "knserverinfo.h"
 
 #include <QPointer>
 #include <kurl.h>

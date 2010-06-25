@@ -28,7 +28,6 @@
 #include <klineedit.h>
 
 #include "utilities.h"
-#include "knnntpaccount.h"
 #include "kngroupdialog.h"
 #include "knglobals.h"
 #include <QPushButton>
@@ -37,6 +36,7 @@
 KNGroupDialog::KNGroupDialog( QWidget *parent, KNNntpAccount::Ptr a ) :
   KNGroupBrowser(parent, i18n("Subscribe to Newsgroups"),a, User1 | User2, true, i18n("New &List"), i18n("New &Groups...") )
 {
+#if 0
   rightLabel->setText(i18n("Current changes:"));
   subView=new Q3ListView(page);
   subView->addColumn(i18n("Subscribe To"));
@@ -70,19 +70,27 @@ KNGroupDialog::KNGroupDialog( QWidget *parent, KNNntpAccount::Ptr a ) :
   KNHelper::restoreWindowSize("groupDlg", this, QSize(662,393));  // optimized for 800x600
 
   setHelp("anc-fetch-group-list");
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 KNGroupDialog::~KNGroupDialog()
 {
+#if 0
   KNHelper::saveWindowSize("groupDlg", this->size());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::itemChangedState(CheckItem *it, bool s)
 {
+#if 0
   kDebug(5003) <<"KNGroupDialog::itemChangedState()";
   if(s){
     if(itemInListView(unsubView, it->info)) {
@@ -110,23 +118,31 @@ void KNGroupDialog::itemChangedState(CheckItem *it, bool s)
       arrowBtn2->setEnabled(false);
     }
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::updateItemState(CheckItem *it)
 {
+#if 0
   it->setChecked( (it->info.subscribed && !itemInListView(unsubView, it->info)) ||
                   (!it->info.subscribed && itemInListView(subView, it->info)) );
 
   if((it->info.subscribed || it->info.newGroup) && it->pixmap(0)==0)
     it->setPixmap(0, (it->info.newGroup)? pmNew:pmGroup);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::toSubscribe(QList<KNGroupInfo> *l)
 {
+#if 0
   l->clear();
 
   bool moderated=false;
@@ -141,22 +157,30 @@ void KNGroupDialog::toSubscribe(QList<KNGroupInfo> *l)
      KMessageBox::information( knGlobals.topWidget,
        i18n("You have subscribed to a moderated newsgroup.\nYour articles will not appear in the group immediately.\nThey have to go through a moderation process."),
        QString(), "subscribeModeratedWarning" );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::toUnsubscribe(QStringList *l)
 {
+#if 0
   l->clear();
   Q3ListViewItemIterator it(unsubView);
   for(; it.current(); ++it)
     l->append(((static_cast<GroupItem*>(it.current()))->info).name);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::setButtonDirection(arrowButton b, arrowDirection d)
 {
+#if 0
   QPushButton *btn=0;
   if(b==btn1 && dir1!=d) {
     btn=arrowBtn1;
@@ -173,12 +197,16 @@ void KNGroupDialog::setButtonDirection(arrowButton b, arrowDirection d)
     else
       btn->setIcon(pmLeft);
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::slotItemSelected(Q3ListViewItem *it)
 {
+#if 0
   const QObject *s=sender();
 
 
@@ -216,20 +244,28 @@ void KNGroupDialog::slotItemSelected(Q3ListViewItem *it)
       arrowBtn2->setEnabled(false);
     }
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::slotSelectionChanged()
 {
+#if 0
   if (!groupView->selectedItem())
     arrowBtn1->setEnabled(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 void KNGroupDialog::slotArrowBtn1()
 {
+#if 0
   if(dir1==right) {
     CheckItem *it=static_cast<CheckItem*>(groupView->selectedItem());
     if (it) {
@@ -246,11 +282,15 @@ void KNGroupDialog::slotArrowBtn1()
   }
 
   arrowBtn1->setEnabled(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNGroupDialog::slotArrowBtn2()
 {
+#if 0
   if(dir2==right) {
     CheckItem *it=static_cast<CheckItem*>(groupView->selectedItem());
     if (it) {
@@ -267,22 +307,30 @@ void KNGroupDialog::slotArrowBtn2()
   }
 
   arrowBtn2->setEnabled(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 // new list
 void KNGroupDialog::slotUser1()
 {
+#if 0
   leftLabel->setText(i18n("Downloading groups..."));
   enableButton(User1,false);
   enableButton(User2,false);
   emit(fetchList(a_ccount));
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 // new groups
 void KNGroupDialog::slotUser2()
 {
+#if 0
   QDate lastDate = a_ccount->lastNewFetch();
   KDialog *dlg = new KDialog( this );
   dlg->setCaption( i18n("New Groups") );
@@ -330,11 +378,18 @@ void KNGroupDialog::slotUser2()
   }
 
   delete dlg;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 void KNGroupDialog::slotDatePickerEnabled( bool b )
 {
+#if 0
   dateSel->setEnabled( b );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 

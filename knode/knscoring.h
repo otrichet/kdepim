@@ -15,8 +15,8 @@
 #ifndef KNSCORING_H
 #define KNSCORING_H
 
-#include "knarticle.h"
 #include "kscoring.h"
+#include "legacy_include.h"
 
 using namespace KPIM;
 

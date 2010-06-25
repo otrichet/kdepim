@@ -23,7 +23,6 @@
 #include "locale.h"
 
 #include "knglobals.h"
-#include "kngroup.h"
 #include "settings.h"
 
 #include <KCharsets>
@@ -39,6 +38,7 @@ using namespace KNode::Utilities;
 
 QString Locale::toMimeCharset( const QString &charset )
 {
+#if 0
   QString c = charset;
 
   // First, get the user preferred encoding
@@ -69,22 +69,33 @@ QString Locale::toMimeCharset( const QString &charset )
   c = c.toUpper();
 
   return c;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 
 QByteArray Locale::defaultCharset()
 {
+#if 0
   return toMimeCharset( knGlobals.settings()->charset() ).toLatin1();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 QByteArray Locale::defaultCharset( KNGroup::Ptr g )
 {
+#if 0
   if ( g && g->useCharset() ) {
     return toMimeCharset( g->defaultCharset() ).toLatin1();
   } else {
     return defaultCharset();
   }
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -92,14 +103,19 @@ QByteArray Locale::defaultCharset( KNGroup::Ptr g )
 
 void Locale::recodeString( const QString &s, KNGroup::Ptr g, QByteArray &result )
 {
+#if 0
   Q_ASSERT( g );
 
   encodeTo7Bit( s.toLatin1(), defaultCharset( g ), result );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QByteArray &result )
 {
+#if 0
   if ( raw.isEmpty() ) {
     result = raw;
     return;
@@ -114,11 +130,15 @@ void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QBy
   // Transform 8-bit data
   QString properData = QTextCodec::codecForName( charset )->toUnicode( raw );
   result = KMime::encodeRFC2047String( properData, "UTF-8" );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 QStringList Locale::encodings()
 {
+#if 0
   QStringList encodings = KGlobal::charsets()->availableEncodingNames();
   QStringList ret;
   QStringList seenEncs;
@@ -145,5 +165,8 @@ QStringList Locale::encodings()
 
   ret.sort();
   return ret;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 

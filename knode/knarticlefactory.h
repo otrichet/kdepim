@@ -15,11 +15,7 @@
 #ifndef KNARTICLEFACTORY_H
 #define KNARTICLEFACTORY_H
 
-#include "knarticle.h"
-#include "kncollection.h"
-#include "kngroup.h"
-#include "knjobdata.h"
-#include "knnntpaccount.h"
+#include "legacy_include.h"
 
 #include <QByteArray>
 #include <QList>
@@ -32,7 +28,8 @@ class KNSendErrorDialog;
 
 
 /** Article factory, responsible for creating and sending news articles. */
-class KNArticleFactory : public QObject , public KNJobConsumer {
+class KNArticleFactory : public QObject , public KNJobConsumer
+{
 
   Q_OBJECT
 

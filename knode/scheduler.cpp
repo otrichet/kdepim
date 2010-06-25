@@ -16,13 +16,7 @@
 #include <kdebug.h>
 #include <kpassworddialog.h>
 
-#include "knaccountmanager.h"
-#include "knarticle.h"
 #include "knglobals.h"
-#include "kngroupmanager.h"
-#include "knjobdata.h"
-#include "scheduler.h"
-#include "knserverinfo.h"
 
 using namespace KNode;
 using KPIM::ProgressManager;

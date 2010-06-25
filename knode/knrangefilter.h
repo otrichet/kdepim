@@ -17,6 +17,7 @@
 
 #include <QGroupBox>
 
+class KConfigGroup;
 class QLabel;
 class KIntSpinBox;
 class QComboBox;

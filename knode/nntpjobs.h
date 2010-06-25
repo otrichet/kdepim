@@ -13,8 +13,6 @@
 #ifndef KNODE_NNTPJOBS_H
 #define KNODE_NNTPJOBS_H
 
-#include "knjobdata.h"
-#include "kngroupmanager.h"
 
 #include <kio/job.h>
 

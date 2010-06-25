@@ -15,11 +15,10 @@
 #ifndef KNARTICLEFILTER_H
 #define KNARTICLEFILTER_H
 
-#include "kngroup.h"
-#include "knfolder.h"
 #include "knstatusfilter.h"
 #include "knrangefilter.h"
 #include "knstringfilter.h"
+#include "legacy_include.h"
 
 class KNRemoteArticle;
 class KNLocalArticle;

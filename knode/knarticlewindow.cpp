@@ -33,6 +33,7 @@ QList<KNode::ArticleWindow*> ArticleWindow::mInstances;
 
 bool ArticleWindow::closeAllWindowsForCollection( KNArticleCollection::Ptr col, bool force )
 {
+#if 0
   ArticleWindow::List list = mInstances;
   for ( ArticleWindow::List::Iterator it = list.begin(); it != list.end(); ++it )
     if ( (*it)->mArticleWidget->article() && (*it)->mArticleWidget->article()->collection() == col ) {
@@ -42,11 +43,15 @@ bool ArticleWindow::closeAllWindowsForCollection( KNArticleCollection::Ptr col, 
         return false;
     }
   return true;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool ArticleWindow::closeAllWindowsForArticle( KNArticle::Ptr art, bool force )
 {
+#if 0
   ArticleWindow::List list = mInstances;
   for ( ArticleWindow::List::Iterator it = list.begin(); it != list.end(); ++it )
     if ( (*it)->mArticleWidget->article() && (*it)->mArticleWidget->article() == art ) {
@@ -56,11 +61,15 @@ bool ArticleWindow::closeAllWindowsForArticle( KNArticle::Ptr art, bool force )
         return false;
     }
   return true;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool ArticleWindow::raiseWindowForArticle( KNArticle::Ptr art )
 {
+#if 0
   for ( ArticleWindow::List::Iterator it = mInstances.begin(); it != mInstances.end(); ++it )
     if ( (*it)->mArticleWidget->article() && (*it)->mArticleWidget->article() == art ) {
 #ifdef Q_OS_UNIX
@@ -69,11 +78,15 @@ bool ArticleWindow::raiseWindowForArticle( KNArticle::Ptr art )
       return true;
     }
   return false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 bool ArticleWindow::raiseWindowForArticle( const QByteArray &mid )
 {
+#if 0
   for ( ArticleWindow::List::Iterator it = mInstances.begin(); it != mInstances.end(); ++it )
     if ( (*it)->mArticleWidget->article() &&
            (*it)->mArticleWidget->article()->messageID()->as7BitString( false ) == mid ) {
@@ -84,6 +97,9 @@ bool ArticleWindow::raiseWindowForArticle( const QByteArray &mid )
     }
 
   return false;
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -92,6 +108,7 @@ bool ArticleWindow::raiseWindowForArticle( const QByteArray &mid )
 ArticleWindow::ArticleWindow( KNArticle::Ptr art )
   : KXmlGuiWindow( 0 )
 {
+#if 0
   setObjectName( "articleWindow" );
   if ( knGlobals.componentData().isValid() )
     setComponentData( knGlobals.componentData() );
@@ -120,13 +137,20 @@ ArticleWindow::ArticleWindow( KNArticle::Ptr art )
   actionCollection()->addAssociatedWidget( this );
   foreach (QAction* action, actionCollection()->actions())
     action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 ArticleWindow::~ArticleWindow()
 {
+#if 0
   mInstances.removeAll( this );
   saveMainWindowSettings(knGlobals.config()->group( "articleWindow_options") );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 //--------------------------------

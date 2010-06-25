@@ -23,7 +23,7 @@
 #ifndef KNODE_COMPOSER_ATTACHMENT_VIEW_H
 #define KNODE_COMPOSER_ATTACHMENT_VIEW_H
 
-#include "knarticle.h"
+#include "legacy_include.h"
 
 #include <QTreeWidget>
 

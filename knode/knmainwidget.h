@@ -14,13 +14,12 @@
 #ifndef KNMAINWIDGET_H
 #define KNMAINWIDGET_H
 
-#include "knarticle.h"
 #include "knode_export.h"
-
+#include "legacy_include.h"
 #include "resource.h"
+
 #include <kdialog.h>
 #include <kvbox.h>
-
 #include <QList>
 
 

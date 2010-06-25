@@ -15,12 +15,11 @@
 #ifndef KNARTICLEMANAGER_H
 #define KNARTICLEMANAGER_H
 
-#include "knarticle.h"
-#include "knfolder.h"
-#include "kngroup.h"
-#include "knjobdata.h"
+#include "legacy_include.h"
 
 #include <QList>
+#include <QObject>
+
 
 class Q3ListViewItem;
 class KTemporaryFile;
@@ -28,15 +27,17 @@ class KNHeaderView;
 class KNArticleCollection;
 class KNArticleFilter;
 class KNFilterManager;
-
+namespace KMime {
+  class Content;
+}
 namespace KNode {
   class SearchDialog;
 }
 
 
 /** Article manager. */
-class KNArticleManager : public QObject, public KNJobConsumer {
-
+class KNArticleManager : public QObject, public KNJobConsumer
+{
   Q_OBJECT
 
   public:
