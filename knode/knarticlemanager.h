@@ -17,6 +17,7 @@
 
 #include "legacy_include.h"
 
+#include <Akonadi/Collection>
 #include <QList>
 #include <QObject>
 
@@ -64,8 +65,10 @@ class KNArticleManager : public QObject, public KNJobConsumer
     void search();
 
     //collection handling
-    void setGroup( KNGroup::Ptr g );
-    void setFolder( KNFolder::Ptr f );
+    /**
+     * Sets the currently selected collection in the GUI.
+     */
+    void setCurrentCollection( const Akonadi::Collection &collection );
     KNArticleCollection::Ptr collection();
 
     //article loading
@@ -113,8 +116,6 @@ class KNArticleManager : public QObject, public KNJobConsumer
     void createCompleteThread( KNRemoteArticle::Ptr a );
 
     KNHeaderView *v_iew;
-    KNGroup::Ptr g_roup;
-    KNFolder::Ptr f_older;
     KNArticleFilter *f_ilter;
     KNFilterManager *f_ilterMgr;
     KNode::SearchDialog *s_earchDlg;
@@ -126,6 +127,8 @@ class KNArticleManager : public QObject, public KNJobConsumer
     void slotSearchDialogDone();
     void slotItemExpanded(Q3ListViewItem *p);
 
+  private:
+    Akonadi::Collection mCurrentCollection;
 };
 
 #endif

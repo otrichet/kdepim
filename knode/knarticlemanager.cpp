@@ -14,18 +14,10 @@
 
 #include "knarticlemanager.h"
 
-#include "utils/scoped_cursor_override.h"
 
-#include <QByteArray>
-#include <QList>
-#include <krun.h>
-#include <kmessagebox.h>
-#include <kmimetypetrader.h>
-#include <klocale.h>
-#include <kdebug.h>
-#include <kwindowsystem.h>
-#include <ktemporaryfile.h>
-
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/folder_manager.h"
+#include "akobackit/item_remote_article.h"
 #include "articlewidget.h"
 #include "knmainwidget.h"
 #include "knglobals.h"
@@ -40,12 +32,27 @@
 #include "knarticlewindow.h"
 #include "headerview.h"
 #include "settings.h"
+#include "utils/scoped_cursor_override.h"
+
+#include <Akonadi/ItemFetchJob>
+#include <Akonadi/ItemFetchScope>
+#include <QByteArray>
+#include <QList>
+#include <krun.h>
+#include <kmessagebox.h>
+#include <kmimetypetrader.h>
+#include <klocale.h>
+#include <kdebug.h>
+#include <kwindowsystem.h>
+#include <ktemporaryfile.h>
 
 using namespace KNode;
 using namespace KNode::Utilities;
 
 
-KNArticleManager::KNArticleManager() : QObject(0)
+KNArticleManager::KNArticleManager()
+  : QObject( 0 ),
+    mCurrentCollection( Akonadi::Collection() )
 {
   f_ilterMgr = knGlobals.filterManager();
   f_ilter = f_ilterMgr->currentFilter();
@@ -177,8 +184,9 @@ void KNArticleManager::openContent(KMime::Content *c)
 
 void KNArticleManager::showHdrs(bool clear)
 {
-#if 0
-  if(!g_roup && !f_older) return;
+  if ( !mCurrentCollection.isValid() ) {
+    return;
+  }
 
   bool setFirstChild=true;
   bool showThreads=knGlobals.settings()->showThreads();
@@ -191,6 +199,61 @@ void KNArticleManager::showHdrs(bool clear)
   knGlobals.setStatusMsg(i18n(" Creating list..."));
   knGlobals.top->secureProcessEvents();
 
+
+  // *** Begin: AKONADI PORT: Hackish code replacement ***
+  kDebug() << "AKONADI PORT: Hackish code replacement in" << Q_FUNC_INFO;
+  Akonadi::ItemFetchJob *job = new Akonadi::ItemFetchJob( mCurrentCollection );
+  job->fetchScope().fetchFullPayload();
+  job->fetchScope().fetchAllAttributes();
+  if ( job->exec() ) {
+    bool isInFolder = Akobackit::manager()->folderManager()->isFolder( mCurrentCollection );
+    const Akonadi::Item::List folderItems = job->items();
+
+    QList<KMime::NewsArticle::Ptr> articles;
+    QHash<QByteArray, KMime::NewsArticle::Ptr> articleByMid;
+    foreach ( const Akonadi::Item &item, folderItems ) {
+      KMime::NewsArticle::Ptr art;
+      if ( isInFolder ) {
+        art = LocalArticle::Ptr( new LocalArticle( item ) );
+      } else {
+        art = RemoteArticle::Ptr( new RemoteArticle( item ) );
+      }
+      art->setContent( item.payloadData() );
+      art->parse();
+
+      articles << art;
+      articleByMid.insert( art->messageID()->identifier(), art );
+    }
+
+    // Slow: we create the complete tree
+    QHash<QByteArray, KNHdrViewItem*> viewItemByMid;
+    while ( !articles.isEmpty() ) {
+      kDebug() << articles.size();
+      const KMime::NewsArticle::Ptr article = articles.takeFirst();
+      const QList<QByteArray> references = article->references()->identifiers();
+      KNHdrViewItem *viewItem = 0;
+      if ( references.isEmpty() ) {
+        viewItem = new KNHdrViewItem( v_iew, article );
+      } else {
+        const QByteArray refMid = references.last();
+        if ( !articleByMid.contains( refMid ) ) {
+          viewItem = new KNHdrViewItem( v_iew, article );
+        } else if ( viewItemByMid.contains( refMid ) ) {
+          viewItem = new KNHdrViewItem( viewItemByMid[ refMid ], article );
+        }
+      }
+
+      if ( viewItem ) {
+        viewItemByMid.insert( article->messageID()->identifier(), viewItem );
+      } else {
+        articles.append( article );
+      }
+    }
+  }
+  // *** End: AKONADI PORT: Hackish code replacement ***
+
+
+#if 0
   if(g_roup) {
     KNRemoteArticle::Ptr art, ref, current;
 
@@ -220,7 +283,6 @@ void KNArticleManager::showHdrs(bool clear)
     d_isableExpander=true;
 
     for(int i=0; i<g_roup->length(); i++) {
-
       art=g_roup->at(i);
       art->setThreadMode(showThreads);
 
@@ -228,39 +290,15 @@ void KNArticleManager::showHdrs(bool clear)
         art->propagateThreadChangedDate();
 
         if( !art->listItem() && art->filterResult() ) {
-
-          // ### disable delayed header view item creation for now, it breaks
-          // the quick search
-          // since it doesn't seem to improve performance at all, it probably
-          // could be removed entirely (see also slotItemExpanded(), etc.)
-          /*if (!expandThreads) {
-
-            if( (ref=art->displayedReference()) ) {
-
-              if( ref->listItem() && ( ref->listItem()->isOpen() || ref->listItem()->childCount()>0 ) ) {
-                art->setListItem(new KNHdrViewItem(ref->listItem()));
-                art->initListItem();
-              }
-
-            }
-            else {
-              art->setListItem(new KNHdrViewItem(v_iew));
-              art->initListItem();
-            }
-
-        } else {  // expandThreads == true */
             createThread(art);
             if ( expandThreads )
               art->listItem()->setOpen(true);
-//           }
-
         }
         else if(art->listItem()) {
           art->updateListItem();
           if (expandThreads)
             art->listItem()->setOpen(true);
         }
-
       }
       else {
 
@@ -269,7 +307,6 @@ void KNArticleManager::showHdrs(bool clear)
           art->initListItem();
         } else if(art->listItem())
           art->updateListItem();
-
       }
 
     }
@@ -321,6 +358,10 @@ void KNArticleManager::showHdrs(bool clear)
 
   }
 
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
+
   if(setFirstChild && v_iew->firstChild()) {
     v_iew->setCurrentItem(v_iew->firstChild());
     knGlobals.top->articleViewer()->setArticle( KNArticle::Ptr() );
@@ -328,16 +369,17 @@ void KNArticleManager::showHdrs(bool clear)
 
   knGlobals.setStatusMsg( QString() );
   updateStatusString();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNArticleManager::updateViewForCollection( KNArticleCollection::Ptr c )
 {
+#if 0
   if(g_roup==c || f_older==c)
     showHdrs(false);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -412,29 +454,38 @@ void KNArticleManager::search()
 }
 
 
-void KNArticleManager::setGroup( KNGroup::Ptr g )
+void KNArticleManager::setCurrentCollection( const Akonadi::Collection &collection )
 {
-  g_roup = g;
-  if ( g )
-    emit aboutToShowGroup();
+  mCurrentCollection = collection;
+
+  switch ( Akobackit::manager()->type( collection ) ) {
+    case Akobackit::NewsGroup:
+      emit aboutToShowGroup();
+      break;
+    case Akobackit::RootFolder:
+    case Akobackit::OutboxFolder:
+    case Akobackit::SentmailFolder:
+    case Akobackit::DraftFolder:
+    case Akobackit::UserFolder:
+      emit aboutToShowFolder();
+      break;
+    default:
+      break;
+  }
+
+  showHdrs();
 }
-
-
-void KNArticleManager::setFolder( KNFolder::Ptr f )
-{
-  f_older = f;
-  if ( f )
-    emit aboutToShowFolder();
-}
-
 
 KNArticleCollection::Ptr KNArticleManager::collection()
 {
+#if 0
   if(g_roup)
     return g_roup;
   if(f_older)
    return f_older;
-
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
   return KNArticleCollection::Ptr();
 }
 
@@ -846,6 +897,7 @@ bool KNArticleManager::toggleWatched(KNRemoteArticle::List &l)
   return watch;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return true;
 #endif
 }
 

@@ -11,11 +11,13 @@
     along with this program; if not, write to the Free Software Foundation,
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
+
 #include "knode.h"
+
 #include "knglobals.h"
+#include "knmainwidget.h"
 
 #include <QApplication>
-
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kstandardaction.h>
@@ -26,14 +28,10 @@
 #include <klocale.h>
 #include <kactioncollection.h>
 #include <ksqueezedtextlabel.h>
+#include <broadcaststatus.h>
+#include <progressdialog.h>
+#include <statusbarprogresswidget.h>
 
-#include "broadcaststatus.h"
-#include "progressdialog.h"
-#include "statusbarprogresswidget.h"
-
-//GUI
-#include "knmainwidget.h"
-#include "knhdrviewitem.h"
 
 KNMainWindow::KNMainWindow( QWidget* parent )
   : KXmlGuiWindow( parent )

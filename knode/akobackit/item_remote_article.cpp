@@ -20,22 +20,31 @@
   this software.
 */
 
-#include "akobackit/item_local_article.h"
+#include "akobackit/item_remote_article.h"
 
 namespace KNode {
 
-LocalArticle::LocalArticle( const Akonadi::Item &item )
-  : RemoteArticle( item )
+RemoteArticle::RemoteArticle( const Akonadi::Item &item )
+  : NewsArticle(),
+    mItem( item )
+{
+  // Sync KMime::Content
+  if ( mItem.isValid() ) {
+    setContent( mItem.payloadData() );
+  }
+}
+
+RemoteArticle::~RemoteArticle()
 {
 }
 
-LocalArticle::~LocalArticle()
+Akonadi::Item RemoteArticle::item()
 {
-}
+  mItem.setMimeType( "message/news" );
+  assemble(); // mandated by encodedContent()
+  mItem.setPayloadFromData( encodedContent() );
 
-bool LocalArticle::isValid() const
-{
-  return mItem.isValid();
+  return mItem;
 }
 
 

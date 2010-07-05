@@ -20,24 +20,48 @@
   this software.
 */
 
-#include "akobackit/item_local_article.h"
+#ifndef KNODE_ITEMREMOTEARTICLE_H
+#define KNODE_ITEMREMOTEARTICLE_H
+
+#include "knode_export.h"
+
+#include <Akonadi/Item>
+#include <KMime/NewsArticle>
+
 
 namespace KNode {
 
-LocalArticle::LocalArticle( const Akonadi::Item &item )
-  : RemoteArticle( item )
+/**
+ * Wrapper around an Akonadi::Item for message contains in newsgroups folder.
+ */
+class KNODE_EXPORT RemoteArticle : public KMime::NewsArticle
 {
+  public:
+    /// Shared pointer to a RemoteArticle.
+    typedef boost::shared_ptr<RemoteArticle> Ptr;
+    /// List of articles.
+    typedef QList<RemoteArticle::Ptr> List;
+
+    /**
+     * Create a new RemoteArticle.
+     * @param item An item from the Akonadi backend (must be valid).
+     */
+    explicit RemoteArticle( const Akonadi::Item &item );
+    /**
+     * Destroys this local article.
+     */
+    virtual ~RemoteArticle();
+
+    /**
+     * Returns the wrapped item.
+     */
+    Akonadi::Item item();
+
+  protected:
+    Akonadi::Item mItem;
+};
+
 }
 
-LocalArticle::~LocalArticle()
-{
-}
-
-bool LocalArticle::isValid() const
-{
-  return mItem.isValid();
-}
-
-
-}
+#endif
 

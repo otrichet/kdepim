@@ -23,8 +23,8 @@
 #ifndef KNODE_ITEMLOCALARTICLE_H
 #define KNODE_ITEMLOCALARTICLE_H
 
+#include "akobackit/item_remote_article.h"
 #include "akobackit/constant.h"
-#include "knode_export.h"
 
 #include <KMime/NewsArticle>
 
@@ -37,7 +37,7 @@ namespace KNode {
 /**
  * Wrapper around an Akonadi::Item for message contains in local folder.
  */
-class KNODE_EXPORT LocalArticle : public KMime::NewsArticle
+class KNODE_EXPORT LocalArticle : public RemoteArticle
 {
   public:
     /// Shared pointer to a LocalArticle.
@@ -57,19 +57,11 @@ class KNODE_EXPORT LocalArticle : public KMime::NewsArticle
     virtual ~LocalArticle();
 
     /**
-     * Returns the wrapped item.
-     */
-    Akonadi::Item item();
-
-    /**
      * Indicate if this article is already present in the backend.
      *
      * This usually indicate that this is new article without content.
      */
     bool isValid() const;
-
-  private:
-    Akonadi::Item mItem;
 
 
   public:

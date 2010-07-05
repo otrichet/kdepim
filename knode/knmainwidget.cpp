@@ -1148,12 +1148,6 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
   if(b_lockui)
     return;
 
-#if 0
-  KNCollection::Ptr c;
-  KNNntpAccount::Ptr selectedAccount;
-  KNGroup::Ptr selectedGroup;
-  KNFolder::Ptr selectedFolder;
-
   s_earchLineEdit->clear();
   h_drView->clear();
   slotArticleSelected(0);
@@ -1163,51 +1157,28 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
     a_rtManager->setAllRead( true );
   a_rtManager->setAllNotNew();
 
-  QTreeWidgetItem *i = c_olView->selectedItems().value( 0 ); // Single item selection
-  if(i) {
-    c = static_cast<KNCollectionViewItem*>( i )->collection();
-    switch(c->type()) {
-      case KNCollection::CTnntpAccount :
-        selectedAccount = boost::static_pointer_cast<KNNntpAccount>( c );
-        if( !i->isExpanded() ) {
-          i->setExpanded( true );
-        }
-      break;
-      case KNCollection::CTgroup :
-        if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() )
-          h_drView->setFocus();
-        selectedGroup = boost::static_pointer_cast<KNGroup>( c );
-        selectedAccount=selectedGroup->account();
-      break;
+  Akobackit::CollectionType collectionType = Akobackit::manager()->type( col );
 
-      case KNCollection::CTfolder :
-        if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() )
-          h_drView->setFocus();
-        selectedFolder = boost::static_pointer_cast<KNFolder>( c );
-      break;
-
-      default: break;
+  if ( collectionType != Akobackit::NntpServer ) {
+    if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() ) {
+      h_drView->setFocus();
     }
   }
 
-  a_ccManager->setCurrentAccount(selectedAccount);
-  g_rpManager->setCurrentGroup(selectedGroup);
-  f_olManager->setCurrentFolder(selectedFolder);
-  if (!selectedGroup && !selectedFolder)         // called from showHeaders() otherwise
-    a_rtManager->updateStatusString();
-
+  a_rtManager->setCurrentCollection( col );
+  a_rtManager->updateStatusString();
   updateCaption();
 
   //actions
   bool enabled;
 
-  enabled=(selectedGroup) || (selectedFolder && !selectedFolder->isRootFolder());
+  enabled = ( collectionType == Akobackit::NewsGroup ) || ( collectionType != Akobackit::RootFolder );
   if(a_ctNavNextArt->isEnabled() != enabled) {
     a_ctNavNextArt->setEnabled(enabled);
     a_ctNavPrevArt->setEnabled(enabled);
   }
 
-  enabled=( selectedGroup!=0 );
+  enabled = ( collectionType == Akobackit::NewsGroup );
   if(a_ctNavNextUnreadArt->isEnabled() != enabled) {
     a_ctNavNextUnreadArt->setEnabled(enabled);
     a_ctNavNextUnreadThread->setEnabled(enabled);
@@ -1215,7 +1186,7 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
     a_ctFetchArticleWithID->setEnabled(enabled);
   }
 
-  enabled=( selectedAccount!=0 );
+  enabled = ( collectionType == Akobackit::NntpServer );
   if(a_ctAccProperties->isEnabled() != enabled) {
     a_ctAccProperties->setEnabled(enabled);
     a_ctAccRename->setEnabled(enabled);
@@ -1228,7 +1199,7 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
     //a_ctAccPostNewArticle->setEnabled(enabled);
   }
 
-  enabled=( selectedGroup!=0 );
+  enabled = ( collectionType == Akobackit::NewsGroup );
   if(a_ctGrpProperties->isEnabled() != enabled) {
     a_ctGrpProperties->setEnabled(enabled);
     a_ctGrpRename->setEnabled(enabled);
@@ -1248,23 +1219,21 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
     a_ctReScore->setEnabled(enabled);
   }
 
-  a_ctFolNewChild->setEnabled(selectedFolder!=0);
+  bool isFolder = Akobackit::manager()->folderManager()->isFolder( col );
+  a_ctFolNewChild->setEnabled( isFolder );
 
-  enabled=( selectedFolder!=0 && !selectedFolder->isRootFolder() && !selectedFolder->isStandardFolder() );
+  enabled = ( collectionType == Akobackit::UserFolder );
   if(a_ctFolDelete->isEnabled() != enabled) {
     a_ctFolDelete->setEnabled(enabled);
     a_ctFolRename->setEnabled(enabled);
   }
 
-  enabled=( selectedFolder!=0 &&  !selectedFolder->isRootFolder() );
+  enabled = isFolder && ( collectionType != Akobackit::RootFolder );
   if ( a_ctFolEmpty->isEnabled() != enabled ) {
     a_ctFolEmpty->setEnabled(enabled);
     a_ctFolMboxImport->setEnabled(enabled);
     a_ctFolMboxExport->setEnabled(enabled);
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

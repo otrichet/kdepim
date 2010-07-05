@@ -64,6 +64,7 @@ set(knodecommon_LIB_SRCS
    akobackit/folder_manager.cpp
    akobackit/item_local_article.cpp
    akobackit/item_merge_job.cpp
+   akobackit/item_remote_article.cpp
    akobackit/localfolders_setup_job.cpp
    collectiontree/widget.cpp
    collectiontree/view.cpp
