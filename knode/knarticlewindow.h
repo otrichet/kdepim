@@ -15,6 +15,7 @@
 #ifndef KNODE_KNARTICLEWINDOW_H
 #define KNODE_KNARTICLEWINDOW_H
 
+#include "akobackit/item_remote_article.h"
 #include "legacy_include.h"
 
 #include <kxmlguiwindow.h>
@@ -34,7 +35,7 @@ class ArticleWindow : public KXmlGuiWindow  {
     /** Create a new article window.
      * @param art The article to show in this window.
      */
-    ArticleWindow( KNArticle::Ptr art );
+    ArticleWindow( RemoteArticle::Ptr art );
     /// Destroy this article viewer window.
     ~ArticleWindow();
     /** Returns the article widget of this window. */
@@ -59,7 +60,7 @@ class ArticleWindow : public KXmlGuiWindow  {
      * @param art The article.
      * @return false if no article window was found.
      */
-    static bool raiseWindowForArticle( KNArticle::Ptr art );
+    static bool raiseWindowForArticle( RemoteArticle::Ptr art );
     /** Raise the article window showing a specific article.
      * @param mid Message-ID of the article.
      * @return false if no article was found.

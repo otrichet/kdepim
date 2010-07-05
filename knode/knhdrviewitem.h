@@ -15,8 +15,9 @@
 #ifndef KNHDRVIEWITEM_H
 #define KNHDRVIEWITEM_H
 
+#include "akobackit/item_remote_article.h"
+
 #include <k3listview.h>
-#include <KMime/NewsArticle>
 
 class KNHeaderView;
 
@@ -25,8 +26,8 @@ class KNHeaderView;
 class KNHdrViewItem : public K3ListViewItem  {
 
   public:
-    explicit KNHdrViewItem( KNHeaderView *ref, KMime::NewsArticle::Ptr a = KMime::NewsArticle::Ptr() );
-    explicit KNHdrViewItem( KNHdrViewItem *ref, KMime::NewsArticle::Ptr a = KMime::NewsArticle::Ptr() );
+    explicit KNHdrViewItem( KNHeaderView *ref, KNode::RemoteArticle::Ptr a );
+    explicit KNHdrViewItem( KNHdrViewItem *ref, KNode::RemoteArticle::Ptr a );
     ~KNHdrViewItem();
 
     virtual int compare(Q3ListViewItem *i, int col, bool ascending) const;
@@ -44,13 +45,13 @@ class KNHdrViewItem : public K3ListViewItem  {
     // DND
     Q3DragObject* dragObject();
 
-    KMime::NewsArticle::Ptr art;
+    KNode::RemoteArticle::Ptr art;
     int countUnreadInThread();
 
     bool showToolTip( int column ) const { return mShowToolTip[column]; }
 
   private:
-    void init( KMime::NewsArticle::Ptr );
+    void init( KNode::RemoteArticle::Ptr );
 
     bool greyOut();
     bool firstColBold();

@@ -37,6 +37,16 @@ namespace KNode {
 class KNODE_EXPORT RemoteArticle : public KMime::NewsArticle
 {
   public:
+    /**
+    * Type of article.
+    */
+    enum ArticleType {
+      ATlocal,
+      ATremote
+    };
+
+
+  public:
     /// Shared pointer to a RemoteArticle.
     typedef boost::shared_ptr<RemoteArticle> Ptr;
     /// List of articles.
@@ -51,6 +61,14 @@ class KNODE_EXPORT RemoteArticle : public KMime::NewsArticle
      * Destroys this local article.
      */
     virtual ~RemoteArticle();
+
+    /**
+     * Returns RemoteArticle.
+     */
+    virtual ArticleType type() const
+    {
+      return ATremote;
+    }
 
     /**
      * Returns the wrapped item.

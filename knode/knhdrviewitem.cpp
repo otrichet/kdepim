@@ -26,22 +26,23 @@
 #include <QPixmap>
 #include <kdebug.h>
 
+using namespace KNode;
 
-KNHdrViewItem::KNHdrViewItem( KNHeaderView *ref, KMime::NewsArticle::Ptr a ) :
+KNHdrViewItem::KNHdrViewItem( KNHeaderView *ref, RemoteArticle::Ptr a ) :
   K3ListViewItem( ref )
 {
   init( a );
 }
 
 
-KNHdrViewItem::KNHdrViewItem( KNHdrViewItem *ref, KMime::NewsArticle::Ptr a ) :
+KNHdrViewItem::KNHdrViewItem( KNHdrViewItem *ref, RemoteArticle::Ptr a ) :
   K3ListViewItem( ref )
 {
   init( a );
 }
 
 
-void KNHdrViewItem::init( KMime::NewsArticle::Ptr a )
+void KNHdrViewItem::init( RemoteArticle::Ptr a )
 {
   art = a;
   mActive = false;
@@ -50,7 +51,7 @@ void KNHdrViewItem::init( KMime::NewsArticle::Ptr a )
 
 
   setText( 0, art->subject()->asUnicodeString() );
-  KNode::LocalArticle *localArticle = dynamic_cast<KNode::LocalArticle*>( a.get() );
+  KNode::LocalArticle *localArticle = dynamic_cast<LocalArticle*>( a.get() );
   if ( !localArticle ) {
     setText( 1, a->from()->asUnicodeString() );
   } else {

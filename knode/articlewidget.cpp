@@ -295,12 +295,12 @@ void ArticleWidget::enableActions()
   mFixedFontToggle->setEnabled( true );
   mFancyToggle->setEnabled( true );
 
-#if 0
   // only valid for remote articles
-  bool enabled = ( mArticle->type() == KNArticle::ATremote );
+  bool enabled = ( mArticle->type() == RemoteArticle::ATremote );
   mReplyAction->setEnabled( enabled );
   mRemailAction->setEnabled( enabled );
 
+#if 0
   enabled = ( mArticle->type() == KNArticle::ATremote
     || mArticle->collection() == knGlobals.folderManager()->sent() );
   mCancelAction->setEnabled( enabled );
@@ -377,7 +377,7 @@ void ArticleWidget::writeConfig()
 
 
 
-void ArticleWidget::setArticle( KNArticle::Ptr article )
+void ArticleWidget::setArticle( RemoteArticle::Ptr article )
 {
   mShowHtml = knGlobals.settings()->alwaysShowHTML();
   mRot13 = false;
@@ -420,7 +420,6 @@ void ArticleWidget::clear()
 
 void ArticleWidget::displayArticle()
 {
-#if 0
   if ( !mArticle) {
     clear();
     return;
@@ -575,11 +574,9 @@ void ArticleWidget::displayArticle()
   mViewer->end();
 
   enableActions();
-  if( mArticle->type() == KNArticle::ATremote && knGlobals.settings()->autoMark() )
+  if ( mArticle->type() == RemoteArticle::ATremote && knGlobals.settings()->autoMark() ) {
     mTimer->start( knGlobals.settings()->autoMarkSeconds() * 1000 );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  }
 }
 
 
@@ -607,7 +604,6 @@ void ArticleWidget::displayErrorMessage( const QString &msg )
 
 void ArticleWidget::displayHeader()
 {
-#if 0
   QString headerHtml;
 
   // full header style
@@ -711,7 +707,7 @@ void ArticleWidget::displayHeader()
 
   // references
   KMime::Headers::References *refs = mArticle->references( false );
-  if ( mArticle->type() == KNArticle::ATremote && refs
+  if ( mArticle->type() == RemoteArticle::ATremote && refs
        && knGlobals.settings()->showRefBar() ) {
     html += "<div class=\"spamheader\">";
     html += QString( "<b>%1</b>" ).arg( i18n("References:") );
@@ -725,15 +721,11 @@ void ArticleWidget::displayHeader()
   }
   html += "</div>";
   mViewer->write( html );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void ArticleWidget::displayBodyBlock( const QStringList &lines )
 {
-#if 0
   int oldLevel = -2, newLevel = -2;
   bool isSig = false;
   QString line, html;
@@ -791,9 +783,6 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
     html += "</div>";
 
   mViewer->write( html );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1126,7 +1115,7 @@ void ArticleWidget::configChanged()
 }
 
 
-bool ArticleWidget::articleVisible( KNArticle::Ptr article )
+bool ArticleWidget::articleVisible( RemoteArticle::Ptr article )
 {
   for ( InstanceIterator it = mInstances.constBegin(); it != mInstances.constEnd(); ++it )
     if ( (*it)->article() == article )
@@ -1135,15 +1124,15 @@ bool ArticleWidget::articleVisible( KNArticle::Ptr article )
 }
 
 
-void ArticleWidget::articleRemoved( KNArticle::Ptr article )
+void ArticleWidget::articleRemoved( RemoteArticle::Ptr article )
 {
   for ( InstanceIterator it = mInstances.constBegin(); it != mInstances.constEnd(); ++it )
     if ( (*it)->article() == article )
-      (*it)->setArticle( KNArticle::Ptr() );
+      (*it)->setArticle( RemoteArticle::Ptr() );
 }
 
 
-void ArticleWidget::articleChanged( KNArticle::Ptr article )
+void ArticleWidget::articleChanged( RemoteArticle::Ptr article )
 {
   for ( InstanceIterator it = mInstances.constBegin(); it != mInstances.constEnd(); ++it )
     if ( (*it)->article() == article )
@@ -1151,7 +1140,7 @@ void ArticleWidget::articleChanged( KNArticle::Ptr article )
 }
 
 
-void ArticleWidget::articleLoadError( KNArticle::Ptr article, const QString &error )
+void ArticleWidget::articleLoadError( RemoteArticle::Ptr article, const QString &error )
 {
   for ( InstanceIterator it = mInstances.constBegin(); it != mInstances.constEnd(); ++it )
   if ( (*it)->article() == article )
@@ -1306,8 +1295,12 @@ void ArticleWidget::slotTimeout()
 
 void ArticleWidget::slotSave()
 {
+#if 0
   if ( mArticle )
     knGlobals.articleManager()->saveArticleToFile( mArticle, this );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 void ArticleWidget::slotPrint( )
@@ -1384,19 +1377,31 @@ void ArticleWidget::slotRemail()
 
 void ArticleWidget::slotForward()
 {
+#if 0
   KNGlobals::self()->articleFactory()->createForward( mArticle );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void ArticleWidget::slotCancel()
 {
+#if 0
   KNGlobals::self()->articleFactory()->createCancel( mArticle );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void ArticleWidget::slotSupersede()
 {
+#if 0
   KNGlobals::self()->articleFactory()->createSupersede( mArticle );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 

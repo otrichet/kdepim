@@ -56,6 +56,13 @@ class KNODE_EXPORT LocalArticle : public RemoteArticle
      */
     virtual ~LocalArticle();
 
+
+    virtual ArticleType type() const
+    {
+      return ATlocal;
+    }
+
+
     /**
      * Indicate if this article is already present in the backend.
      *

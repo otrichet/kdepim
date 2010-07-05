@@ -14,6 +14,7 @@
 #ifndef KNODE_ARTICLEWIDGET_H
 #define KNODE_ARTICLEWIDGET_H
 
+#include "akobackit/item_remote_article.h"
 #include "legacy_include.h"
 
 #include <QByteArray>
@@ -63,29 +64,29 @@ class ArticleWidget : public QWidget//, public KNJobConsumer
     /** display the given article
      * @param article The article to display.
      */
-    void setArticle( KNArticle::Ptr article );
+    void setArticle( RemoteArticle::Ptr article );
     /// returns the currently shown article
-    KNArticle::Ptr article() const { return mArticle; }
+    RemoteArticle::Ptr article() const { return mArticle; }
 
     /// notify all instances about a config change
     static void configChanged();
     /** check whether the given article is displayed in any instance
      * @param article The article to check.
      */
-    static bool articleVisible( KNArticle::Ptr article );
+    static bool articleVisible( RemoteArticle::Ptr article );
     /** notify all instances that the given article has been removed
      * @param article The removed article.
      */
-    static void articleRemoved( KNArticle::Ptr article );
+    static void articleRemoved( RemoteArticle::Ptr article );
     /** notify all instances that the given article has changed
      * @param article The changed article.
      */
-    static void articleChanged( KNArticle::Ptr article );
+    static void articleChanged( RemoteArticle::Ptr article );
     /** notify all instances about an error during loading the given article
      * @param article The article that couldn't be loaded.
      * @param error The error message.
      */
-    static void articleLoadError( KNArticle::Ptr article, const QString &error );
+    static void articleLoadError( RemoteArticle::Ptr article, const QString &error );
     /** notify all instances that the given collection has been removed
      * @param coll The removed article collection (a group or a folder).
      */
@@ -216,7 +217,7 @@ class ArticleWidget : public QWidget//, public KNJobConsumer
 
   private:
     /// the currently shown article
-    KNArticle::Ptr mArticle;
+    RemoteArticle::Ptr mArticle;
     /// attachments of the current article
     KMime::Content::List mAttachments;
     /// mapping of temporary file names to part numbers

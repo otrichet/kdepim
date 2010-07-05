@@ -67,7 +67,7 @@ bool ArticleWindow::closeAllWindowsForArticle( KNArticle::Ptr art, bool force )
 }
 
 
-bool ArticleWindow::raiseWindowForArticle( KNArticle::Ptr art )
+bool ArticleWindow::raiseWindowForArticle( RemoteArticle::Ptr art )
 {
 #if 0
   for ( ArticleWindow::List::Iterator it = mInstances.begin(); it != mInstances.end(); ++it )
@@ -105,7 +105,7 @@ bool ArticleWindow::raiseWindowForArticle( const QByteArray &mid )
 
 //==================================================================================
 
-ArticleWindow::ArticleWindow( KNArticle::Ptr art )
+ArticleWindow::ArticleWindow( RemoteArticle::Ptr art )
   : KXmlGuiWindow( 0 )
 {
 #if 0

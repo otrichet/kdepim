@@ -1074,21 +1074,23 @@ void KNMainWidget::closeCurrentThread()
 
 void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArticleSelected(QListViewItem *i)";
+  kDebug();
   if(b_lockui)
     return;
-  KNArticle::Ptr selectedArticle;
+
+  RemoteArticle::Ptr selectedArticle;
 
   if(i)
     selectedArticle=(static_cast<KNHdrViewItem*>(i))->art;
 
   mArticleViewer->setArticle( selectedArticle );
 
+  Akobackit::CollectionType type = Akobackit::manager()->type( mCollectionWidget->selectedCollection() );
+
   //actions
   bool enabled;
 
-  enabled=( selectedArticle && selectedArticle->type()==KNArticle::ATremote );
+  enabled = ( selectedArticle && selectedArticle->type() == RemoteArticle::ATremote );
   if(a_ctArtSetArtRead->isEnabled() != enabled) {
     a_ctArtSetArtRead->setEnabled(enabled);
     a_ctArtSetArtUnread->setEnabled(enabled);
@@ -1100,28 +1102,25 @@ void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
     a_ctScoreRaise->setEnabled(enabled);
   }
 
-  a_ctArtOpenNewWindow->setEnabled( selectedArticle && (f_olManager->currentFolder()!=f_olManager->outbox())
-                                                    && (f_olManager->currentFolder()!=f_olManager->drafts()));
+  a_ctArtOpenNewWindow->setEnabled( selectedArticle && ( type != Akobackit::OutboxFolder )
+                                                    && ( type != Akobackit::DraftFolder ) );
 
-  enabled=( selectedArticle && selectedArticle->type()==KNArticle::ATlocal );
+  enabled = ( selectedArticle && selectedArticle->type() == RemoteArticle::ATlocal );
   a_ctArtDelete->setEnabled(enabled);
-  a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
-  a_ctArtEdit->setEnabled(enabled && ((f_olManager->currentFolder()==f_olManager->outbox())||
-                                      (f_olManager->currentFolder()==f_olManager->drafts())));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  a_ctArtSendNow->setEnabled( enabled && ( type == Akobackit::OutboxFolder ) );
+  a_ctArtEdit->setEnabled( enabled && ( ( type == Akobackit::OutboxFolder )
+                                        || ( type == Akobackit::DraftFolder ) ) );
 }
 
 
 void KNMainWidget::slotArticleSelectionChanged()
 {
-#if 0
   // enable all actions that work with multiple selection
 
-  //actions
-  bool enabled = (g_rpManager->currentGroup()!=0);
+  Akobackit::CollectionType type = Akobackit::manager()->type( mCollectionWidget->selectedCollection() );
 
+  //actions
+  bool enabled = ( type == Akobackit::NewsGroup );
   if(a_ctArtSetArtRead->isEnabled() != enabled) {
     a_ctArtSetArtRead->setEnabled(enabled);
     a_ctArtSetArtUnread->setEnabled(enabled);
@@ -1133,12 +1132,9 @@ void KNMainWidget::slotArticleSelectionChanged()
     a_ctScoreRaise->setEnabled(enabled);
   }
 
-  enabled = (f_olManager->currentFolder()!=0);
+  enabled = Akobackit::manager()->folderManager()->isFolder( mCollectionWidget->selectedCollection() );
   a_ctArtDelete->setEnabled(enabled);
-  a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  a_ctArtSendNow->setEnabled( type == Akobackit::OutboxFolder );
 }
 
 

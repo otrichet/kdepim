@@ -209,10 +209,10 @@ void KNArticleManager::showHdrs(bool clear)
     bool isInFolder = Akobackit::manager()->folderManager()->isFolder( mCurrentCollection );
     const Akonadi::Item::List folderItems = job->items();
 
-    QList<KMime::NewsArticle::Ptr> articles;
-    QHash<QByteArray, KMime::NewsArticle::Ptr> articleByMid;
+    QList<RemoteArticle::Ptr> articles;
+    QHash<QByteArray, RemoteArticle::Ptr> articleByMid;
     foreach ( const Akonadi::Item &item, folderItems ) {
-      KMime::NewsArticle::Ptr art;
+      RemoteArticle::Ptr art;
       if ( isInFolder ) {
         art = LocalArticle::Ptr( new LocalArticle( item ) );
       } else {
@@ -228,8 +228,7 @@ void KNArticleManager::showHdrs(bool clear)
     // Slow: we create the complete tree
     QHash<QByteArray, KNHdrViewItem*> viewItemByMid;
     while ( !articles.isEmpty() ) {
-      kDebug() << articles.size();
-      const KMime::NewsArticle::Ptr article = articles.takeFirst();
+      const RemoteArticle::Ptr article = articles.takeFirst();
       const QList<QByteArray> references = article->references()->identifiers();
       KNHdrViewItem *viewItem = 0;
       if ( references.isEmpty() ) {
@@ -364,7 +363,7 @@ void KNArticleManager::showHdrs(bool clear)
 
   if(setFirstChild && v_iew->firstChild()) {
     v_iew->setCurrentItem(v_iew->firstChild());
-    knGlobals.top->articleViewer()->setArticle( KNArticle::Ptr() );
+    knGlobals.top->articleViewer()->setArticle( RemoteArticle::Ptr() );
   }
 
   knGlobals.setStatusMsg( QString() );
