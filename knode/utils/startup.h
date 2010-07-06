@@ -45,6 +45,10 @@ class KNODE_EXPORT Startup
     */
     void updateDataAndConfiguration() const;
 
+    /**
+     * Initialize data / Ensure it exists and is correctly setup.
+     */
+    void initData();
 };
 
 

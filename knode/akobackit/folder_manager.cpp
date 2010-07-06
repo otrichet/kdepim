@@ -45,8 +45,6 @@ FolderManager::FolderManager( AkoManager *parent )
   : QObject( parent ),
     mMainManager( parent )
 {
-  // Side effect: register special folder to SpecialMailCollections.
-  foldersResource( true );
 }
 
 FolderManager::~FolderManager()

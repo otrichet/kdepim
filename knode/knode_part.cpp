@@ -59,6 +59,7 @@ KNodePart::KNodePart( QWidget *parentWidget, QObject *parent, const QVariantList
   KNode::Utilities::Startup s;
   s.loadLibrariesIconsAndTranslations();
   s.updateDataAndConfiguration();
+  s.initData();
 
 #ifdef __GNUC__
 #warning Port me!

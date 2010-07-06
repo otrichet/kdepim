@@ -22,6 +22,10 @@
 
 #include "utils/startup.h"
 
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/folder_manager.h"
+
+#include <Akonadi/AgentInstance>
 #include <KDebug>
 #include <KIconLoader>
 #include <KLocale>
@@ -67,6 +71,13 @@ return;
     exit( migrator.exitCode() );
   }
 }
+
+void Startup::initData()
+{
+  // Side effect: register special folder to SpecialMailCollections.
+  Akobackit::manager()->folderManager()->foldersResource( true );
+}
+
 
 
 }
