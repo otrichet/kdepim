@@ -16,10 +16,12 @@
 
 #include "akobackit/akonadi_manager.h"
 #include "akobackit/folder_manager.h"
+#include "akobackit/nntpaccount_manager.h"
 #include "collectiontree/widget.h"
 #include "headerview.h"
 
 #include <Akonadi/Collection>
+#include <Akonadi/AgentManager>
 #include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
@@ -1362,10 +1364,17 @@ void KNMainWidget::slotNavReadThrough()
 
 void KNMainWidget::slotAccProperties()
 {
+  kDebug();
+  const Akonadi::Collection collection = mCollectionWidget->selectedCollection();
+  const Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance(  collection.resource() );
+  if ( !agent.isValid() ) {
+    return;
+  }
+
+  Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+  am->editAccount( am->account( agent ), this );
 #if 0
-  kDebug(5003) <<"KNMainWidget::slotAccProperties()";
-  if(a_ccManager->currentAccount())
-    a_ccManager->editProperties(a_ccManager->currentAccount());
+  // FIXME editAccount() is async now!
   updateCaption();
   a_rtManager->updateStatusString();
 #else
@@ -1427,15 +1436,14 @@ void KNMainWidget::slotAccGetNewHdrs()
 
 void KNMainWidget::slotAccDelete()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotAccDelete()";
-  if(a_ccManager->currentAccount()) {
-    if (a_ccManager->removeAccount(a_ccManager->currentAccount()))
-      slotCollectionSelected();
+  kDebug();
+  const Akonadi::Collection collection = mCollectionWidget->selectedCollection();
+  const Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance(  collection.resource() );
+  if ( !agent.isValid() ) {
+    return;
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+  am->editAccount( am->account( agent ), this );
 }
 
 void KNMainWidget::slotAccGetNewHdrsAll()

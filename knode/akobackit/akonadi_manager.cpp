@@ -24,6 +24,7 @@
 
 #include "akobackit/folder_manager.h"
 #include "akobackit/localfolders_setup_job.h"
+#include "akobackit/nntpaccount_manager.h"
 #include "knglobals.h"
 
 #include <Akonadi/ChangeRecorder>
@@ -60,6 +61,7 @@ AkoManager::AkoManager( QObject *parent )
     mMonitor( 0 ),
     mBaseModel( 0 ),
     mSession( new Akonadi::Session( "KNode", this ) ),
+    mAccountManager( new NntpAccountManager( this ) ),
     mFolderManager( new FolderManager( this ) )
 {
 }

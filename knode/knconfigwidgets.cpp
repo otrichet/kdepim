@@ -14,6 +14,8 @@
 
 #include "knconfigwidgets.h"
 
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/nntpaccount_manager.h"
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
 #include "kndisplayedheader.h"
@@ -28,6 +30,7 @@
 #include "settings.h"
 #include "utils/locale.h"
 
+#include <Akonadi/AgentFilterProxyModel>
 #include <QPainter>
 #include <kcharsets.h>
 #include <kio/ioslave_defaults.h>
@@ -46,164 +49,73 @@
 KNode::NntpAccountListWidget::NntpAccountListWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   setupUi( this );
 
+  // Restrict to NNTP account
+  // TODO: change the ItemDelegate to have something nicer to display...
+  Akonadi::AgentFilterProxyModel *accountModel = mAccountList->agentFilterProxyModel();
+  accountModel->clearFilters();
+  accountModel->addMimeTypeFilter( "message/news" );
+  accountModel->addCapabilityFilter( "Resource" );
+
+  mAccountList->view()->setSelectionMode( QAbstractItemView::SingleSelection );
+
   // account listbox
-  connect( mAccountList, SIGNAL( itemDoubleClicked( QListWidgetItem* ) ), SLOT( slotEditBtnClicked() ) );
-  connect( mAccountList, SIGNAL( itemSelectionChanged() ), SLOT( slotSelectionChanged() ) );
+  connect( mAccountList, SIGNAL( doubleClicked( const Akonadi::AgentInstance & ) ),
+           this, SLOT( slotEditBtnClicked() ) );
+  connect( mAccountList, SIGNAL( currentChanged( const Akonadi::AgentInstance &, const Akonadi::AgentInstance &) ),
+           this, SLOT( slotSelectionChanged( const Akonadi::AgentInstance & ) ) );
 
   // buttons
   connect( mAddButton, SIGNAL( clicked() ), SLOT( slotAddBtnClicked() ) );
   connect( mEditButton, SIGNAL( clicked() ), SLOT( slotEditBtnClicked() ) );
   connect( mDeleteButton, SIGNAL( clicked() ), SLOT( slotDelBtnClicked() ) );
   connect( mSubscribeButton, SIGNAL( clicked() ), SLOT( slotSubBtnClicked() ) );
-
-  load();
-
-  // the settings dialog is non-modal, so we have to react to changes
-  // made outside of the dialog
-  KNAccountManager *am = knGlobals.accountManager();
-  connect( am, SIGNAL( accountAdded( KNNntpAccount::Ptr ) ), SLOT( slotAddItem( KNNntpAccount::Ptr ) ) );
-  connect( am, SIGNAL( accountRemoved( KNNntpAccount::Ptr ) ), SLOT( slotRemoveItem( KNNntpAccount::Ptr ) ) );
-  connect( am, SIGNAL( accountModified( KNNntpAccount::Ptr ) ), SLOT( slotUpdateItem( KNNntpAccount::Ptr ) ) );
-
-  slotSelectionChanged();     // disable Delete & Edit initially
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNode::NntpAccountListWidget::load()
-{
-#if 0
-  mAccountList->clear();
-  KNNntpAccount::List list = knGlobals.accountManager()->accounts();
-  for ( KNNntpAccount::List::Iterator it = list.begin(); it != list.end(); ++it )
-    slotAddItem( *it );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNode::NntpAccountListWidget::slotAddItem( KNNntpAccount::Ptr a )
-{
-#if 0
-  AccountListItem *item;
-  item = new AccountListItem( a );
-  item->setText( a->name() );
-  item->setIcon( SmallIcon( "network-server" ) );
-  mAccountList->addItem( item );
-  emit changed( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNode::NntpAccountListWidget::slotRemoveItem( KNNntpAccount::Ptr a )
-{
-#if 0
-  AccountListItem *item;
-  for ( int i = 0; i < mAccountList->count(); ++i ) {
-    item = static_cast<AccountListItem*>( mAccountList->item( i ) );
-    if ( item && item->account() == a ) {
-      delete mAccountList->takeItem( i );
-      break;
-    }
-  }
-  slotSelectionChanged();
-  emit changed( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNode::NntpAccountListWidget::slotUpdateItem( KNNntpAccount::Ptr a )
-{
-#if 0
-  AccountListItem *item;
-  for ( int i = 0; i < mAccountList->count(); ++i ) {
-    item = static_cast<AccountListItem*>( mAccountList->item( i ) );
-    if ( item && item->account() == a )
-      item->setText( a->name() );
-  }
-  slotSelectionChanged();
-  emit changed( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
-void KNode::NntpAccountListWidget::slotSelectionChanged()
+void KNode::NntpAccountListWidget::slotSelectionChanged( const Akonadi::AgentInstance &account )
 {
-#if 0
-  AccountListItem *item = static_cast<AccountListItem*>( mAccountList->currentItem() );
-  mDeleteButton->setEnabled( item );
-  mEditButton->setEnabled( item );
-  mSubscribeButton->setEnabled( item );
+  bool valid = account.isValid();
+  mDeleteButton->setEnabled( valid );
+  mEditButton->setEnabled( valid );
+  mSubscribeButton->setEnabled( valid );
 
-  if ( item ) {
-    mServerInfo->setText( i18n("Server: %1", item->account()->server() ) );
-    mPortInfo->setText( i18n("Port: %1", item->account()->port() ) );
+  if ( valid ) {
+    NntpAccount::Ptr nntpAccount = Akobackit::manager()->accountManager()->account( account );
+    mServerInfo->setText( i18n( "Server: %1", nntpAccount->server() ) );
+    mPortInfo->setText( i18n( "Port: %1", nntpAccount->port() ) );
   } else {
     mServerInfo->setText( i18n("Server: ") );
     mPortInfo->setText( i18n("Port: ") );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::NntpAccountListWidget::slotAddBtnClicked()
 {
-#if 0
-  KNNntpAccount::Ptr acc = KNNntpAccount::Ptr( new KNNntpAccount() );
-
-  if(acc->editProperties(this)) {
-    if(knGlobals.accountManager()->newAccount(acc))
-      acc->writeConfig();
-  }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  Akobackit::manager()->accountManager()->createAccount( this );
 }
-
-
 
 void KNode::NntpAccountListWidget::slotDelBtnClicked()
 {
-#if 0
-  AccountListItem *item = static_cast<AccountListItem*>( mAccountList->currentItem() );
-  if ( item )
-    knGlobals.accountManager()->removeAccount( item->account() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  const Akonadi::AgentInstance agent = mAccountList->currentAgentInstance();
+  if ( agent.isValid() ) {
+    Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+    am->removeAccount( am->account( agent ), this );
+  }
 }
-
-
 
 void KNode::NntpAccountListWidget::slotEditBtnClicked()
 {
-#if 0
-  AccountListItem *item = static_cast<AccountListItem*>( mAccountList->currentItem() );
-  if ( item ) {
-    item->account()->editProperties( this );
-    slotUpdateItem( item->account() );
+  Akonadi::AgentInstance agent = mAccountList->currentAgentInstance();
+  if ( agent.isValid() ) {
+    Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+    am->editAccount( am->account( agent ), this );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
-
 
 void KNode::NntpAccountListWidget::slotSubBtnClicked()
 {
@@ -220,16 +132,17 @@ void KNode::NntpAccountListWidget::slotSubBtnClicked()
 //=======================================================================================
 
 
-KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *parent ) :
+KNode::NntpAccountConfDialog::NntpAccountConfDialog( NntpAccount::Ptr a, QWidget *parent ) :
     KPageDialog( parent ),
     mAccount( a ),
-    mUseServerForName( false )
+    mUseServerForName( false ),
+    mDeleteAccountOnCancel( false )
 {
-#if 0
-  if ( a->id() != -1 )
-    setCaption( i18n("Properties of %1", a->name()) );
-  else
+  if ( !a->name().isEmpty() ) {
+    setCaption( i18n( "Properties of %1", a->name() ) );
+  } else {
     setCaption( i18n("New Account") );
+  }
   setFaceType( Tabbed );
   setButtons( Ok | Cancel | Help );
   setDefaultButton( Ok );
@@ -253,24 +166,29 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
   connect( mServer, SIGNAL( editingFinished() ),
            this, SLOT( slotEditingFinished() ) );
 
-  mLogin->setChecked( a->needsLogon() );
+  mLogin->setChecked( a->requiresAuthentication() );
   mUser->setText( a->user() );
 
+#if 0
   connect( knGlobals.accountManager(), SIGNAL(passwordsChanged()), SLOT(slotPasswordChanged()) );
   if ( a->readyForLogin() )
-    mPassword->setText( a->pass() );
+    mPassword->setText( a->password() );
   else
-    if ( a->needsLogon() )
+    if ( a->requiresAuthentication() )
       knGlobals.accountManager()->loadPasswordsAsync();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
+
 
   switch ( mAccount->encryption() ) {
-    case KNServerInfo::None:
+    case NntpAccount::None:
       mEncNone->setChecked( true );
       break;
-    case KNServerInfo::SSL:
+    case NntpAccount::SSL:
       mEncSSL->setChecked( true );
       break;
-    case KNServerInfo::TLS:
+    case NntpAccount::TLS:
       mEncTLS->setChecked( true );
       break;
   }
@@ -280,42 +198,46 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
            this, SLOT( encryptionChanged( bool ) ) );
   connect( mEncTLS, SIGNAL( toggled( bool ) ),
            this, SLOT( encryptionChanged( bool ) ) );
-
-
+#if 0
   mIntervalChecking->setChecked( a->intervalChecking() );
   mInterval->setValue( a->checkInterval() );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
   mInterval->setSuffix(ki18np(" minute", " minutes"));
 
   // identity tab
-  mIdentityWidget = new KNode::IdentityWidget( a, knGlobals.componentData(), this );
+  mIdentityWidget = new KNode::IdentityWidget( a.get(), knGlobals.componentData(), this );
   addPage( mIdentityWidget, i18n("&Identity") );
 
+#if 0
   // per server cleanup configuration
   mCleanupWidget = new GroupCleanupWidget( a->cleanupConfig(), this );
   addPage( mCleanupWidget, i18n("&Cleanup") );
   mCleanupWidget->load();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 
   KNHelper::restoreWindowSize("accNewsPropDLG", this, sizeHint());
 
   setHelp("anc-setting-the-news-account");
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNode::NntpAccountConfDialog::~NntpAccountConfDialog()
 {
-#if 0
   KNHelper::saveWindowSize("accNewsPropDLG", size());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
+
+void KNode::NntpAccountConfDialog::setDeleteAccountOnCancel( bool del )
+{
+  mDeleteAccountOnCancel = del;
+}
+
 
 void KNode::NntpAccountConfDialog::slotServerTextEdited()
 {
-#if 0
   if ( mName->text().trimmed().isEmpty() ) {
     mUseServerForName = true;
   }
@@ -323,23 +245,15 @@ void KNode::NntpAccountConfDialog::slotServerTextEdited()
   if ( mUseServerForName ) {
     mName->setText( mServer->text() );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNode::NntpAccountConfDialog::slotEditingFinished()
 {
-#if 0
   mUseServerForName = false;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNode::NntpAccountConfDialog::slotButtonClicked( int button )
 {
-#if 0
   if ( button == KDialog::Ok ) {
     if ( mName->text().isEmpty() || mServer->text().trimmed().isEmpty() ) {
       KMessageBox::sorry(this, i18n("Please enter an arbitrary name for the account and the\nhostname of the news server."));
@@ -349,51 +263,55 @@ void KNode::NntpAccountConfDialog::slotButtonClicked( int button )
     mAccount->setName( mName->text() );
     mAccount->setServer( mServer->text().trimmed() );
     mAccount->setPort( mPort->value() );
+
     mAccount->setFetchDescriptions( mFetchDesc->isChecked() );
-    mAccount->setNeedsLogon( mLogin->isChecked() );
+    mAccount->setRequiresAuthentication( mLogin->isChecked() );
     mAccount->setUser( mUser->text() );
-    mAccount->setPass( mPassword->text() );
+    mAccount->setPassword( mPassword->text() );
 
     if ( mEncNone->isChecked() )
-      mAccount->setEncryption( KNServerInfo::None );
+      mAccount->setEncryption( NntpAccount::None );
     if ( mEncSSL->isChecked() )
-      mAccount->setEncryption( KNServerInfo::SSL );
+      mAccount->setEncryption( NntpAccount::SSL );
     if ( mEncTLS->isChecked() )
-      mAccount->setEncryption( KNServerInfo::TLS );
+      mAccount->setEncryption( NntpAccount::TLS );
 
+#if 0
     mAccount->setIntervalChecking( mIntervalChecking->isChecked() );
     mAccount->setCheckInterval( mInterval->value() );
+#else
+  // TODO: to be implemented. Either throught a process inside Akonadi or inside KNode.
+  kDebug() << "AKONADI PORT: Not ported code in" << Q_FUNC_INFO;
+#endif
 
-    if ( mAccount->id() != -1 ) // only save if account has a valid id
-      mAccount->writeConfig();
+    Akobackit::manager()->accountManager()->saveAccount( mAccount );
 
     mIdentityWidget->save();
+#if 0
     mCleanupWidget->save();
-
-    accept();
-  } else {
-    KDialog::slotButtonClicked( button );
-  }
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+    accept();
+  } else {
+    if ( mDeleteAccountOnCancel ) {
+      Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+      am->removeAccount( mAccount, 0 );
+    }
+    KDialog::slotButtonClicked( button );
+  }
 }
 
 
 void KNode::NntpAccountConfDialog::slotPasswordChanged()
 {
-#if 0
   if ( mPassword->text().isEmpty() )
-    mPassword->setText( mAccount->pass() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+    mPassword->setText( mAccount->password() );
 }
 
 
 void KNode::NntpAccountConfDialog::encryptionChanged( bool checked )
 {
-#if 0
   if ( checked ) { // All 3 buttons are connected to this slot, so only the checked one is taken into account.
     if ( mEncNone->isChecked() ) {
       mPort->setValue( DEFAULT_NNTP_PORT );
@@ -401,9 +319,6 @@ void KNode::NntpAccountConfDialog::encryptionChanged( bool checked )
       mPort->setValue( DEFAULT_NNTPS_PORT );
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

@@ -38,6 +38,7 @@ namespace Akonadi {
 namespace KNode {
 namespace Akobackit {
 
+class NntpAccountManager;
 class AkoManager;
 class FolderManager;
 class GroupManager;
@@ -95,12 +96,20 @@ class AkoManager : public QObject
     {
       return mGroupManager;
     };
+    /**
+     * Returns the manager responsible of accounts.
+     */
+    Akobackit::NntpAccountManager * accountManager()
+    {
+      return mAccountManager;
+    };
 
   private:
     Akonadi::ChangeRecorder *mMonitor;
     Akonadi::EntityTreeModel *mBaseModel;
     Akonadi::Session *mSession;
 
+    NntpAccountManager *mAccountManager;
     FolderManager *mFolderManager;
     GroupManager *mGroupManager;
 };

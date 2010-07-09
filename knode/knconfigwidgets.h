@@ -15,20 +15,18 @@
 #ifndef KNCONFIGWIDGETS_H
 #define KNCONFIGWIDGETS_H
 
+#include "akobackit/nntpaccount.h"
 #include "knode_export.h"
 #include "legacy_include.h"
-
-#include <kpagedialog.h>
-#include <kcmodule.h>
-
 #include "ui_nntpaccountdialog_base.h"
 #include "ui_nntpaccountlistwidget_base.h"
 #include "ui_postnewstechnicalwidget_base.h"
 #include "ui_readnewsgeneralwidget_base.h"
 
+#include <kpagedialog.h>
+#include <kcmodule.h>
 
 class KComboBox;
-
 namespace Sonnet{
 class ConfigWidget;
 }
@@ -63,43 +61,13 @@ class KNODE_EXPORT NntpAccountListWidget : public KCModule, private Ui::NntpAcco
     /** Create a new NNTP account list widget. */
     explicit NntpAccountListWidget( const KComponentData &inst, QWidget *parent = 0 );
 
-    /** Reimplemented from KCModule. */
-    virtual void load();
-
-  protected:
-    /** Account list widget item. */
-    class AccountListItem : public QListWidgetItem {
-      public:
-        /** Creates a new account list item.
-         * @param a The account.
-         */
-        explicit AccountListItem( KNNntpAccount::Ptr a )
-          : mAccount( a )
-          {}
-        /** Returns the account assiciated with this item. */
-        KNNntpAccount::Ptr account() const
-          { return mAccount; }
-      private:
-        KNNntpAccount::Ptr mAccount;
-    };
-
-  public slots:
-    /** Add an list view item for the given account.
-     * @param a The new account.
-     */
-    void slotAddItem( KNNntpAccount::Ptr a );
-    /** Remove the list view item of the given account.
-     * @param a The account.
-     */
-    void slotRemoveItem( KNNntpAccount::Ptr a );
-    /** Update the item of the given account.
-     * @param a The account.
-     */
-    void slotUpdateItem( KNNntpAccount::Ptr a );
-
   protected slots:
-    /** Item selection has changed. */
-    void slotSelectionChanged();
+    /**
+     * Account selection has changed.
+     * @param account the selected account.
+     */
+    void slotSelectionChanged( const Akonadi::AgentInstance &account = Akonadi::AgentInstance() );
+
     /** Add account button has been clicked. */
     void slotAddBtnClicked();
     /** Delete account button has been clicked. */
@@ -118,8 +86,15 @@ class KNODE_EXPORT NntpAccountConfDialog : public KPageDialog, private Ui::NntpA
   Q_OBJECT
 
   public:
-    explicit NntpAccountConfDialog( KNNntpAccount *a, QWidget *parent = 0 );
+    explicit NntpAccountConfDialog( NntpAccount::Ptr a, QWidget *parent = 0 );
     ~NntpAccountConfDialog();
+
+    /**
+     * When @p del is true, the account passed to the construtor is deleted if the user
+     * does not accept this dialog.
+     * Default is false.
+     */
+    void setDeleteAccountOnCancel( bool del );
 
   protected slots:
     void slotServerTextEdited();
@@ -134,10 +109,11 @@ class KNODE_EXPORT NntpAccountConfDialog : public KPageDialog, private Ui::NntpA
     void encryptionChanged( bool checked );
 
   private:
-    KNNntpAccount *mAccount;
+    NntpAccount::Ptr mAccount;
     IdentityWidget* mIdentityWidget;
     GroupCleanupWidget *mCleanupWidget;
     bool mUseServerForName;
+    bool mDeleteAccountOnCancel;
 };
 
 
