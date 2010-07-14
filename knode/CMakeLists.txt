@@ -62,6 +62,8 @@ set(knodecommon_LIB_SRCS
    csshelper.cpp
    akobackit/akonadi_manager.cpp
    akobackit/folder_manager.cpp
+   akobackit/group.cpp
+   akobackit/group_manager.cpp
    akobackit/item_local_article.cpp
    akobackit/item_merge_job.cpp
    akobackit/item_remote_article.cpp

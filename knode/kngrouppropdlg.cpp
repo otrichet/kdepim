@@ -14,6 +14,9 @@
 
 #include "kngrouppropdlg.h"
 
+
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/group_manager.h"
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
 #include "knconfigwidgets.h"
@@ -33,15 +36,15 @@
 #include <klineedit.h>
 #include <kvbox.h>
 
+using namespace KNode;
 
 
-KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
+KNGroupPropDlg::KNGroupPropDlg( Group::Ptr group, QWidget *parent )
   : KPageDialog( parent ),
-    g_rp(group), n_ickChanged(false)
+    g_rp( group )
 {
-#if 0
   setFaceType( Tabbed );
-  setCaption( i18nc( "@title:window %1=newsgroup name", "Properties of %1", group->groupname() ) );
+  setCaption( i18nc( "@title:window %1=newsgroup name", "Properties of %1", group->groupName() ) );
   setButtons( Ok|Cancel|Help );
   setDefaultButton( Ok );
 
@@ -62,8 +65,7 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
   grpL->addItem( new QSpacerItem( 0, fontMetrics().lineSpacing()-9), 0, 0 );
 
   n_ick=new KLineEdit(gb);
-  if (g_rp->hasName())
-    n_ick->setText(g_rp->name());
+  n_ick->setText( g_rp->displayName() );
   QLabel *l = new QLabel( i18nc( "@label:textbox Alternative name of a newsgroup", "Nickname:" ), gb );
   l->setBuddy(n_ick);
   grpL->addWidget(l,1,0);
@@ -80,8 +82,8 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
   c_harset->setCurrentIndex( c_harset->findText( defaultCsDesc ) );
   c_harset->setEnabled(g_rp->useCharset());
   connect(u_seCharset, SIGNAL(toggled(bool)), c_harset, SLOT(setEnabled(bool)));
-  grpL->addWidget(c_harset, 2,2);
 
+  grpL->addWidget(c_harset, 2,2);
   grpL->setColumnStretch(1,1);
   grpL->setColumnStretch(2,2);
 
@@ -96,7 +98,7 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
 
   l = new QLabel( i18nc( "@label name of a newsgroup", "Name:" ), gb );
   grpL->addWidget(l,1,0);
-  l=new QLabel(group->groupname(),gb);
+  l = new QLabel( group->groupName(), gb );
   grpL->addWidget(l,1,2);
 
   l = new QLabel( i18nc( "@label description of a newsgroup", "Description:" ), gb );
@@ -107,15 +109,19 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
   l = new QLabel( i18nc( "@label status of posting to a newsgroup", "Status:" ), gb );
   grpL->addWidget(l,3,0);
   QString status;
-  switch (g_rp->status()) {
-    case KNGroup::unknown:  status = i18nc( "posting status", "unknown" );
-                            break;
-    case KNGroup::readOnly: status=i18n("posting forbidden");
-                            break;
-    case KNGroup::postingAllowed:  status=i18n("posting allowed");
-                                   break;
-    case KNGroup::moderated:       status = i18nc( "posting status", "moderated" );
-                                   break;
+  switch ( g_rp->postingStatus() ) {
+    case Group::Unknown:
+      status = i18nc( "posting status", "unknown" );
+      break;
+    case Group::ReadOnly:
+      status = i18nc( "posting status", "posting forbidden" );
+      break;
+    case Group::PostingAllowed:
+      status = i18nc( "posting status", "posting allowed" );
+      break;
+    case Group::Moderated:
+      status = i18nc( "posting status", "moderated" );
+      break;
   }
   l=new QLabel(status,gb);
   grpL->addWidget(l,3,2);
@@ -123,6 +129,7 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
   grpL->addItem( new QSpacerItem(20, 0 ), 0, 1 );
   grpL->setColumnStretch(2,1);
 
+#if 0
   // statistics
   gb = new QGroupBox( i18nc( "@title:group", "Statistics" ), page );
   pageL->addWidget(gb);
@@ -159,54 +166,55 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
 
   grpL->addItem( new QSpacerItem(20, 0 ), 0, 1 );
   grpL->setColumnStretch(2,1);
-
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
   pageL->addStretch(1);
 
   // Specific Identity tab =========================================
-  i_dWidget = new KNode::IdentityWidget( g_rp, knGlobals.componentData(), this );
+  i_dWidget = new KNode::IdentityWidget( g_rp.get(), knGlobals.componentData(), this );
   addPage( i_dWidget, i18nc( "@title:tab", "Identity" ) );
 
+#if 0
   // per server cleanup configuration
   mCleanupWidget = new KNode::GroupCleanupWidget( g_rp->cleanupConfig(), this );
   addPage( mCleanupWidget, i18nc( "@title:tab", "Cleanup" ) );
   mCleanupWidget->load();
-
-  KNHelper::restoreWindowSize("groupPropDLG", this, sizeHint());
-  connect(this,SIGNAL(okClicked()),SLOT(slotOk()));
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+
+  KNHelper::restoreWindowSize("groupPropDLG", this, sizeHint());
+  connect(this,SIGNAL(okClicked()),SLOT(slotOk()));
 }
 
 
 
 KNGroupPropDlg::~KNGroupPropDlg()
 {
-#if 0
   KNHelper::saveWindowSize("groupPropDLG", size());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNGroupPropDlg::slotOk()
 {
-#if 0
-  if( !(g_rp->name()==n_ick->text()) ) {
-    g_rp->setName(n_ick->text());
-    n_ickChanged=true;
+  if( g_rp->name() != n_ick->text() ) {
+    g_rp->setDisplayName( n_ick->text() );
+  } else {
+    g_rp->setDisplayName( QString() );
   }
-
-  i_dWidget->save();
-  mCleanupWidget->save();
-
   g_rp->setUseCharset(u_seCharset->isChecked());
   g_rp->setDefaultCharset( KGlobal::charsets()->encodingForName( c_harset->currentText() ).toLatin1() );
 
-  accept();
+
+  i_dWidget->save();
+#if 0
+  mCleanupWidget->save();
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  Akobackit::manager()->groupManager()->saveGroup( g_rp );
+
+  accept();
 }

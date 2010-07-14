@@ -16,6 +16,7 @@
 
 #include "akobackit/akonadi_manager.h"
 #include "akobackit/folder_manager.h"
+#include "akobackit/group_manager.h"
 #include "akobackit/nntpaccount_manager.h"
 #include "collectiontree/widget.h"
 #include "headerview.h"
@@ -1473,15 +1474,18 @@ void KNMainWidget::slotAccPostNewArticle()
 
 void KNMainWidget::slotGrpProperties()
 {
-#if 0
-  kDebug(5003) <<"slotGrpProperties()";
-  if(g_rpManager->currentGroup())
-    g_rpManager->showGroupProperties(g_rpManager->currentGroup());
+  kDebug();
+  const Akonadi::Collection collection = mCollectionWidget->selectedCollection();
+  if ( collection.isValid() ) {
+    Akobackit::GroupManager *gm = Akobackit::manager()->groupManager();
+    if ( gm->isGroup( collection ) ) {
+      gm->editGroup( gm->group( collection ), this );
+    }
+  }
+
+  kDebug() << "AKONADI PORT: does the following works (I guess no: edition is not blocking)?";
   updateCaption();
   a_rtManager->updateStatusString();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

@@ -15,6 +15,8 @@
 #ifndef KNGROUPPROPDLG_H
 #define KNGROUPPROPDLG_H
 
+#include "akobackit/group.h"
+
 #include <kpagedialog.h>
 
 class QCheckBox;
@@ -22,7 +24,6 @@ class QComboBox;
 
 class KLineEdit;
 
-class KNGroup;
 
 namespace KNode {
   class IdentityWidget;
@@ -34,14 +35,11 @@ namespace KNode {
 class KNGroupPropDlg : public KPageDialog  {
 Q_OBJECT
   public:
-    explicit KNGroupPropDlg( KNGroup *group, QWidget *parent=0 );
+    explicit KNGroupPropDlg( KNode::Group::Ptr group, QWidget *parent = 0 );
     ~KNGroupPropDlg();
 
-    bool nickHasChanged()const { return n_ickChanged; }
-
   protected:
-    KNGroup *g_rp;
-    bool n_ickChanged;
+    KNode::Group::Ptr g_rp;
     KNode::IdentityWidget* i_dWidget;
     KNode::GroupCleanupWidget *mCleanupWidget;
     KLineEdit *n_ick;
