@@ -72,6 +72,10 @@ class AkoManager : public QObject
      */
     Akonadi::ChangeRecorder * monitor();
     /**
+     * Returns the Akonadi Session.
+     */
+    Akonadi::Session * session();
+    /**
      * Returns the base model of the collection tree view.
      * It includes both the nntp accounts and the local folders.
      */

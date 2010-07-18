@@ -77,6 +77,13 @@ class GroupManager : public QObject
      */
     void saveGroup( Group::Ptr group );
 
+
+    /**
+     * Show the dialog use to (un)subscribe to news groups.
+     * @param account The account whose groups will be available for subscription.
+     */
+    void showSubscriptionDialog( NntpAccount::Ptr account, QWidget *parentWidget );
+
   private:
     AkoManager *mMainManager;
 };

@@ -102,6 +102,12 @@ Akonadi::EntityTreeModel* AkoManager::collectionModel()
   return mBaseModel;
 }
 
+Akonadi::Session * AkoManager::session()
+{
+  return mSession;
+}
+
+
 
 
 CollectionType AkoManager::type( const Akonadi::Collection &col )

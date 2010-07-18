@@ -23,6 +23,7 @@
 #include "akobackit/group_manager.h"
 
 #include "akobackit/akonadi_manager.h"
+#include "groupselector/group_subscription_dialog.h"
 #include "kngrouppropdlg.h"
 
 #include <Akonadi/Collection>
@@ -74,6 +75,16 @@ void GroupManager::saveGroup( Group::Ptr group )
 {
   group->save();
 }
+
+
+
+void GroupManager::showSubscriptionDialog( NntpAccount::Ptr account, QWidget *parentWidget )
+{
+  GroupSubscriptionDialog *subscription = new GroupSubscriptionDialog( parentWidget, account );
+  subscription->open();
+  // TODO: connect signals if necessary
+}
+
 
 
 }

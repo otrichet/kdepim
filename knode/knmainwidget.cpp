@@ -1400,13 +1400,16 @@ void KNMainWidget::slotAccRename()
 
 void KNMainWidget::slotAccSubscribe()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotAccSubscribe()";
-  if(a_ccManager->currentAccount())
-    g_rpManager->showGroupDialog(a_ccManager->currentAccount());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  kDebug();
+  const Akonadi::Collection collection = mCollectionWidget->selectedCollection();
+  const Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance( collection.resource() );
+  if ( !agent.isValid() ) {
+    return;
+  }
+
+  Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+  Akobackit::GroupManager *gm = Akobackit::manager()->groupManager();
+  gm->showSubscriptionDialog( am->account( agent ), this );
 }
 
 

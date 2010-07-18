@@ -76,6 +76,11 @@ set(knodecommon_LIB_SRCS
    composer/followupto_combobox.cpp
    configuration/identity_widget.cpp
    configuration/identity_edition_dialog.cpp
+   groupselector/group_selection_proxy_model.cpp
+   groupselector/group_subscription_dialog.cpp
+   groupselector/subscription_change_filter_proxy_model.cpp
+   groupselector/subscription_state_grouping_proxy_model.cpp
+   groupselector/subscription_state_model.cpp
    utils/locale.cpp
    utils/startup.cpp
    kscoring.cpp
@@ -97,6 +102,7 @@ kde4_add_ui_files(knodecommon_LIB_SRCS
    composer/composer_view.ui
    configuration/identity_widget.ui
    configuration/identity_edition_dialog.ui
+   groupselector/group_subscription_dialog.ui
 )
 
 kde4_add_kcfg_files(knodecommon_LIB_SRCS settings_base.kcfgc )
