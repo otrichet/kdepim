@@ -31,13 +31,14 @@
 #include <Akonadi/ChangeRecorder>
 #include <Akonadi/Control>
 #include <Akonadi/EntityTreeView>
-#include <akonadi/entitytreeviewstatesaver.h>
 #include <Akonadi/EntityTreeModel>
+#include <akonadi/etmviewstatesaver.h>
 #include <akonadi/selectionproxymodel.h>
 #include <Akonadi/Session>
 #include <akonadi/statisticsproxymodel.h>
 #include <KConfigGroup>
 #include <KXMLGUIClient>
+#include <QtGui/QApplication>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QSplitter>
@@ -59,9 +60,6 @@ Widget::Widget( KXMLGUIClient *guiClient, QWidget *parent )
 
 Widget::~Widget()
 {
-  // save view layout
-  KConfigGroup conf( KNGlobals::self()->config(), "GroupView" );
-  mViewSaver->saveState( conf );
 }
 
 void Widget::init()
@@ -83,20 +81,44 @@ void Widget::init()
 
   // View
   mTreeView->setModel( filterModel );
+  mTreeView->setColumnHidden( View::SizeColumn, true );
 
   // Selection model
   mSelectionModel = new Akonadi::SelectionProxyModel( mTreeView->selectionModel(), this );
   mSelectionModel->setSourceModel( filterModel );
 
-  // Restore view layout
-  mViewSaver = new Akonadi::EntityTreeViewStateSaver( mTreeView );
+  // Restore/save view layout
+  // FIXME: disabled until the crash it induce is fixed. Seems like the connnection
+  //        between currentChanged(Ak::Collection) and selectedCollectionChanged(Ak::Collection)
+  //        triggers this crash.
+//   connect( mTreeView->model(), SIGNAL( modelAboutToBeReset() ),
+//            this, SLOT( saveState() ) );
+//   connect( mTreeView->model(), SIGNAL( modelReset() ),
+//            this, SLOT( restoreState() ) );
+//   connect( qApp, SIGNAL( aboutToQuit() ),
+//            this, SLOT( saveState() ) );
+//   restoreState();
+}
+
+void Widget::restoreState()
+{
+  Akonadi::ETMViewStateSaver *saver = new Akonadi::ETMViewStateSaver();
+  saver->setView( mTreeView );
   KConfig *conf = KNGlobals::self()->config();
   KConfigGroup group( conf, "GroupView" );
-  // TODO: commented out (bug #223487)
-//   mViewSaver->restoreState( group );
-
-  mTreeView->setColumnHidden( View::SizeColumn, true );
+  saver->restoreState( group );
 }
+
+void Widget::saveState()
+{
+  Akonadi::ETMViewStateSaver saver;
+  saver.setView( mTreeView );
+  KConfig *conf = KNGlobals::self()->config();
+  KConfigGroup group( conf, "GroupView" );
+  saver.saveState( group );
+  group.sync();
+}
+
 
 
 

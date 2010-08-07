@@ -74,6 +74,15 @@ class Widget : public QSplitter
      */
     void init();
 
+    /**
+     * Restore the state (expanded items, selection, etc) of the view.
+     */
+    void restoreState();
+    /**
+     * Save the state of the view.
+     */
+    void saveState();
+
   private:
     View *mTreeView;
     Akonadi::EntityTreeViewStateSaver *mViewSaver;
