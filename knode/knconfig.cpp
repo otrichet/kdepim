@@ -324,5 +324,3 @@ void KNode::Cleanup::setLastCompactDate()
 
 //END: Cleanup configuration =================================================
 
-
-#include "knconfig.moc"

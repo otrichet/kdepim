@@ -54,6 +54,8 @@ KNODE_EXPORT AkoManager * manager();
  */
 class AkoManager : public QObject
 {
+  Q_OBJECT
+
   friend class AkoManagerPrivate;
 
   private:

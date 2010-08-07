@@ -31,6 +31,8 @@ namespace CollectionTree {
 
 class View : public Akonadi::EntityTreeView
 {
+  Q_OBJECT
+
   public:
     /**
      * Index of columns drawn by the Akonadi::CollectionStatisticsDelegate.
