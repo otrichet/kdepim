@@ -70,6 +70,7 @@ set(knodecommon_LIB_SRCS
    akobackit/localfolders_setup_job.cpp
    akobackit/nntpaccount.cpp
    akobackit/nntpaccount_manager.cpp
+   collectiontree/collection_filter_proxy_model.cpp
    collectiontree/widget.cpp
    collectiontree/view.cpp
    composer/attachment_view.cpp

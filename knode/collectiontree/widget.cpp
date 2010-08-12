@@ -23,11 +23,11 @@
 #include "collectiontree/widget.h"
 
 #include "akobackit/akonadi_manager.h"
+#include "collectiontree/collection_filter_proxy_model.h"
 #include "collectiontree/view.h"
 #include "knglobals.h"
 
 #include <Akonadi/AgentManager>
-#include <akonadi/recursivecollectionfilterproxymodel.h>
 #include <Akonadi/ChangeRecorder>
 #include <Akonadi/Control>
 #include <Akonadi/EntityTreeView>
@@ -40,7 +40,6 @@
 #include <KXMLGUIClient>
 #include <QtGui/QApplication>
 #include <QTimer>
-#include <QVBoxLayout>
 #include <QSplitter>
 
 namespace KNode {
@@ -73,11 +72,9 @@ void Widget::init()
   statisticsModel->setSourceModel( Akobackit::manager()->collectionModel() );
 //   statisticsModel->setToolTipEnabled( true );
   // filter collections containing news articles
-  Akonadi::RecursiveCollectionFilterProxyModel *filterModel = new Akonadi::RecursiveCollectionFilterProxyModel( this );
-//   filterModel->addContentMimeTypeInclusionFilter( KMime::NewsArticle::mimeType() );
+  CollectionFilterProxyModel *filterModel = new CollectionFilterProxyModel( this );
   filterModel->setSourceModel( statisticsModel );
-//   filterModel->setDynamicSortFilter( true );
-  filterModel->setSortCaseSensitivity( Qt::CaseInsensitive );
+  filterModel->setDynamicSortFilter( true );
 
   // View
   mTreeView->setModel( filterModel );
