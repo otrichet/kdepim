@@ -55,6 +55,9 @@ GroupSubscriptionDialog::GroupSubscriptionDialog( QWidget *parent, NntpAccount::
     mRevertFromChangeViewButton->setIcon( KIcon( "arrow-right" ) );
   }
 
+  // Auto delete
+  connect( this, SIGNAL( finished() ), this, SLOT( delayedDestruct() ) );
+
   Akonadi::CollectionFetchJob *fetchRoot =
         new Akonadi::CollectionFetchJob( Akonadi::Collection::root(), Akonadi::CollectionFetchJob::FirstLevel, this );
   fetchRoot->fetchScope().setResource( account->agent().identifier() );

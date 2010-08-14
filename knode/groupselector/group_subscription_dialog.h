@@ -40,11 +40,18 @@ namespace KNode {
 
 class SubscriptionStateModel;
 
+/**
+ * A dialog to (un)subscribe to groups of an account.
+ */
 class GroupSubscriptionDialog : public KDialog, private Ui::GroupSelectionDialog
 {
   Q_OBJECT
 
   public:
+    /**
+     * Create a new dialog window to subscribe to group of @p account.
+     * It will auto-delete when it is closed.
+     */
     GroupSubscriptionDialog( QWidget *parent, NntpAccount::Ptr account );
     virtual ~GroupSubscriptionDialog();
 
