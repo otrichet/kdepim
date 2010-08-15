@@ -66,6 +66,7 @@ AkoManager::AkoManager( QObject *parent )
     mFolderManager( new FolderManager( this ) ),
     mGroupManager( new GroupManager( this ) )
 {
+  setName( "KNode::Akobackit::AkoManager" );
 }
 
 AkoManager::~AkoManager()
@@ -82,11 +83,7 @@ Akonadi::ChangeRecorder * AkoManager::monitor()
     mMonitor->setAllMonitored( true );
     // EntityTreeModel requiers that only one collection is monitored
     mMonitor->setCollectionMonitored( Akonadi::Collection::root() );
-    //     mMonitor->fetchCollectionStatistics( true );
-//     mMonitor->collectionFetchScope().setAncestorRetrieval( Akonadi::CollectionFetchScope::All );
-//     mMonitor->collectionFetchScope().setIncludeUnsubscribed( false );
-
-    //mMonitor->setMimeTypeMonitored( Collection::mimeType() );
+//     mMonitor->fetchCollectionStatistics( true );
     mMonitor->setSession( mSession );
   }
   return mMonitor;
@@ -97,7 +94,7 @@ Akonadi::EntityTreeModel* AkoManager::collectionModel()
   if ( !mBaseModel ) {
     mBaseModel = new Akonadi::EntityTreeModel( monitor(), this );
     mBaseModel->setItemPopulationStrategy( Akonadi::EntityTreeModel::NoItemPopulation );
-    //baseModel->setIncludeUnsubscribed( false ); // Don't fetch thousand of collection!
+    mBaseModel->setIncludeUnsubscribed( false );
   }
   return mBaseModel;
 }

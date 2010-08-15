@@ -70,6 +70,7 @@ void Widget::init()
   // Show unread/total counts
   Akonadi::StatisticsProxyModel *statisticsModel = new Akonadi::StatisticsProxyModel( this );
   statisticsModel->setSourceModel( Akobackit::manager()->collectionModel() );
+  statisticsModel->setDynamicSortFilter( true );
 //   statisticsModel->setToolTipEnabled( true );
   // filter collections containing news articles
   CollectionFilterProxyModel *filterModel = new CollectionFilterProxyModel( this );
