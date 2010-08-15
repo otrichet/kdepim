@@ -1543,17 +1543,20 @@ void KNMainWidget::slotGrpReorganize()
 
 void KNMainWidget::slotGrpUnsubscribe()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotGrpUnsubscribe()";
-  if(g_rpManager->currentGroup()) {
-    if(KMessageBox::Yes==KMessageBox::questionYesNo(knGlobals.topWidget,
-       i18n("Do you really want to unsubscribe from %1?", g_rpManager->currentGroup()->groupname()), QString(), KGuiItem(i18n("Unsubscribe")), KStandardGuiItem::cancel()))
-      if (g_rpManager->unsubscribeGroup(g_rpManager->currentGroup()))
-        slotCollectionSelected();
+  kDebug();
+  const Akonadi::Collection collection = mCollectionWidget->selectedCollection();
+  Akobackit::GroupManager *gm = Akobackit::manager()->groupManager();
+  if ( gm->isGroup( collection ) ) {
+    Group::Ptr group = gm->group( collection );
+    int response = KMessageBox::questionYesNo( this,
+                                               i18n( "Do you really want to unsubscribe from %1?", group->name() ),
+                                               QString(),
+                                               KGuiItem( i18nc( "@action:button", "Unsubscribe" ) ),
+                                               KStandardGuiItem::cancel() );
+    if ( KMessageBox::Yes == response ) {
+      gm->unsubscribeGroup( group );
+    }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

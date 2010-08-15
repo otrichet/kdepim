@@ -24,6 +24,7 @@
 
 #include "akobackit/akonadi_manager.h"
 #include "groupselector/group_subscription_dialog.h"
+#include "groupselector/subscriptionjob_p.h"
 #include "kngrouppropdlg.h"
 
 #include <Akonadi/Collection>
@@ -82,8 +83,15 @@ void GroupManager::showSubscriptionDialog( NntpAccount::Ptr account, QWidget *pa
 {
   GroupSubscriptionDialog *subscription = new GroupSubscriptionDialog( parentWidget, account );
   subscription->open();
-  // TODO: connect signals if necessary
 }
+
+void GroupManager::unsubscribeGroup( const Group::Ptr &group )
+{
+  Akonadi::SubscriptionJob *job = new Akonadi::SubscriptionJob();
+  job->unsubscribe( Akonadi::Collection::List() << group->mCollection);
+  job->start();
+}
+
 
 
 

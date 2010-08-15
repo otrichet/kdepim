@@ -83,6 +83,10 @@ class GroupManager : public QObject
      * @param account The account whose groups will be available for subscription.
      */
     void showSubscriptionDialog( NntpAccount::Ptr account, QWidget *parentWidget );
+    /**
+     * Unsubscribed from the group represented by @p collection.
+     */
+    void unsubscribeGroup( const Group::Ptr &group );
 
   private:
     AkoManager *mMainManager;
