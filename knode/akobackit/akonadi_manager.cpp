@@ -66,7 +66,7 @@ AkoManager::AkoManager( QObject *parent )
     mFolderManager( new FolderManager( this ) ),
     mGroupManager( new GroupManager( this ) )
 {
-  setName( "KNode::Akobackit::AkoManager" );
+  setObjectName( "KNode::Akobackit::AkoManager" );
 }
 
 AkoManager::~AkoManager()

@@ -63,6 +63,11 @@ class GroupManager : public QObject
      */
     Group::Ptr group( const Akonadi::Collection &collection );
 
+    /**
+     * Returns the account that contains the group @p group.
+     */
+    NntpAccount::Ptr account( const Group::Ptr &group );
+
 
 
     /**

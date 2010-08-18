@@ -15,6 +15,7 @@
 #include "knconfigwidgets.h"
 
 #include "akobackit/akonadi_manager.h"
+#include "akobackit/group_manager.h"
 #include "akobackit/nntpaccount_manager.h"
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
@@ -110,7 +111,7 @@ void KNode::NntpAccountListWidget::slotDelBtnClicked()
 
 void KNode::NntpAccountListWidget::slotEditBtnClicked()
 {
-  Akonadi::AgentInstance agent = mAccountList->currentAgentInstance();
+  const Akonadi::AgentInstance agent = mAccountList->currentAgentInstance();
   if ( agent.isValid() ) {
     Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
     am->editAccount( am->account( agent ), this );
@@ -119,13 +120,13 @@ void KNode::NntpAccountListWidget::slotEditBtnClicked()
 
 void KNode::NntpAccountListWidget::slotSubBtnClicked()
 {
-#if 0
-  AccountListItem *item = static_cast<AccountListItem*>( mAccountList->currentItem() );
-  if( item )
-    knGlobals.groupManager()->showGroupDialog( item->account(), this );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  const Akonadi::AgentInstance agent = mAccountList->currentAgentInstance();
+  if ( agent.isValid() ) {
+    Q_ASSERT( agent.identifier().startsWith( Akobackit::NNTP_RESOURCE_AGENTTYPE ) );
+    Akobackit::AkoManager *akoManager = Akobackit::manager();
+    const NntpAccount::Ptr account = akoManager->accountManager()->account( agent );
+    akoManager->groupManager()->showSubscriptionDialog( account, this );
+  }
 }
 
 
@@ -329,17 +330,12 @@ void KNode::NntpAccountConfDialog::encryptionChanged( bool checked )
 KNode::AppearanceWidget::ColorListItem::ColorListItem( const QString &text, const QColor &color, QListWidget *parent ) :
   QListWidgetItem( text, parent )
 {
-#if 0
   setColor( color );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::ColorListItem::setColor( const QColor &color )
 {
-#if 0
   mColor = color;
   int height = QFontMetrics( font() ).height();
   QPixmap icon( height, height );
@@ -350,9 +346,6 @@ void KNode::AppearanceWidget::ColorListItem::setColor( const QColor &color )
   setIcon( icon );
   if ( listWidget() )
     listWidget()->update();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -363,24 +356,16 @@ KNode::AppearanceWidget::FontListItem::FontListItem( const QString &text, const 
   QListWidgetItem( parent ),
   mText( text )
 {
-#if 0
   setFont( font );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::FontListItem::setFont( const QFont &font )
 {
-#if 0
   mFont = font;
   setText( QString("[%1 %2] %3").arg( mFont.family() ).arg( mFont.pointSize() ).arg( mText ) );
   if ( listWidget() )
     listWidget()->update();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -390,7 +375,6 @@ void KNode::AppearanceWidget::FontListItem::setFont( const QFont &font )
 KNode::AppearanceWidget::AppearanceWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule(inst, parent )
 {
-#if 0
   QGridLayout *topL = new QGridLayout( this );
 
   //color-list
@@ -426,16 +410,11 @@ KNode::AppearanceWidget::AppearanceWidget( const KComponentData &inst, QWidget *
   topL->setColumnStretch( 0, 1 );
 
   addConfig( knGlobals.settings(), this );
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::load()
 {
-#if 0
   KCModule::load();
 
   slotColCheckBoxToggled( c_olorCB->isChecked() );
@@ -455,15 +434,11 @@ void KNode::AppearanceWidget::load()
     if ( item )
       mFontList->addItem( new FontListItem( item->label(), item->value() ) );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::save()
 {
-#if 0
   KConfigSkeletonItem::List items = knGlobals.settings()->items();
   int row = 0;
   for ( KConfigSkeletonItem::List::Iterator it = items.begin(); it != items.end(); ++it ) {
@@ -486,15 +461,11 @@ void KNode::AppearanceWidget::save()
   KCModule::save();
 
   knGlobals.configManager()->appearance()->recreateLVIcons();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::defaults()
 {
-#if 0
   KCModule::defaults();
 
   KConfigSkeletonItem::List items = knGlobals.settings()->items();
@@ -519,28 +490,20 @@ void KNode::AppearanceWidget::defaults()
   }
 
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::slotColCheckBoxToggled(bool b)
 {
-#if 0
   mColorList->setEnabled( b );
   c_olChngBtn->setEnabled( b && mColorList->currentItem() );
   if (b) mColorList->setFocus();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 // show color dialog for the entry
 void KNode::AppearanceWidget::slotColItemActivated( QListWidgetItem *item )
 {
-#if 0
   if ( item ) {
     ColorListItem *colorItem = static_cast<ColorListItem*>( item );
     QColor col = colorItem->color();
@@ -551,49 +514,33 @@ void KNode::AppearanceWidget::slotColItemActivated( QListWidgetItem *item )
     }
   }
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::slotColChangeBtnClicked()
 {
-#if 0
   if ( mColorList->currentItem() )
     slotColItemActivated( mColorList->currentItem() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::slotColSelectionChanged()
 {
-#if 0
   c_olChngBtn->setEnabled( mColorList->currentItem() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::slotFontCheckBoxToggled(bool b)
 {
-#if 0
   mFontList->setEnabled( b );
   f_ntChngBtn->setEnabled( b && mFontList->currentItem() );
   if (b) mFontList->setFocus();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 // show font dialog for the entry
 void KNode::AppearanceWidget::slotFontItemActivated( QListWidgetItem *item )
 {
-#if 0
   if ( item ) {
     FontListItem *fontItem = static_cast<FontListItem*>( item );
     QFont font = fontItem->font();
@@ -603,30 +550,19 @@ void KNode::AppearanceWidget::slotFontItemActivated( QListWidgetItem *item )
       fontItem->setFont(font);
   }
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::slotFontChangeBtnClicked()
 {
-#if 0
   if ( mFontList->currentItem() )
     slotFontItemActivated( mFontList->currentItem() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::AppearanceWidget::slotFontSelectionChanged()
 {
-#if 0
   f_ntChngBtn->setEnabled( mFontList->currentItem() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -636,19 +572,13 @@ void KNode::AppearanceWidget::slotFontSelectionChanged()
 KNode::ReadNewsGeneralWidget::ReadNewsGeneralWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   setupUi( this );
   addConfig( knGlobals.settings(), this );
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::ReadNewsGeneralWidget::load()
 {
-#if 0
   KCModule::load();
   switch ( knGlobals.settings()->dateFormat() ) {
     case KMime::DateFormatter::CTime: mStandardDateFormat->setChecked( true ); break;
@@ -659,14 +589,10 @@ void KNode::ReadNewsGeneralWidget::load()
     case KMime::DateFormatter::Rfc: break; // not used
 
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNode::ReadNewsGeneralWidget::save()
 {
-#if 0
   if ( mStandardDateFormat->isChecked() )
     knGlobals.settings()->setDateFormat( KMime::DateFormatter::CTime );
   if ( mLocalizedDateFormat->isChecked() )
@@ -676,9 +602,6 @@ void KNode::ReadNewsGeneralWidget::save()
   if ( mCustomDateFormat->isChecked() )
     knGlobals.settings()->setDateFormat( KMime::DateFormatter::Custom );
   KCModule::save();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //=============================================================================================
@@ -687,14 +610,9 @@ void KNode::ReadNewsGeneralWidget::save()
 KNode::ReadNewsNavigationWidget::ReadNewsNavigationWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   KNode::Ui::ReadNewsNavigationWidgetBase ui;
   ui.setupUi( this );
   addConfig( knGlobals.settings(), this );
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -704,14 +622,9 @@ KNode::ReadNewsNavigationWidget::ReadNewsNavigationWidget( const KComponentData 
 KNode::ReadNewsViewerWidget::ReadNewsViewerWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   KNode::Ui::ReadNewsViewerWidgetBase ui;
   ui.setupUi( this );
   addConfig( knGlobals.settings(), this );
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -723,7 +636,6 @@ KNode::DisplayedHeadersWidget::DisplayedHeadersWidget( DisplayedHeaders *d, cons
   s_ave( false ),
   d_ata( d )
 {
-#if 0
   QGridLayout *topL=new QGridLayout(this);
   topL->setSpacing(5);
   topL->setMargin(5);
@@ -759,45 +671,31 @@ KNode::DisplayedHeadersWidget::DisplayedHeadersWidget( DisplayedHeaders *d, cons
   topL->setRowStretch(6,1);         // stretch the listbox
 
   slotSelectionChanged();     // disable buttons initially
-
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::load()
 {
-#if 0
   mHeaderList->clear();
   KNDisplayedHeader::List list = d_ata->headers();
   for ( KNDisplayedHeader::List::Iterator it = list.begin(); it != list.end(); ++it )
     mHeaderList->addItem( generateItem( (*it) ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNode::DisplayedHeadersWidget::save()
 {
-#if 0
   if(s_ave) {
     d_ata->setDirty(true);
     d_ata->save();
   }
   s_ave = false;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 KNode::DisplayedHeadersWidget::HdrItem* KNode::DisplayedHeadersWidget::generateItem(KNDisplayedHeader *h)
 {
-#if 0
   QString text;
   if(h->hasName()) {
     text=h->translatedName();
@@ -808,31 +706,23 @@ KNode::DisplayedHeadersWidget::HdrItem* KNode::DisplayedHeadersWidget::generateI
   text+=h->header();
   text+='>';
   return new HdrItem(text,h);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::slotSelectionChanged()
 {
-#if 0
   int curr = mHeaderList->currentRow();
   d_elBtn->setEnabled(curr!=-1);
   e_ditBtn->setEnabled(curr!=-1);
   u_pBtn->setEnabled(curr>0);
   d_ownBtn->setEnabled( ( curr != -1 )  && ( curr + 1 != mHeaderList->count() ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::slotAddBtnClicked()
 {
-#if 0
   KNDisplayedHeader *h=d_ata->createNewHeader();
 
   DisplayedHeaderConfDialog* dlg=new DisplayedHeaderConfDialog(h, this);
@@ -843,16 +733,12 @@ void KNode::DisplayedHeadersWidget::slotAddBtnClicked()
   } else
     d_ata->remove(h);
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::slotDelBtnClicked()
 {
-#if 0
   if ( !mHeaderList->currentItem() )
     return;
 
@@ -863,16 +749,12 @@ void KNode::DisplayedHeadersWidget::slotDelBtnClicked()
     s_ave=true;
   }
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::slotEditBtnClicked()
 {
-#if 0
   if ( !mHeaderList->currentItem() )
     return;
   KNDisplayedHeader *h = ( static_cast<HdrItem*>( mHeaderList->currentItem() ) )->header();
@@ -887,16 +769,12 @@ void KNode::DisplayedHeadersWidget::slotEditBtnClicked()
     s_ave=true;
   }
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::slotUpBtnClicked()
 {
-#if 0
   int row =  mHeaderList->currentRow();
   if ( row <= 0 )
     return;
@@ -908,16 +786,12 @@ void KNode::DisplayedHeadersWidget::slotUpBtnClicked()
   mHeaderList->setCurrentRow( row - 1 );
   s_ave=true;
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNode::DisplayedHeadersWidget::slotDownBtnClicked()
 {
-#if 0
   int row = mHeaderList->currentRow();
   if ( row < 0 || row >= mHeaderList->count() )
     return;
@@ -929,9 +803,6 @@ void KNode::DisplayedHeadersWidget::slotDownBtnClicked()
   mHeaderList->setCurrentRow( row + 1 );
   s_ave=true;
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -942,7 +813,6 @@ KNode::DisplayedHeaderConfDialog::DisplayedHeaderConfDialog( KNDisplayedHeader *
   : KDialog( parent ),
     h_dr(h)
 {
-#if 0
   setCaption( i18n("Header Properties") );
   setButtons( Ok | Cancel | Help );
 
@@ -1027,25 +897,17 @@ KNode::DisplayedHeaderConfDialog::DisplayedHeaderConfDialog( KNDisplayedHeader *
   setHelp("anc-knode-headers");
   slotNameChanged( n_ameE->text() );
   connect(this,SIGNAL(okClicked()),SLOT(slotOk()));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNode::DisplayedHeaderConfDialog::~DisplayedHeaderConfDialog()
 {
-#if 0
   KNHelper::saveWindowSize("accReadHdrPropDLG", size());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::DisplayedHeaderConfDialog::slotOk()
 {
-#if 0
   h_dr->setHeader(h_drC->currentText());
   h_dr->setTranslatedName(n_ameE->text());
   for(int i=0; i<4; i++) {
@@ -1056,32 +918,21 @@ void KNode::DisplayedHeaderConfDialog::slotOk()
     h_dr->setFlag(i+4, v_alueCB[i]->isChecked());
   }
   accept();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 // the user selected one of the presets, insert the *translated* string as display name:
 void KNode::DisplayedHeaderConfDialog::slotActivated(int pos)
 {
-#if 0
   n_ameE->setText(i18n(h_drC->itemText(pos).toLocal8Bit()));  // I think it's save here, the combobox has only english defaults
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 // disable the name format options when the name is empty
 void KNode::DisplayedHeaderConfDialog::slotNameChanged(const QString& str)
 {
-#if 0
   for(int i=0; i<4; i++)
       n_ameCB[i]->setEnabled(!str.isEmpty());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //=============================================================================================
@@ -1130,7 +981,6 @@ KNode::FilterListWidget::FilterListWidget( const KComponentData &inst, QWidget *
   KCModule( inst, parent ),
   f_ilManager( knGlobals.filterManager() )
 {
-#if 0
   QGridLayout *topL=new QGridLayout(this);
   topL->setSpacing(5);
   topL->setMargin(5);
@@ -1198,46 +1048,30 @@ KNode::FilterListWidget::FilterListWidget( const KComponentData &inst, QWidget *
 
   slotSelectionChangedFilter();
   slotSelectionChangedMenu();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNode::FilterListWidget::~FilterListWidget()
 {
-#if 0
   f_ilManager->endConfig();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::load()
 {
-#if 0
   mFilterList->clear();
   mMenuList->clear();
   f_ilManager->startConfig(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNode::FilterListWidget::save()
 {
-#if 0
   f_ilManager->commitChanges();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::addItem(KNArticleFilter *f)
 {
-#if 0
   FilterListItem *item = new FilterListItem( f , f->translatedName() );
   if(f->isEnabled())
     item->setIcon( a_ctive );
@@ -1246,29 +1080,21 @@ void KNode::FilterListWidget::addItem(KNArticleFilter *f)
   mFilterList->addItem( item );
   slotSelectionChangedFilter();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::removeItem(KNArticleFilter *f)
 {
-#if 0
   int i = findItem( mFilterList, f );
   if ( i >= 0 )
     delete mFilterList->takeItem( i );
   slotSelectionChangedFilter();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::updateItem(KNArticleFilter *f)
 {
-#if 0
   int i = findItem( mFilterList, f );
 
   if ( i >= 0 ) {
@@ -1284,15 +1110,11 @@ void KNode::FilterListWidget::updateItem(KNArticleFilter *f)
   }
   slotSelectionChangedFilter();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::addMenuItem(KNArticleFilter *f)
 {
-#if 0
   if (f) {
     if ( findItem( mMenuList, f) < 0 )
       mMenuList->addItem( new FilterListItem( f, f->translatedName() ) );
@@ -1300,29 +1122,21 @@ void KNode::FilterListWidget::addMenuItem(KNArticleFilter *f)
     mMenuList->addItem( new FilterListItem( 0, "===" ) );
   slotSelectionChangedMenu();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::removeMenuItem(KNArticleFilter *f)
 {
-#if 0
   int i = findItem( mMenuList, f );
   if ( i >= 0 )
     delete mMenuList->takeItem( i );
   slotSelectionChangedMenu();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 QList<int> KNode::FilterListWidget::menuOrder()
 {
-#if 0
   KNArticleFilter *f;
   QList<int> lst;
 
@@ -1334,149 +1148,102 @@ QList<int> KNode::FilterListWidget::menuOrder()
       lst << -1;
   }
  return lst;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 int KNode::FilterListWidget::findItem( QListWidget *l, KNArticleFilter *f )
 {
-#if 0
   for ( int i = 0; i < l->count(); ++i )
     if ( static_cast<FilterListItem*>( l->item( i ) )->filter() == f )
       return i;
   return -1;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotAddBtnClicked()
 {
-#if 0
   f_ilManager->newFilter();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotDelBtnClicked()
 {
-#if 0
   if ( mFilterList->currentItem() )
     f_ilManager->deleteFilter( static_cast<FilterListItem*>( mFilterList->currentItem() )->filter() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotEditBtnClicked()
 {
-#if 0
   if ( mFilterList->currentItem() )
     f_ilManager->editFilter( static_cast<FilterListItem*>( mFilterList->currentItem() )->filter() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotCopyBtnClicked()
 {
-#if 0
   if ( mFilterList->currentItem() )
     f_ilManager->copyFilter( static_cast<FilterListItem*>( mFilterList->currentItem() )->filter() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotUpBtnClicked()
 {
-#if 0
   int row = mMenuList->currentRow();
   if ( row <= 0)
     return;
   mMenuList->insertItem( row - 1, mMenuList->takeItem( row ) );
   mMenuList->setCurrentRow( row - 1 );
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotDownBtnClicked()
 {
-#if 0
   int row = mMenuList->currentRow();
   if ( row < 0 || row > mMenuList->count() - 1 )
     return;
   mMenuList->insertItem( row + 1, mMenuList->takeItem( row ) );
   mMenuList->setCurrentRow( row + 1 );
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotSepAddBtnClicked()
 {
-#if 0
   mMenuList->insertItem( mMenuList->currentRow(), new FilterListItem( 0, "===" ) );
   slotSelectionChangedMenu();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotSepRemBtnClicked()
 {
-#if 0
   FilterListItem *item = static_cast<FilterListItem*>( mMenuList->currentItem() );
   if ( item && item->filter() == 0 )
     delete item;
   slotSelectionChangedMenu();
   emit changed(true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotSelectionChangedFilter()
 {
-#if 0
   QListWidgetItem *item = mFilterList->currentItem();
 
   d_elBtn->setEnabled( item );
   e_ditBtn->setEnabled( item );
   c_opyBtn->setEnabled( item );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::FilterListWidget::slotSelectionChangedMenu()
 {
-#if 0
   int current = mMenuList->currentRow();
 
   u_pBtn->setEnabled( current > 0 );
   d_ownBtn->setEnabled( current >= 0 && ( current < mMenuList->count() - 1 ) );
   s_epRemBtn->setEnabled( current >= 0 && ( static_cast<FilterListItem*>( mMenuList->item( current ) )->filter() == 0 ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1486,7 +1253,6 @@ void KNode::FilterListWidget::slotSelectionChangedMenu()
 KNode::PostNewsTechnicalWidget::PostNewsTechnicalWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   setupUi( this );
 
   mCharset->addItems( KNode::Utilities::Locale::encodings() );
@@ -1501,18 +1267,11 @@ KNode::PostNewsTechnicalWidget::PostNewsTechnicalWidget( const KComponentData &i
   connect( mDeleteButton, SIGNAL( clicked() ), SLOT( slotDelBtnClicked() ) );
 
   addConfig( knGlobals.settings(), this );
-  load();
-
-  slotSelectionChanged();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PostNewsTechnicalWidget::load()
 {
-#if 0
   KCModule::load();
 
   QString charsetDesc = KGlobal::charsets()->descriptionForEncoding( knGlobals.settings()->charset() );
@@ -1523,15 +1282,13 @@ void KNode::PostNewsTechnicalWidget::load()
   XHeader::List list = knGlobals.settings()->xHeaders();
   for ( XHeader::List::Iterator it = list.begin(); it != list.end(); ++it )
     mHeaderList->addItem( (*it).header() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+
+  slotSelectionChanged();
 }
 
 
 void KNode::PostNewsTechnicalWidget::save()
 {
-#if 0
   QString charset = KGlobal::charsets()->encodingForName( mCharset->currentText() );
   knGlobals.settings()->setCharset( charset );
   knGlobals.settings()->setAllow8BitBody( mEncoding->currentIndex() == 0 );
@@ -1542,26 +1299,18 @@ void KNode::PostNewsTechnicalWidget::save()
   knGlobals.settings()->setXHeaders( list );
 
   KCModule::save();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PostNewsTechnicalWidget::slotSelectionChanged()
 {
-#if 0
   mDeleteButton->setEnabled( mHeaderList->currentItem() != 0 );
   mEditButton->setEnabled( mHeaderList->currentItem() != 0 );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PostNewsTechnicalWidget::slotAddBtnClicked()
 {
-#if 0
   XHeaderConfDialog *dlg = new XHeaderConfDialog( QString(), this );
   if ( dlg->exec() )
     mHeaderList->addItem( dlg->result() );
@@ -1570,30 +1319,22 @@ void KNode::PostNewsTechnicalWidget::slotAddBtnClicked()
 
   slotSelectionChanged();
   emit changed( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PostNewsTechnicalWidget::slotDelBtnClicked()
 {
-#if 0
   QListWidgetItem *item = mHeaderList->currentItem();
   if ( !item )
     return;
   delete item;
   slotSelectionChanged();
   emit changed( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PostNewsTechnicalWidget::slotEditBtnClicked()
 {
-#if 0
   QListWidgetItem *item = mHeaderList->currentItem();
   if ( !item )
     return;
@@ -1606,9 +1347,6 @@ void KNode::PostNewsTechnicalWidget::slotEditBtnClicked()
 
   slotSelectionChanged();
   emit changed( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1618,7 +1356,6 @@ void KNode::PostNewsTechnicalWidget::slotEditBtnClicked()
 KNode::XHeaderConfDialog::XHeaderConfDialog( const QString &h, QWidget *parent ) :
   KDialog( parent )
 {
-#if 0
   setCaption( i18n("Additional Header") );
   setButtons( Ok | Cancel );
 
@@ -1640,32 +1377,21 @@ KNode::XHeaderConfDialog::XHeaderConfDialog( const QString &h, QWidget *parent )
   KNHelper::restoreWindowSize("XHeaderDlg", this, sizeHint());
 
   mNameEdit->setFocus();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNode::XHeaderConfDialog::~XHeaderConfDialog()
 {
-#if 0
   KNHelper::saveWindowSize("XHeaderDlg", size());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 QString KNode::XHeaderConfDialog::result() const
 {
-#if 0
   QString value = mValueEdit->text();
   // just in case someone pastes a newline
   value.replace( '\n', ' ' );
   return mNameEdit->text() + ": " + value;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1675,14 +1401,9 @@ QString KNode::XHeaderConfDialog::result() const
 KNode::PostNewsComposerWidget::PostNewsComposerWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   KNode::Ui::PostNewsComposerWidgetBase ui;
   ui.setupUi( this );
   addConfig( knGlobals.settings(), this );
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1692,7 +1413,6 @@ KNode::PostNewsComposerWidget::PostNewsComposerWidget( const KComponentData &ins
 KNode::PostNewsSpellingWidget::PostNewsSpellingWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent )
 {
-#if 0
   QVBoxLayout *topL=new QVBoxLayout(this);
   topL->setSpacing(5);
 
@@ -1701,28 +1421,17 @@ KNode::PostNewsSpellingWidget::PostNewsSpellingWidget( const KComponentData &ins
   connect(c_conf, SIGNAL(configChanged()), SLOT(changed()));
 
   topL->addStretch(1);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNode::PostNewsSpellingWidget::~PostNewsSpellingWidget()
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PostNewsSpellingWidget::save()
 {
-#if 0
   c_conf->save();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1731,7 +1440,6 @@ void KNode::PostNewsSpellingWidget::save()
 KNode::PrivacyWidget::PrivacyWidget( const KComponentData &inst,QWidget *parent ) :
   KCModule(inst, parent )
 {
-#if 0
   QBoxLayout *topLayout = new QVBoxLayout(this);
   topLayout->setSpacing(5);
   c_onf = new Kpgp::Config( this, false );
@@ -1740,30 +1448,17 @@ KNode::PrivacyWidget::PrivacyWidget( const KComponentData &inst,QWidget *parent 
   connect(c_onf, SIGNAL(changed()), SLOT(changed()));
 
   topLayout->addStretch(1);
-
-  load();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNode::PrivacyWidget::~PrivacyWidget()
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNode::PrivacyWidget::save()
 {
-#if 0
   c_onf->applySettings();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

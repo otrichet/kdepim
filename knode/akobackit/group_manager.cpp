@@ -23,10 +23,12 @@
 #include "akobackit/group_manager.h"
 
 #include "akobackit/akonadi_manager.h"
+#include "akobackit/nntpaccount_manager.h"
 #include "groupselector/group_subscription_dialog.h"
 #include "groupselector/subscriptionjob_p.h"
 #include "kngrouppropdlg.h"
 
+#include <Akonadi/AgentManager>
 #include <Akonadi/Collection>
 
 
@@ -63,6 +65,13 @@ Group::Ptr GroupManager::group( const Akonadi::Collection &collection )
 {
   return Group::Ptr( new Group( collection ) );
 }
+
+NntpAccount::Ptr GroupManager::account( const Group::Ptr &group )
+{
+  Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance( group->mCollection.resource() );
+  return Akobackit::manager()->accountManager()->account( agent );
+}
+
 
 
 

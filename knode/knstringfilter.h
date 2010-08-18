@@ -15,6 +15,8 @@
 #ifndef KNODE_KNSTRINGFILTER_H
 #define KNODE_KNSTRINGFILTER_H
 
+#include "akobackit/group.h"
+
 #include <QGroupBox>
 
 class QCheckBox;
@@ -38,7 +40,7 @@ class StringFilter
 
     StringFilter& operator=( const StringFilter &sf );
     /** replace placeholders */
-    void expand(KNGroup *g);
+    void expand( const Group::Ptr &g );
 
     void load(const KConfigGroup &group);
     void save(KConfigGroup &conf);
