@@ -27,14 +27,14 @@
 
 #include <KCharsets>
 #include <KGlobal>
-#include <kmime/kmime_charfreq.h>
 #include <KLocale>
-
+#include <KMime/CharFreq>
+#include <KMime/Util>
 #include <QTextCodec>
 
 
-using namespace KNode::Utilities;
-
+namespace KNode {
+namespace Utilities {
 
 QString Locale::toMimeCharset( const QString &charset )
 {
@@ -74,46 +74,31 @@ QString Locale::toMimeCharset( const QString &charset )
 
 QByteArray Locale::defaultCharset()
 {
-#if 0
   return toMimeCharset( knGlobals.settings()->charset() ).toLatin1();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-  return "UTF-8";
-#endif
 }
 
-QByteArray Locale::defaultCharset( KNGroup::Ptr g )
+QByteArray Locale::defaultCharset( const Group::Ptr &g )
 {
-#if 0
   if ( g && g->useCharset() ) {
     return toMimeCharset( g->defaultCharset() ).toLatin1();
   } else {
     return defaultCharset();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-  return "UTF-8";
-#endif
 }
 
 
 
 
-void Locale::recodeString( const QString &s, KNGroup::Ptr g, QByteArray &result )
+void Locale::recodeString( const QString &s, const Group::Ptr &g, QByteArray &result )
 {
-#if 0
   Q_ASSERT( g );
 
   encodeTo7Bit( s.toLatin1(), defaultCharset( g ), result );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QByteArray &result )
 {
-#if 0
   if ( raw.isEmpty() ) {
     result = raw;
     return;
@@ -128,9 +113,6 @@ void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QBy
   // Transform 8-bit data
   QString properData = QTextCodec::codecForName( charset )->toUnicode( raw );
   result = KMime::encodeRFC2047String( properData, "UTF-8" );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -164,3 +146,6 @@ QStringList Locale::encodings()
   return ret;
 }
 
+
+}
+}
