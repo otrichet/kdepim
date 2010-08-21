@@ -83,7 +83,7 @@ void Widget::init()
 
   // Selection model
   mSelectionModel = new Akonadi::SelectionProxyModel( mTreeView->selectionModel(), this );
-  mSelectionModel->setSourceModel( filterModel );
+  mSelectionModel->setSourceModel( Akobackit::manager()->collectionModel() );
 
   // Restore/save view layout
   // FIXME: disabled until the crash it induce is fixed. Seems like the connnection
