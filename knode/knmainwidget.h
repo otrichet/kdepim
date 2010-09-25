@@ -24,6 +24,9 @@
 #include <QList>
 
 
+namespace Akonadi {
+  class Item;
+}
 class Q3ListViewItem;
 class QSplitter;
 class QTreeWidget;
@@ -198,7 +201,7 @@ protected:
 
 protected slots:
   //listview slots
-  void slotArticleSelected(Q3ListViewItem*);
+  void slotArticleSelected( const Akonadi::Item &item );
   void slotArticleSelectionChanged();
 
   /**
@@ -210,7 +213,7 @@ protected slots:
   void slotCollectionRenamed( QTreeWidgetItem *i );
   void slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p);
   /** Open selected article in own composer/reader window */
-  void slotOpenArticle(Q3ListViewItem *item);
+  void slotOpenArticle( const Akonadi::Item &item );
   void slotHdrViewSortingChanged(int i);
 
   //network slots

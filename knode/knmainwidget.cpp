@@ -23,6 +23,7 @@
 #include <Akonadi/AgentManager>
 #include <Akonadi/Collection>
 #include <Akonadi/EntityTreeModel>
+#include <Akonadi/ItemFetchJob>
 #include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
@@ -144,14 +145,14 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
                                     MessageList::Core::Aggregation::ExpandThreadsWithUnreadMessages,
                                     MessageList::Core::Aggregation::FavorInteractivity ) );
 
-  connect( mMessageList, SIGNAL(itemSelected(Q3ListViewItem*)),
-          SLOT(slotArticleSelected(Q3ListViewItem*)));
+  connect( mMessageList, SIGNAL( messageSelected( const Akonadi::Item & ) ),
+           this, SLOT( slotArticleSelected( const Akonadi::Item & ) ) );
   connect( mMessageList, SIGNAL(selectionChanged()),
           SLOT(slotArticleSelectionChanged()));
   connect( mMessageList, SIGNAL(contextMenu(K3ListView*, Q3ListViewItem*, const QPoint&)),
           SLOT(slotArticleRMB(K3ListView*, Q3ListViewItem*, const QPoint&)));
-  connect( mMessageList, SIGNAL(doubleClick(Q3ListViewItem *)),
-          SLOT(slotOpenArticle(Q3ListViewItem *)));
+  connect( mMessageList, SIGNAL( messageActivated( const Akonadi::Item & ) ),
+           this, SLOT( slotOpenArticle( const Akonadi::Item & ) ) );
   connect( mMessageList, SIGNAL(sortingChanged(int)),
           SLOT(slotHdrViewSortingChanged(int)));
 
@@ -831,7 +832,7 @@ void KNMainWidget::initActions()
 
   a_ctToggleQuickSearch = actionCollection()->add<KToggleAction>("settings_show_quickSearch");
   a_ctToggleQuickSearch->setText(i18n("Show Quick Search"));
-  connect( a_ctToggleQuickSearch, SIGNAL( triggered( bool ) ), mMessageList, SLOT( changeQuickSerachVisibility() ) );
+  connect( a_ctToggleQuickSearch, SIGNAL( triggered( bool ) ), mMessageList, SLOT( changeQuicksearchVisibility() ) );
 }
 
 bool KNMainWidget::firstStart()
@@ -1072,16 +1073,21 @@ void KNMainWidget::closeCurrentThread()
 #endif
 }
 
-void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
+void KNMainWidget::slotArticleSelected( const Akonadi::Item &item )
 {
   kDebug();
   if(b_lockui)
     return;
 
   RemoteArticle::Ptr selectedArticle;
-
-  if(i)
-    selectedArticle=(static_cast<KNHdrViewItem*>(i))->art;
+  if ( item.isValid() ) {
+    bool isInFolder = Akobackit::manager()->folderManager()->isFolder( mCollectionWidget->selectedCollection() );
+    if ( isInFolder ) {
+      selectedArticle = LocalArticle::Ptr( new LocalArticle( item ) );
+    } else {
+      selectedArticle = RemoteArticle::Ptr( new RemoteArticle( item ) );
+    }
+  }
 
   mArticleViewer->setArticle( selectedArticle );
 
@@ -1144,7 +1150,7 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
   if(b_lockui)
     return;
 
-  slotArticleSelected(0);
+  slotArticleSelected( Akonadi::Item() );
 
   // mark all articles in current group as not new/read
   if ( knGlobals.settings()->leaveGroupMarkAsRead() )
@@ -1273,7 +1279,7 @@ void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &
 }
 
 
-void KNMainWidget::slotOpenArticle(Q3ListViewItem *item)
+void KNMainWidget::slotOpenArticle( const Akonadi::Item &item )
 {
 #if 0
   if(b_lockui)

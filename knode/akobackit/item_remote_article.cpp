@@ -31,6 +31,7 @@ RemoteArticle::RemoteArticle( const Akonadi::Item &item )
   // Sync KMime::Content
   if ( mItem.isValid() ) {
     setContent( mItem.payloadData() );
+    parse();
   }
 }
 
