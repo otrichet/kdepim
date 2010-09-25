@@ -78,10 +78,10 @@ class AkoManager : public QObject
      */
     Akonadi::Session * session();
     /**
-     * Returns the base model of the collection tree view.
-     * It includes both the nntp accounts and the local folders.
+     * Returns the base model of the collection tree view and
+     * the message list view.
      */
-    Akonadi::EntityTreeModel * collectionModel();
+    Akonadi::EntityTreeModel * entityModel();
 
     /**
      * Returns the type of the given collection.
@@ -112,7 +112,7 @@ class AkoManager : public QObject
 
   private:
     Akonadi::ChangeRecorder *mMonitor;
-    Akonadi::EntityTreeModel *mBaseModel;
+    Akonadi::EntityTreeModel *mEntityModel;
     Akonadi::Session *mSession;
 
     NntpAccountManager *mAccountManager;

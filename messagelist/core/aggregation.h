@@ -28,6 +28,7 @@ class QDataStream;
 #include <QString>
 
 #include <messagelist/core/optionset.h>
+#include <messagelist/messagelist_export.h>
 
 namespace MessageList
 {
@@ -40,7 +41,7 @@ namespace Core
  * The set defines the behaviours related to the population of the model, threading
  * of messages and grouping.
  */
-class Aggregation : public OptionSet
+class MESSAGELIST_EXPORT Aggregation : public OptionSet
 {
 public:
 

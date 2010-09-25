@@ -109,6 +109,7 @@ StorageModel::StorageModel( QAbstractItemModel *model, QItemSelectionModel *sele
   itemFilter->setSourceModel( childrenFilter );
   itemFilter->addMimeTypeExclusionFilter( Collection::mimeType() );
   itemFilter->addMimeTypeInclusionFilter( QLatin1String( "message/rfc822" ) );
+  itemFilter->addMimeTypeInclusionFilter( QLatin1String( "message/news" ) );
   itemFilter->setHeaderGroup( EntityTreeModel::ItemListHeaders );
 
   d->mModel = itemFilter;

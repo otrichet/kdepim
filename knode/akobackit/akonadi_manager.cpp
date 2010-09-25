@@ -30,6 +30,7 @@
 
 #include <Akonadi/ChangeRecorder>
 #include <Akonadi/EntityTreeModel>
+#include <Akonadi/ItemFetchScope>
 #include <Akonadi/Session>
 #include <KGlobal>
 
@@ -60,7 +61,7 @@ AkoManager * manager()
 AkoManager::AkoManager( QObject *parent )
   : QObject( parent ),
     mMonitor( 0 ),
-    mBaseModel( 0 ),
+    mEntityModel( 0 ),
     mSession( new Akonadi::Session( "KNode", this ) ),
     mAccountManager( new NntpAccountManager( this ) ),
     mFolderManager( new FolderManager( this ) ),
@@ -79,24 +80,26 @@ Akonadi::ChangeRecorder * AkoManager::monitor()
   if ( !mMonitor ) {
     // Monitor
     mMonitor = new Akonadi::ChangeRecorder( this );
-    mMonitor->fetchCollection( true );
     mMonitor->setAllMonitored( true );
     // EntityTreeModel requiers that only one collection is monitored
     mMonitor->setCollectionMonitored( Akonadi::Collection::root() );
 //     mMonitor->fetchCollectionStatistics( true );
     mMonitor->setSession( mSession );
+
+    mMonitor->fetchCollection( true );
+    mMonitor->itemFetchScope().fetchFullPayload( true );
   }
   return mMonitor;
 }
 
-Akonadi::EntityTreeModel* AkoManager::collectionModel()
+Akonadi::EntityTreeModel* AkoManager::entityModel()
 {
-  if ( !mBaseModel ) {
-    mBaseModel = new Akonadi::EntityTreeModel( monitor(), this );
-    mBaseModel->setItemPopulationStrategy( Akonadi::EntityTreeModel::NoItemPopulation );
-    mBaseModel->setIncludeUnsubscribed( false );
+  if ( !mEntityModel ) {
+    mEntityModel = new Akonadi::EntityTreeModel( monitor(), this );
+    mEntityModel->setItemPopulationStrategy( Akonadi::EntityTreeModel::LazyPopulation );
+    mEntityModel->setIncludeUnsubscribed( false );
   }
-  return mBaseModel;
+  return mEntityModel;
 }
 
 Akonadi::Session * AkoManager::session()

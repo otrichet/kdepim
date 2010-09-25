@@ -5,6 +5,7 @@ include_directories(
   ${CMAKE_BINARY_DIR}/libkdepim
   ${CMAKE_SOURCE_DIR}/libkdepim
   ${CMAKE_SOURCE_DIR}/libkleo
+  ${CMAKE_SOURCE_DIR}/messagelist
   ${Boost_INCLUDE_DIR}
 
   ${knode_SOURCE_DIR}
@@ -120,6 +121,7 @@ target_link_libraries(knodecommon
   kdepim kpgp
   messagecomposer
   messageviewer
+  messagelist
   akonadi_next
 )
 

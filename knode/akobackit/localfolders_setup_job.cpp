@@ -65,7 +65,8 @@ Akonadi::AgentInstance LocalFoldersSetupJob::instance() const
 
 void LocalFoldersSetupJob::start()
 {
-  QTimer::singleShot( 0, this, SLOT( doStart() ) );
+//   QTimer::singleShot( 0, this, SLOT( doStart() ) );
+  emitResult();
 }
 
 void LocalFoldersSetupJob::doStart()

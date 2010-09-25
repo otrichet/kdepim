@@ -32,7 +32,6 @@
     <Separator/>
     <Action name="view_Filter"/>
     <Action name="view_Sort"/>
-    <Action name="view_Refresh"/>
     <Separator/>
     <Action name="view_rot13"/>
     <Separator/>
@@ -143,7 +142,6 @@
   <Separator/>
   <Action name="view_Filter"/>
   <Action name="article_search"/>
-  <Action name="view_Refresh"/>
   <Separator/>
   <Action name="account_subscribe"/>
 </ToolBar>

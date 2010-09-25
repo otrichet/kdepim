@@ -54,7 +54,8 @@ Widget::Widget( KXMLGUIClient *guiClient, QWidget *parent )
   addWidget( mTreeView );
   setContentsMargins( 0, 0, 0, 0 );
 
-  QTimer::singleShot( 0, this, SLOT( init() ) );
+//   QTimer::singleShot( 0, this, SLOT( init() ) );
+  init();
 }
 
 Widget::~Widget()
@@ -69,7 +70,7 @@ void Widget::init()
 
   // Show unread/total counts
   Akonadi::StatisticsProxyModel *statisticsModel = new Akonadi::StatisticsProxyModel( this );
-  statisticsModel->setSourceModel( Akobackit::manager()->collectionModel() );
+  statisticsModel->setSourceModel( Akobackit::manager()->entityModel() );
   statisticsModel->setDynamicSortFilter( true );
 //   statisticsModel->setToolTipEnabled( true );
   // filter collections containing news articles
@@ -83,7 +84,7 @@ void Widget::init()
 
   // Selection model
   mSelectionModel = new Akonadi::SelectionProxyModel( mTreeView->selectionModel(), this );
-  mSelectionModel->setSourceModel( Akobackit::manager()->collectionModel() );
+  mSelectionModel->setSourceModel( Akobackit::manager()->entityModel() );
 
   // Restore/save view layout
   // FIXME: disabled until the crash it induce is fixed. Seems like the connnection
@@ -119,8 +120,6 @@ void Widget::saveState()
 
 
 
-
-
 Akonadi::Collection Widget::selectedCollection() const
 {
   if ( !mSelectionModel ) {
@@ -150,6 +149,13 @@ void Widget::renameCollection( const Akonadi::Collection &col )
   mTreeView->scrollTo( idx );
   mTreeView->edit( idx );
 }
+
+
+QItemSelectionModel * Widget::selectionModel() const
+{
+  return mTreeView->selectionModel();
+}
+
 
 
 }

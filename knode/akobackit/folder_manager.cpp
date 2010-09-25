@@ -88,7 +88,7 @@ bool FolderManager::isFolder( const Akonadi::Collection &col )
 
 bool FolderManager::hasChild( const Akonadi::Collection &parent, const QString &childName )
 {
-  Akonadi::EntityTreeModel *model = mMainManager->collectionModel();
+  Akonadi::EntityTreeModel *model = mMainManager->entityModel();
   const QModelIndex pIdx = Akonadi::EntityTreeModel::modelIndexForCollection( model, parent );
   if ( !pIdx.isValid() ) {
     return false;

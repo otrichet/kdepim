@@ -19,17 +19,19 @@
 #include "akobackit/group_manager.h"
 #include "akobackit/nntpaccount_manager.h"
 #include "collectiontree/widget.h"
-#include "headerview.h"
 
-#include <Akonadi/Collection>
 #include <Akonadi/AgentManager>
+#include <Akonadi/Collection>
+#include <Akonadi/EntityTreeModel>
 #include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <messagelist/core/aggregation.h>
+#include <messagelist/storagemodel.h>
+#include <messagelist/widget.h>
 #include <QMenu>
 #include <QSplitter>
-#include <ktoolbar.h>
 #include <kicon.h>
 #include <kactioncollection.h>
 #include <kinputdialog.h>
@@ -50,13 +52,11 @@
 #include <kxmlguiclient.h>
 #include <kxmlguifactory.h>
 #include <ksqueezedtextlabel.h>
-
 #include <libkdepim/uistatesaver.h>
-#include "broadcaststatus.h"
-#include "recentaddresses.h"
+#include <broadcaststatus.h>
+#include <recentaddresses.h>
 using KPIM::BroadcastStatus;
 using KPIM::RecentAddresses;
-
 #include <mailtransport/transportmanager.h>
 using MailTransport::TransportManager;
 
@@ -128,32 +128,31 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   accel->connectItem( accel->insertItem(Qt::Key_PageDown), mArticleViewer, SLOT(scrollNext()) );
 
   //header view
-  QWidget *dummy = new QWidget( mSecondSplitter );
-  QVBoxLayout *vlay = new QVBoxLayout(dummy);
-  vlay->setSpacing( 0 );
-  vlay->setMargin( 0 );
-  h_drView = new KNHeaderView( dummy );
+  mMessageList = new MessageList::Widget( mSecondSplitter );
+  mMessageList->setXmlGuiClient( client );
+  MessageList::StorageModel *sm = new MessageList::StorageModel( Akobackit::manager()->entityModel(),
+                                                                 mCollectionWidget->selectionModel(), mMessageList );
+  mMessageList->setStorageModel( sm );
+  mMessageList->view()->setAggregation(
+                              new MessageList::Core::Aggregation(
+                                    i18nc( "Messages aggregation name (in the header view)", "News group" ),
+                                    i18n( "This aggregation of message is the best suited to read news group." ),
+                                    MessageList::Core::Aggregation::NoGrouping,
+                                    MessageList::Core::Aggregation::NeverExpandGroups,
+                                    MessageList::Core::Aggregation::PerfectReferencesAndSubject,
+                                    MessageList::Core::Aggregation::MostRecentMessage,
+                                    MessageList::Core::Aggregation::ExpandThreadsWithUnreadMessages,
+                                    MessageList::Core::Aggregation::FavorInteractivity ) );
 
-  q_uicksearch = new KToolBar( dummy );
-  QLabel *lbl = new QLabel(i18n("&Search:"),dummy);
-  lbl->setObjectName("kde toolbar widget");
-  q_uicksearch->addWidget( lbl );
-  s_earchLineEdit = new K3ListViewSearchLine( q_uicksearch, h_drView );
-  q_uicksearch->addWidget( s_earchLineEdit );
-  lbl->setBuddy(s_earchLineEdit);
-
-  vlay->addWidget(q_uicksearch);
-  vlay->addWidget(h_drView);
-
-  connect(h_drView, SIGNAL(itemSelected(Q3ListViewItem*)),
+  connect( mMessageList, SIGNAL(itemSelected(Q3ListViewItem*)),
           SLOT(slotArticleSelected(Q3ListViewItem*)));
-  connect(h_drView, SIGNAL(selectionChanged()),
+  connect( mMessageList, SIGNAL(selectionChanged()),
           SLOT(slotArticleSelectionChanged()));
-  connect(h_drView, SIGNAL(contextMenu(K3ListView*, Q3ListViewItem*, const QPoint&)),
+  connect( mMessageList, SIGNAL(contextMenu(K3ListView*, Q3ListViewItem*, const QPoint&)),
           SLOT(slotArticleRMB(K3ListView*, Q3ListViewItem*, const QPoint&)));
-  connect(h_drView, SIGNAL(doubleClick(Q3ListViewItem *)),
+  connect( mMessageList, SIGNAL(doubleClick(Q3ListViewItem *)),
           SLOT(slotOpenArticle(Q3ListViewItem *)));
-  connect(h_drView, SIGNAL(sortingChanged(int)),
+  connect( mMessageList, SIGNAL(sortingChanged(int)),
           SLOT(slotHdrViewSortingChanged(int)));
 
   //actions
@@ -162,7 +161,7 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   // splitter setup
   mPrimarySplitter->addWidget( mCollectionWidget );
   mPrimarySplitter->addWidget( mSecondSplitter );
-  mSecondSplitter->addWidget( dummy );
+  mSecondSplitter->addWidget( mMessageList );
   mSecondSplitter->addWidget( mArticleViewer );
 
   //-------------------------------- </GUI> ------------------------------------
@@ -182,7 +181,7 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   //Article Manager
   a_rtManager = knGlobals.articleManager();
-  a_rtManager->setView(h_drView);
+  a_rtManager->setView( 0 );
 
   //Article Factory
   a_rtFactory = KNGlobals::self()->articleFactory();
@@ -226,8 +225,6 @@ KNMainWidget::~KNMainWidget()
 #endif
 
   //delete a_ccel;
-
-  h_drView->clear(); //avoid some random crashes in KNHdrViewItem::~KNHdrViewItem()
 
   delete a_rtManager;
   kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Article Manager deleted";
@@ -490,13 +487,13 @@ void KNMainWidget::initActions()
   a_ctNavNextArt->setText(i18n("&Next Article"));
   a_ctNavNextArt->setToolTip(i18n("Go to next article"));
   a_ctNavNextArt->setShortcuts(KShortcut("N; Right"));
-  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), h_drView, SLOT(nextArticle()));
+  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), mMessageList, SLOT(nextArticle()));
 
   a_ctNavPrevArt = actionCollection()->addAction("go_prevArticle" );
   a_ctNavPrevArt->setText(i18n("&Previous Article"));
   a_ctNavPrevArt->setShortcuts(KShortcut("P; Left"));
   a_ctNavPrevArt->setToolTip(i18n("Go to previous article"));
-  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), h_drView, SLOT(prevArticle()));
+  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), mMessageList, SLOT(prevArticle()));
 
   a_ctNavNextUnreadArt = actionCollection()->addAction("go_nextUnreadArticle");
   a_ctNavNextUnreadArt->setIcon(KIcon("go-next"));
@@ -544,17 +541,17 @@ void KNMainWidget::initActions()
 
   action = actionCollection()->addAction("inc_current_article");
   action->setText(i18n("Focus on Next Article"));
-  connect(action, SIGNAL(triggered(bool) ), h_drView, SLOT(incCurrentArticle()));
+  connect(action, SIGNAL(triggered(bool) ), mMessageList, SLOT(incCurrentArticle()));
   action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Right));
 
   action = actionCollection()->addAction("dec_current_article");
   action->setText(i18n("Focus on Previous Article"));
-  connect(action, SIGNAL(triggered(bool) ), h_drView, SLOT(decCurrentArticle()));
+  connect(action, SIGNAL(triggered(bool) ), mMessageList, SLOT(decCurrentArticle()));
   action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Left));
 
   action = actionCollection()->addAction("select_current_article");
   action->setText(i18n("Select Article with Focus"));
-  connect(action, SIGNAL(triggered(bool) ), h_drView, SLOT(selectCurrentArticle()));
+  connect(action, SIGNAL(triggered(bool) ), mMessageList, SLOT(selectCurrentArticle()));
   action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Space));
 
   //collection-view - accounts
@@ -834,7 +831,7 @@ void KNMainWidget::initActions()
 
   a_ctToggleQuickSearch = actionCollection()->add<KToggleAction>("settings_show_quickSearch");
   a_ctToggleQuickSearch->setText(i18n("Show Quick Search"));
-  connect(a_ctToggleQuickSearch, SIGNAL(triggered(bool) ), SLOT(slotToggleQuickSearch()));
+  connect( a_ctToggleQuickSearch, SIGNAL( triggered( bool ) ), mMessageList, SLOT( changeQuickSerachVisibility() ) );
 }
 
 bool KNMainWidget::firstStart()
@@ -1147,8 +1144,6 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
   if(b_lockui)
     return;
 
-  s_earchLineEdit->clear();
-  h_drView->clear();
   slotArticleSelected(0);
 
   // mark all articles in current group as not new/read
@@ -1159,12 +1154,11 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
   Akobackit::CollectionType collectionType = Akobackit::manager()->type( col );
 
   if ( collectionType != Akobackit::NntpServer ) {
-    if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() ) {
-      h_drView->setFocus();
+    if ( !mMessageList->hasFocus() && !mArticleViewer->hasFocus() ) {
+      mMessageList->setFocus();
     }
   }
 
-  a_rtManager->setCurrentCollection( col );
   a_rtManager->updateStatusString();
   updateCaption();
 
@@ -1730,18 +1724,26 @@ void KNMainWidget::slotFolMBoxExport()
 
 void KNMainWidget::slotArtSortHeaders(int i)
 {
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeaders(int i)";
   h_drView->setSorting( i );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNMainWidget::slotArtSortHeadersKeyb()
 {
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeadersKeyb()";
 
   int newCol = KNHelper::selectDialog(this, i18n("Select Sort Column"), a_ctArtSortHeaders->items(), a_ctArtSortHeaders->currentItem());
   if (newCol != -1)
     h_drView->setSorting( newCol );
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -1752,31 +1754,32 @@ void KNMainWidget::slotArtSearch()
 }
 
 
-void KNMainWidget::slotArtRefreshList()
-{
-  kDebug(5003) <<"KNMainWidget::slotArtRefreshList()";
-  a_rtManager->showHdrs(true);
-}
-
-
 void KNMainWidget::slotArtCollapseAll()
 {
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtCollapseAll()";
 
   closeCurrentThread();
   a_rtManager->setAllThreadsOpen(false);
   if (h_drView->currentItem())
     h_drView->ensureItemVisible(h_drView->currentItem());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
 void KNMainWidget::slotArtExpandAll()
 {
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtExpandAll()";
 
   a_rtManager->setAllThreadsOpen(true);
   if (h_drView->currentItem())
     h_drView->ensureItemVisible(h_drView->currentItem());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 
@@ -2093,16 +2096,6 @@ void KNMainWidget::slotFetchArticleWithID()
 #endif
 }
 
-
-void KNMainWidget::slotToggleQuickSearch()
-{
-  if (q_uicksearch->isHidden())
-    q_uicksearch->show();
-  else
-    q_uicksearch->hide();
-}
-
-
 void KNMainWidget::slotSettings()
 {
   c_fgManager->configure();
@@ -2158,13 +2151,21 @@ void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 // Move to the next article
 void KNMainWidget::nextArticle()
 {
+#if 0
   h_drView->nextArticle();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 // Move to the previous article
 void KNMainWidget::previousArticle()
 {
+#if 0
   h_drView->prevArticle();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 }
 
 // Move to the next unread article

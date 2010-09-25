@@ -31,6 +31,7 @@ namespace Akonadi {
   class SelectionProxyModel;
 }
 class KXMLGUIClient;
+class QItemSelectionModel;
 
 namespace KNode {
 namespace CollectionTree {
@@ -60,6 +61,11 @@ class Widget : public QSplitter
      * @param col The collection to rename.
      */
     void renameCollection( const Akonadi::Collection &col );
+
+    /**
+     * Returns the selection model (to use with the MessageList library).
+     */
+    QItemSelectionModel * selectionModel() const;
 
   signals:
     /**

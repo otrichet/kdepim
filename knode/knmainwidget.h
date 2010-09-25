@@ -25,7 +25,6 @@
 
 
 class Q3ListViewItem;
-class QLineEdit;
 class QSplitter;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -35,9 +34,7 @@ class KToggleAction;
 class KSelectAction;
 class KSqueezedTextLabel;
 class KLineEdit;
-class KToolBar;
 class KXMLGUIClient;
-class KNHeaderView;
 class KNCollectionView;
 class KNConfigManager;
 class KNArticleManager;
@@ -52,6 +49,10 @@ namespace KNode {
   }
 }
 class KActionCollection;
+namespace MessageList {
+  class Widget;
+}
+
 
 /** This is the central part of the KNode GUI. */
 class KNODE_EXPORT KNMainWidget : public KVBox
@@ -85,8 +86,6 @@ public:
 
   /** Returns the collection tree widget. */
   KNode::CollectionTree::Widget * collectionView() const { return mCollectionWidget; }
-  /** Returns the article list view. */
-  KNHeaderView*       headerView()const      { return h_drView; }
   /** Returns the article viewer. */
   KNode::ArticleWidget* articleViewer() const     { return mArticleViewer; }
   KSqueezedTextLabel*  statusBarLabelGroup() const { return s_tatusGroup; }
@@ -187,10 +186,8 @@ protected:
   //GUI
   //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
-  KNHeaderView      *h_drView;
+  MessageList::Widget *mMessageList;
   bool b_lockui;
-  KToolBar        *q_uicksearch;
-  QLineEdit       *s_earchLineEdit;
 
   //Core
   KNConfigManager   *c_fgManager;
@@ -351,7 +348,6 @@ protected slots:
   void slotArtSortHeaders(int i);
   void slotArtSortHeadersKeyb();
   void slotArtSearch();
-  void slotArtRefreshList();
   void slotArtCollapseAll();
   void slotArtExpandAll();
   void slotArtToggleThread();
@@ -379,7 +375,6 @@ protected slots:
 
   void slotFetchArticleWithID();
 
-  void slotToggleQuickSearch();
   void slotSettings();
 
   //--------------------------- </Actions> -----------------------------
