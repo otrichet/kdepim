@@ -31,6 +31,8 @@
 #include <Akonadi/ChangeRecorder>
 #include <Akonadi/EntityTreeModel>
 #include <Akonadi/ItemFetchScope>
+#include <Akonadi/ItemModifyJob>
+#include <akonadi/kmime/messagestatus.h>
 #include <Akonadi/Session>
 #include <KGlobal>
 
@@ -139,6 +141,56 @@ CollectionType AkoManager::type( const Akonadi::Collection &col )
   kError() << "Collection not handled: " << col;
   return Akobackit::InvalidCollection;
 }
+
+
+
+void AkoManager::changeStatus( const Akonadi::Item::List &articles, const Akonadi::MessageStatus &newStatus )
+{
+  foreach ( Akonadi::Item item, articles ) {
+    if ( !item.isValid() ) {
+      continue;
+    }
+    Akonadi::MessageStatus status;
+    status.setStatusFromFlags( item.flags() );
+    status.set( newStatus );
+    item.setFlags( status.statusFlags() );
+
+    Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( item );
+    job->disableRevisionCheck();
+    job->setIgnorePayload( true );
+  }
+}
+
+bool AkoManager::toggleStatus( const Akonadi::Item::List &articles, const Akonadi::MessageStatus &newStatus )
+{
+  if ( articles.isEmpty() ) {
+    return false;
+  }
+
+  Akonadi::MessageStatus finalStatus;
+  finalStatus.set( newStatus );
+  Akonadi::MessageStatus articleStatus;
+  articleStatus.setStatusFromFlags( articles.at( 0 ).flags() );
+  if ( articleStatus & finalStatus ) {
+    finalStatus.toggle( newStatus );
+  }
+
+  foreach ( Akonadi::Item item, articles ) {
+    if ( !item.isValid() ) {
+      continue;
+    }
+    Akonadi::MessageStatus status;
+    status.setStatusFromFlags( item.flags() );
+    status.toggle( newStatus );
+    item.setFlags( status.statusFlags() );
+
+    Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( item );
+    job->disableRevisionCheck();
+    job->setIgnorePayload( true );
+  }
+  return true;
+}
+
 
 
 }

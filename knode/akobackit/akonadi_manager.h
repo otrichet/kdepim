@@ -32,6 +32,8 @@ namespace Akonadi {
   class ChangeRecorder;
   class Collection;
   class EntityTreeModel;
+  class Item;
+  class MessageStatus;
   class Session;
 }
 
@@ -69,6 +71,17 @@ class AkoManager : public QObject
     virtual ~AkoManager();
 
   public:
+    /**
+     * Mark @p articles with the status @p newStatus.
+     */
+    void changeStatus( const QList<Akonadi::Item> &articles, const Akonadi::MessageStatus &newStatus );
+    /**
+     * Toggle status of @p articles to the status @p newStatus.
+     * @return true if any modification was done.
+     */
+    bool toggleStatus( const QList<Akonadi::Item> &articles, const Akonadi::MessageStatus &newStatus );
+
+
     /**
      * Returns the change recorder for use in EntityTreeModel.
      */

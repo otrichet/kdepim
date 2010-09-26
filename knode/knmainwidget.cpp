@@ -25,6 +25,7 @@
 #include <Akonadi/Collection>
 #include <Akonadi/EntityTreeModel>
 #include <Akonadi/ItemFetchJob>
+#include <akonadi/kmime/messagestatus.h>
 #include <KLineEdit>
 #include <Q3Accel>
 #include <QEvent>
@@ -1502,10 +1503,8 @@ void KNMainWidget::slotGrpUnsubscribe()
 
 void KNMainWidget::slotGrpSetAllRead()
 {
+  mMessageList->markAll( Akonadi::MessageStatus::statusRead() );
 #if 0
-  kDebug(5003) <<"KNMainWidget::slotGrpSetAllRead()";
-
-  a_rtManager->setAllRead(true);
   if ( knGlobals.settings()->markAllReadGoNext() )
     c_olView->nextGroup();
 #else
@@ -1516,12 +1515,7 @@ void KNMainWidget::slotGrpSetAllRead()
 
 void KNMainWidget::slotGrpSetAllUnread()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotGrpSetAllUnread()";
-  a_rtManager->setAllRead(false);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->markAll( Akonadi::MessageStatus::statusUnread() );
 }
 
 void KNMainWidget::slotGrpSetUnread()
@@ -1759,72 +1753,52 @@ void KNMainWidget::slotArtToggleShowThreads()
 
 void KNMainWidget::slotArtSetArtRead()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtSetArtRead()";
-  if(!g_rpManager->currentGroup())
+  kDebug();
+  if ( !Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
     return;
+  }
 
-  KNRemoteArticle::List l;
-  getSelectedArticles(l);
-  a_rtManager->setRead(l, true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->markSelection( Akonadi::MessageStatus::statusRead() );
 }
 
 
 void KNMainWidget::slotArtSetArtUnread()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtSetArtUnread()";
-  if(!g_rpManager->currentGroup())
+  kDebug();
+  if ( !Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
     return;
+  }
 
-  KNRemoteArticle::List l;
-  getSelectedArticles(l);
-  a_rtManager->setRead(l, false);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->markSelection( Akonadi::MessageStatus::statusUnread() );
 }
 
 
 void KNMainWidget::slotArtSetThreadRead()
 {
-#if 0
-  kDebug(5003) <<"slotArtSetThreadRead()";
-  if( !g_rpManager->currentGroup() )
+  kDebug();
+  if ( !Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
     return;
+  }
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
-  a_rtManager->setRead(l, true);
+  mMessageList->markThread( Akonadi::MessageStatus::statusRead() );
 
-  if (h_drView->currentItem()) {
+  if ( mMessageList->currentMessageItem() ) {
     if ( knGlobals.settings()->markThreadReadCloseThread() )
       closeCurrentThread();
     if ( knGlobals.settings()->markThreadReadGoNext() )
       slotNavNextUnreadThread();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtSetThreadUnread()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtSetThreadUnread()";
-  if( !g_rpManager->currentGroup() )
+  kDebug();
+  if ( !Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
     return;
+  }
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
-  a_rtManager->setRead(l, false);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->markThread( Akonadi::MessageStatus::statusUnread() );
 }
 
 
@@ -1886,38 +1860,36 @@ void KNMainWidget::slotScoreRaise()
 
 void KNMainWidget::slotArtToggleIgnored()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtToggleIgnored()";
-  if( !g_rpManager->currentGroup() )
+  kDebug();
+  if ( !Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
     return;
+  }
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
-  bool revert = !a_rtManager->toggleIgnored(l);
+  bool revert = mMessageList->toggleThread( Akonadi::MessageStatus::statusIgnored() );
+#if 0
   a_rtManager->rescoreArticles(l);
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
 
-  if (h_drView->currentItem() && !revert) {
+  if ( mMessageList->currentMessageItem() && !revert ) {
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
       closeCurrentThread();
     if ( knGlobals.settings()->ignoreThreadGoNext() )
       slotNavNextUnreadThread();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNMainWidget::slotArtToggleWatched()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtToggleWatched()";
-  if( !g_rpManager->currentGroup() )
+  kDebug();
+  if ( !Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
     return;
+  }
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
-  a_rtManager->toggleWatched(l);
+  mMessageList->toggleThread( Akonadi::MessageStatus::statusWatched() );
+#if 0
   a_rtManager->rescoreArticles(l);
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;

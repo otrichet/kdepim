@@ -31,7 +31,6 @@
 #include <KXMLGUIFactory>
 #include <messagelist/core/aggregation.h>
 #include <messagelist/core/messageitem.h>
-#include <messagelist/storagemodel.h>
 #include <messagelist/widget.h>
 #include <QMenu>
 
@@ -49,6 +48,7 @@ Widget::Widget( QWidget *parent, KXMLGUIClient *xmlGuiClient )
 Widget::~Widget()
 {
 }
+
 
 
 void Widget::viewMessageListContextPopupRequest( const QList<MessageList::Core::MessageItem*> &selectedItems, const QPoint &globalPos )
@@ -71,6 +71,7 @@ void Widget::viewMessageListContextPopupRequest( const QList<MessageList::Core::
 }
 
 
+
 void Widget::initAggregation()
 {
   view()->setAggregation(
@@ -85,6 +86,34 @@ void Widget::initAggregation()
                       MessageList::Core::Aggregation::FavorInteractivity ) );
   view()->reload();
 }
+
+
+
+void Widget::markAll( const Akonadi::MessageStatus &newStatus )
+{
+  kDebug() << "AKONADI PORT: Not implemented code in" << Q_FUNC_INFO;
+//   const Akonadi::Item::List items = ...;
+//   Akobackit::manager()->changeStatus( items, newStatus );
+}
+
+void Widget::markSelection( const Akonadi::MessageStatus &newStatus )
+{
+  const Akonadi::Item::List items = selectionAsMessageItemList( true/*include collapsed items*/ );
+  Akobackit::manager()->changeStatus( items, newStatus );
+}
+
+void Widget::markThread( const Akonadi::MessageStatus &newStatus )
+{
+  const Akonadi::Item::List items = currentThreadAsMessageList();
+  Akobackit::manager()->changeStatus( items, newStatus );
+}
+
+bool Widget::toggleThread( const Akonadi::MessageStatus& newStatus )
+{
+  const Akonadi::Item::List items = currentThreadAsMessageList();
+  return Akobackit::manager()->toggleStatus( items, newStatus );
+}
+
 
 
 }

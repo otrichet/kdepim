@@ -26,6 +26,10 @@
 
 #include <messagelist/widget.h>
 
+namespace Akonadi {
+  class MessageStatus;
+}
+
 
 namespace KNode {
 
@@ -44,6 +48,26 @@ class Widget : public MessageList::Widget
   public:
     explicit Widget( QWidget *parent, KXMLGUIClient *xmlGuiClient );
     virtual ~Widget();
+
+
+    /**
+     * Mark all articles with the status @p newStatus.
+     */
+    void markAll( const Akonadi::MessageStatus &newStatus );
+    /**
+     * Mark all selected with the status @p newStatus.
+     */
+    void markSelection( const Akonadi::MessageStatus &newStatus );
+    /**
+     * Mark threads whose articles are selected with the status @p newStatus.
+     */
+    void markThread( const Akonadi::MessageStatus &newStatus );
+    /**
+     * Toggle status of selected thread to @p newStatus.
+     * @return true if any change were made.
+     */
+    bool toggleThread( const Akonadi::MessageStatus &newStatus );
+
 
   protected:
     virtual void viewMessageListContextPopupRequest(const QList< MessageList::Core::MessageItem* >& selectedItems, const QPoint& globalPos);
