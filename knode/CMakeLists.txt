@@ -5,7 +5,6 @@ include_directories(
   ${CMAKE_BINARY_DIR}/libkdepim
   ${CMAKE_SOURCE_DIR}/libkdepim
   ${CMAKE_SOURCE_DIR}/libkleo
-  ${CMAKE_SOURCE_DIR}/messagelist
   ${Boost_INCLUDE_DIR}
 
   ${knode_SOURCE_DIR}
@@ -83,6 +82,7 @@ set(knodecommon_LIB_SRCS
    groupselector/subscription_change_filter_proxy_model.cpp
    groupselector/subscription_state_grouping_proxy_model.cpp
    groupselector/subscription_state_model.cpp
+   messagelistview/widget.cpp
    utils/locale.cpp
    utils/startup.cpp
    kscoring.cpp

@@ -19,25 +19,23 @@
 #include "akobackit/group_manager.h"
 #include "akobackit/nntpaccount_manager.h"
 #include "collectiontree/widget.h"
+#include "messagelistview/widget.h"
 
 #include <Akonadi/AgentManager>
 #include <Akonadi/Collection>
 #include <Akonadi/EntityTreeModel>
 #include <Akonadi/ItemFetchJob>
+#include <KLineEdit>
 #include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <messagelist/core/aggregation.h>
 #include <messagelist/storagemodel.h>
-#include <messagelist/widget.h>
-#include <QMenu>
 #include <QSplitter>
 #include <kicon.h>
 #include <kactioncollection.h>
 #include <kinputdialog.h>
 #include <kmessagebox.h>
-#include <kedittoolbar.h>
 #include <kstandardaction.h>
 #include <kdebug.h>
 #include <kmenubar.h>
@@ -45,13 +43,11 @@
 #include <kstatusbar.h>
 #include <klocale.h>
 #include <kcmdlineargs.h>
-#include <k3listviewsearchline.h>
 #include <khbox.h>
 #include <kselectaction.h>
 #include <kstandardshortcut.h>
 #include <ktoggleaction.h>
 #include <kxmlguiclient.h>
-#include <kxmlguifactory.h>
 #include <ksqueezedtextlabel.h>
 #include <libkdepim/uistatesaver.h>
 #include <broadcaststatus.h>
@@ -63,7 +59,6 @@ using MailTransport::TransportManager;
 
 //GUI
 #include "knarticlewindow.h"
-#include "knhdrviewitem.h"
 
 //Core
 #include "articlewidget.h"
@@ -129,28 +124,15 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   accel->connectItem( accel->insertItem(Qt::Key_PageDown), mArticleViewer, SLOT(scrollNext()) );
 
   //header view
-  mMessageList = new MessageList::Widget( mSecondSplitter );
-  mMessageList->setXmlGuiClient( client );
+  mMessageList = new MessageListView::Widget( mSecondSplitter, client );
   MessageList::StorageModel *sm = new MessageList::StorageModel( Akobackit::manager()->entityModel(),
                                                                  mCollectionWidget->selectionModel(), mMessageList );
   mMessageList->setStorageModel( sm );
-  mMessageList->view()->setAggregation(
-                              new MessageList::Core::Aggregation(
-                                    i18nc( "Messages aggregation name (in the header view)", "News group" ),
-                                    i18n( "This aggregation of message is the best suited to read news group." ),
-                                    MessageList::Core::Aggregation::NoGrouping,
-                                    MessageList::Core::Aggregation::NeverExpandGroups,
-                                    MessageList::Core::Aggregation::PerfectReferencesAndSubject,
-                                    MessageList::Core::Aggregation::MostRecentMessage,
-                                    MessageList::Core::Aggregation::ExpandThreadsWithUnreadMessages,
-                                    MessageList::Core::Aggregation::FavorInteractivity ) );
 
   connect( mMessageList, SIGNAL( messageSelected( const Akonadi::Item & ) ),
            this, SLOT( slotArticleSelected( const Akonadi::Item & ) ) );
   connect( mMessageList, SIGNAL(selectionChanged()),
           SLOT(slotArticleSelectionChanged()));
-  connect( mMessageList, SIGNAL(contextMenu(K3ListView*, Q3ListViewItem*, const QPoint&)),
-          SLOT(slotArticleRMB(K3ListView*, Q3ListViewItem*, const QPoint&)));
   connect( mMessageList, SIGNAL( messageActivated( const Akonadi::Item & ) ),
            this, SLOT( slotOpenArticle( const Akonadi::Item & ) ) );
   connect( mMessageList, SIGNAL(sortingChanged(int)),
@@ -1250,30 +1232,6 @@ void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
 #endif
 }
 
-
-void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p)
-{
-#if 0
-  if(b_lockui)
-    return;
-
-  if(i) {
-    QMenu *popup;
-    if( (static_cast<KNHdrViewItem*>(i))->art->type()==KNArticle::ATremote) {
-     popup = popupMenu( "remote_popup" );
-    } else {
-     popup = popupMenu( "local_popup" );
-    }
-
-    if ( popup )
-      popup->popup(p);
-  }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
 void KNMainWidget::slotOpenArticle( const Akonadi::Item &item )
 {
 #if 0
@@ -2094,12 +2052,6 @@ KActionCollection* KNMainWidget::actionCollection() const
   return m_GUIClient->actionCollection();
 }
 
-QMenu * KNMainWidget::popupMenu( const QString &name ) const
-{
-  Q_ASSERT( m_GUIClient );
-  Q_ASSERT( m_GUIClient->factory() );
-  return static_cast<QMenu*>( m_GUIClient->factory()->container( name, m_GUIClient ) );
-}
 
 //--------------------------------
 

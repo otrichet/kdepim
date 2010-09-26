@@ -27,11 +27,9 @@
 namespace Akonadi {
   class Item;
 }
-class Q3ListViewItem;
 class QSplitter;
 class QTreeWidget;
 class QTreeWidgetItem;
-class K3ListView;
 class KAction;
 class KToggleAction;
 class KSelectAction;
@@ -50,11 +48,11 @@ namespace KNode {
   namespace CollectionTree {
     class Widget;
   }
+  namespace MessageListView {
+    class Widget;
+  }
 }
 class KActionCollection;
-namespace MessageList {
-  class Widget;
-}
 
 
 /** This is the central part of the KNode GUI. */
@@ -157,11 +155,6 @@ signals:
 protected:
 
   KActionCollection* actionCollection() const;
-  /**
-    Returns the menu from knodeui.rc whose name is @p name.
-  */
-  QMenu * popupMenu( const QString &name ) const;
-
   void initActions();
   void initStatusBar();
 
@@ -189,7 +182,7 @@ protected:
   //GUI
   //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
-  MessageList::Widget *mMessageList;
+  KNode::MessageListView::Widget *mMessageList;
   bool b_lockui;
 
   //Core
@@ -211,7 +204,6 @@ protected slots:
   void slotCollectionSelected( const Akonadi::Collection &col = Akonadi::Collection() );
   /** Called when a collection is renamed. */
   void slotCollectionRenamed( QTreeWidgetItem *i );
-  void slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p);
   /** Open selected article in own composer/reader window */
   void slotOpenArticle( const Akonadi::Item &item );
   void slotHdrViewSortingChanged(int i);
