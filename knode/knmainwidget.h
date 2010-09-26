@@ -247,7 +247,6 @@ protected:
     *a_ctGrpRename,
     *a_ctGrpGetNewHdrs,
     *a_ctGrpExpire,
-    *a_ctGrpReorganize,
     *a_ctGrpUnsubscribe,
     *a_ctGrpSetAllRead,
     *a_ctGrpSetAllUnread,
@@ -321,7 +320,6 @@ protected slots:
   void slotGrpRename();
   void slotGrpGetNewHdrs();
   void slotGrpExpire();
-  void slotGrpReorganize();
   void slotGrpUnsubscribe();
   void slotGrpSetAllRead();
   void slotGrpSetAllUnread();

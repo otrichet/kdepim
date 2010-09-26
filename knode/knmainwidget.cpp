@@ -616,10 +616,6 @@ void KNMainWidget::initActions()
   a_ctGrpExpire->setText(i18n("E&xpire Group"));
   connect(a_ctGrpExpire, SIGNAL(triggered(bool)), SLOT(slotGrpExpire()));
 
-  a_ctGrpReorganize = actionCollection()->addAction("group_reorg");
-  a_ctGrpReorganize->setText(i18n("Re&organize Group"));
-  connect(a_ctGrpReorganize, SIGNAL(triggered(bool) ), SLOT(slotGrpReorganize()));
-
   a_ctGrpUnsubscribe = actionCollection()->addAction("group_unsubscribe");
   a_ctGrpUnsubscribe->setIcon(KIcon("news-unsubscribe"));
   a_ctGrpUnsubscribe->setText(i18n("&Unsubscribe From Group"));
@@ -1204,7 +1200,6 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
     a_ctGrpRename->setEnabled(enabled);
     a_ctGrpGetNewHdrs->setEnabled(enabled);
     a_ctGrpExpire->setEnabled(enabled);
-    a_ctGrpReorganize->setEnabled(enabled);
     a_ctGrpUnsubscribe->setEnabled(enabled);
     a_ctGrpSetAllRead->setEnabled(enabled);
     a_ctGrpSetAllUnread->setEnabled(enabled);
@@ -1522,17 +1517,6 @@ void KNMainWidget::slotGrpExpire()
   kDebug(5003) <<"KNMainWidget::slotGrpExpire()";
   if(g_rpManager->currentGroup())
     g_rpManager->expireGroupNow(g_rpManager->currentGroup());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::slotGrpReorganize()
-{
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotGrpReorganize()";
-  g_rpManager->reorganizeGroup(g_rpManager->currentGroup());
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif

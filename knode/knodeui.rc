@@ -64,8 +64,6 @@
     <Action name="group_dnlHeaders"/>
     <Action name="group_expire"/>
     <Separator/>
-    <Action name="group_reorg"/>
-    <Separator/>
     <Action name="group_allRead"/>
     <Action name="group_allUnread"/>
     <Action name="group_unread"/>
