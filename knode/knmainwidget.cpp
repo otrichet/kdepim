@@ -1427,13 +1427,16 @@ void KNMainWidget::slotAccExpireAll()
 
 void KNMainWidget::slotAccGetNewHdrs()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotAccGetNewHdrs()";
-  if(a_ccManager->currentAccount())
-    g_rpManager->checkAll(a_ccManager->currentAccount());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  kDebug();
+  const Akonadi::Collection collection = mCollectionWidget->selectedCollection();
+  const Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance( collection.resource() );
+  if ( !agent.isValid() ) {
+    return;
+  }
+
+  Akobackit::NntpAccountManager *am = Akobackit::manager()->accountManager();
+  Akobackit::GroupManager *gm = Akobackit::manager()->groupManager();
+  gm->fetchNewHeaders( am->account( agent ) );
 }
 
 
@@ -1452,13 +1455,7 @@ void KNMainWidget::slotAccDelete()
 
 void KNMainWidget::slotAccGetNewHdrsAll()
 {
-#if 0
-  KNNntpAccount::List list = a_ccManager->accounts();
-  for ( KNNntpAccount::List::Iterator it = list.begin(); it != list.end(); ++it )
-    g_rpManager->checkAll( *it );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  Akobackit::manager()->groupManager()->fetchNewHeaders();
 }
 
 void KNMainWidget::slotAccPostNewArticle()
@@ -1508,13 +1505,14 @@ void KNMainWidget::slotGrpRename()
 
 void KNMainWidget::slotGrpGetNewHdrs()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotGrpGetNewHdrs()";
-  if(g_rpManager->currentGroup())
-    g_rpManager->checkGroupForNewHeaders(g_rpManager->currentGroup());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  kDebug();
+  Akobackit::GroupManager *grpManager = Akobackit::manager()->groupManager();
+
+  const Akonadi::Collection col = collectionView()->selectedCollection();
+  if ( grpManager->isGroup( col ) ) {
+    const Group::Ptr group = grpManager->group( col );
+    grpManager->fetchNewHeaders( group );
+  }
 }
 
 

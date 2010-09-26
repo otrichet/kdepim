@@ -69,6 +69,26 @@ class GroupManager : public QObject
     NntpAccount::Ptr account( const Group::Ptr &group );
 
 
+    /**
+     * Fetch new headers of a group.
+     * @param group The group whose headers should be checked.
+     * @param silent If true, no error feedback is presented to the user.
+     */
+    void fetchNewHeaders( Group::Ptr group, bool silent = false );
+
+    /**
+     * Fetch new headers in an account
+     * @param account All groups of the this account are checked.
+     * @param silent If true, no error feedback is presented to the user.
+     */
+    void fetchNewHeaders( NntpAccount::Ptr account, bool silent = false );
+
+    /**
+     * Fetch new headers in all groups of all accounts.
+     * @param silent If true, no error is presented to the user.
+     */
+    void fetchNewHeaders( bool silent = false);
+
 
     /**
      * Edits the property of a group. This opens the edition dialog of the group.

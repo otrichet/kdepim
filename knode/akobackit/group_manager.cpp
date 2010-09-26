@@ -104,6 +104,31 @@ void GroupManager::unsubscribeGroup( const Group::Ptr &group )
 
 
 
+void GroupManager::fetchNewHeaders( Group::Ptr group, bool silent )
+{
+  Q_UNUSED( silent );
+  // TODO: feed back in case of failure.
+  Akonadi::AgentManager::self()->synchronizeCollection( group->mCollection );
+}
+
+void GroupManager::fetchNewHeaders( NntpAccount::Ptr account, bool silent )
+{
+  Q_UNUSED( silent );
+  // TODO: feed back in case of failure.
+  account->agent().synchronize();
+}
+
+void GroupManager::fetchNewHeaders( bool silent )
+{
+  NntpAccount::List accounts = mMainManager->accountManager()->accounts();
+  foreach( const NntpAccount::Ptr account, accounts ) {
+    // TODO: single feed back in case of failure for all account.
+    fetchNewHeaders( account, silent );
+  }
+}
+
+
+
 }
 }
 
