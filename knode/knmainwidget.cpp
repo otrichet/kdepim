@@ -23,6 +23,7 @@
 
 #include <Akonadi/AgentManager>
 #include <Akonadi/Collection>
+#include <Akonadi/EntityDisplayAttribute>
 #include <Akonadi/EntityTreeModel>
 #include <Akonadi/ItemFetchJob>
 #include <akonadi/kmime/messagestatus.h>
@@ -273,21 +274,27 @@ void KNMainWidget::setStatusHelpMsg(const QString& text)
 
 void KNMainWidget::updateCaption()
 {
-#if 0
+  // FIXME: the new caption is not in sync with the current collection :-(
   QString newCaption=i18n("KDE News Reader");
-  if (g_rpManager->currentGroup()) {
-    newCaption = g_rpManager->currentGroup()->name();
-    if (g_rpManager->currentGroup()->status()==KNGroup::moderated)
-      newCaption += i18n(" (moderated)");
-  } else if (a_ccManager->currentAccount()) {
-    newCaption = a_ccManager->currentAccount()->name();
-  } else if (f_olManager->currentFolder()) {
-    newCaption = f_olManager->currentFolder()->name();
+
+  const Akonadi::Collection currentCollection = mCollectionWidget->selectedCollection();
+  if ( currentCollection.isValid() ) {
+    Akonadi::EntityDisplayAttribute *attribute = currentCollection.attribute<Akonadi::EntityDisplayAttribute>();
+    if ( attribute ) {
+      newCaption = attribute->displayName();
+    } else {
+      newCaption = currentCollection.name();
+    }
+
+    Akobackit::GroupManager *gm = Akobackit::manager()->groupManager();
+    if( gm->isGroup( currentCollection ) ) {
+      Group::Ptr group( new Group( currentCollection ) );
+      if ( group->postingStatus() == Group::Moderated ) {
+        newCaption = i18nc( "@title:window %1:newsgroup name", "%1 (moderated)", newCaption );
+      }
+    }
   }
   emit signalCaptionChangeRequest(newCaption);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNMainWidget::disableAccels(bool b)

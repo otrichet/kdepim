@@ -70,6 +70,9 @@ public:
   //GUI
   void setStatusMsg(const QString& = QString(), int id=SB_MAIN);
   void setStatusHelpMsg(const QString& text);
+  /**
+   * Emit signalCaptionChangeRequest() to update the main KNode window title.
+   */
   void updateCaption();
   void disableAccels(bool b=true);
   /** processEvents with some blocking */
