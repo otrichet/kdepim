@@ -116,5 +116,77 @@ bool Widget::toggleThread( const Akonadi::MessageStatus& newStatus )
 
 
 
+void Widget::nextArticle()
+{
+  kDebug();
+
+  // TODO: if a the next message is in a different group then this message is not selected when calling selectNextMessageItem() !
+  // Note: this is certainly a behaviour from ::Core.
+
+  if ( view()->selectionEmpty() ) {
+    if ( !view()->selectFirstMessageItem( MessageList::Core::MessageTypeAny,
+                                          true /*centerItem*/ ) ) {
+      emit messagelistEndReached();
+    }
+  } else {
+    MessageList::Core::MessageItem *item = view()->currentMessageItem( false/*selectIfNeeded*/ );
+    if( item && item->hasChildren() ) {
+      view()->setCurrentThreadExpanded( true );
+    }
+    if ( !view()->selectNextMessageItem( MessageList::Core::MessageTypeAny,
+                                         MessageList::Core::ClearExistingSelection,
+                                         true /*centerItem*/,
+                                         false /*loop*/ ) ) {
+      emit messagelistEndReached();
+    }
+  }
+}
+
+void Widget::previousArticle()
+{
+  view()->selectPreviousMessageItem( MessageList::Core::MessageTypeAny,
+                                     MessageList::Core::ClearExistingSelection,
+                                     true /*centerItem*/,
+                                     false /*loop*/
+                                   );
+}
+
+void Widget::nextUnreadArticle()
+{
+  kDebug();
+  if ( !view()->selectNextMessageItem( MessageList::Core::MessageTypeUnreadOnly,
+                                       MessageList::Core::ClearExistingSelection,
+                                       true /*centerItem*/,
+                                       false /*loop*/ ) ) {
+    emit messagelistEndReached();
+  }
+}
+
+void Widget::nextUnreadThread()
+{
+  kDebug();
+
+  MessageList::Core::MessageItem *curItem = view()->currentMessageItem( false /*selectIfNeeded*/ );
+
+  // No selection yet ? Then select the first message
+  if ( !curItem ) {
+    if ( !view()->selectFirstMessageItem( MessageList::Core::MessageTypeUnreadOnly, true /*centerItem*/ ) ) {
+      emit messagelistEndReached();
+    }
+    return;
+  }
+
+  QList<MessageList::Core::MessageItem *> threadItems = view()->currentThreadAsMessageItemList();
+  while ( threadItems.contains( curItem ) ) { // This test is wrong if different pointer references the same articles !
+    if ( !view()->focusNextMessageItem( MessageList::Core::MessageTypeUnreadOnly, false /*centerItem*/, false /*loop*/ ) ) {
+      emit messagelistEndReached();
+      return;
+    }
+    curItem = view()->currentMessageItem( false /*selectIfNeeded*/ );
+  }
+  view()->selectFocusedMessageItem( true /*centerItem*/ );
+}
+
+
 }
 }

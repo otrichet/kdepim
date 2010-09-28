@@ -138,6 +138,8 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
            this, SLOT( slotOpenArticle( const Akonadi::Item & ) ) );
   connect( mMessageList, SIGNAL(sortingChanged(int)),
           SLOT(slotHdrViewSortingChanged(int)));
+  connect( mMessageList, SIGNAL( messagelistEndReached() ),
+           this, SLOT( nextGroup() ) );
 
   //actions
   initActions();
@@ -471,24 +473,24 @@ void KNMainWidget::initActions()
   a_ctNavNextArt->setText(i18n("&Next Article"));
   a_ctNavNextArt->setToolTip(i18n("Go to next article"));
   a_ctNavNextArt->setShortcuts(KShortcut("N; Right"));
-  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), mMessageList, SLOT(nextArticle()));
+  connect( a_ctNavNextArt, SIGNAL( triggered( bool ) ), mMessageList, SLOT( nextArticle() ) );
 
   a_ctNavPrevArt = actionCollection()->addAction("go_prevArticle" );
   a_ctNavPrevArt->setText(i18n("&Previous Article"));
   a_ctNavPrevArt->setShortcuts(KShortcut("P; Left"));
   a_ctNavPrevArt->setToolTip(i18n("Go to previous article"));
-  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), mMessageList, SLOT(prevArticle()));
+  connect( a_ctNavPrevArt, SIGNAL( triggered( bool ) ), mMessageList, SLOT( previousArticle() ) );
 
   a_ctNavNextUnreadArt = actionCollection()->addAction("go_nextUnreadArticle");
   a_ctNavNextUnreadArt->setIcon(KIcon("go-next"));
   a_ctNavNextUnreadArt->setText(i18n("Next Unread &Article"));
-  connect(a_ctNavNextUnreadArt, SIGNAL(triggered(bool)), SLOT(slotNavNextUnreadArt()));
+  connect( a_ctNavNextUnreadArt, SIGNAL( triggered( bool ) ), mMessageList, SLOT( nextUnreadArticle() ) );
   a_ctNavNextUnreadArt->setShortcut(QKeySequence(Qt::ALT+Qt::SHIFT+Qt::Key_Space));
 
   a_ctNavNextUnreadThread = actionCollection()->addAction("go_nextUnreadThread");
   a_ctNavNextUnreadThread->setIcon(KIcon("go-last"));
   a_ctNavNextUnreadThread->setText(i18n("Next Unread &Thread"));
-  connect(a_ctNavNextUnreadThread, SIGNAL(triggered(bool)), SLOT(slotNavNextUnreadThread()));
+  connect( a_ctNavNextUnreadThread, SIGNAL( triggered( bool ) ), mMessageList, SLOT( nextUnreadThread() ) );
   a_ctNavNextUnreadThread->setShortcut(QKeySequence(Qt::SHIFT+Qt::Key_Space));
 
   a_ctNavNextGroup = actionCollection()->addAction("go_nextGroup");
@@ -500,7 +502,7 @@ void KNMainWidget::initActions()
   a_ctNavPrevGroup = actionCollection()->addAction("go_prevGroup");
   a_ctNavPrevGroup->setIcon(KIcon("go-up"));
   a_ctNavPrevGroup->setText(i18n("Pre&vious Group"));
-  connect(a_ctNavPrevGroup, SIGNAL(triggered(bool)), mCollectionWidget, SLOT(prevGroup()));
+  connect( a_ctNavPrevGroup, SIGNAL( triggered( bool ) ), mCollectionWidget, SLOT( previousGroup() ) );
   a_ctNavPrevGroup->setShortcut(QKeySequence(Qt::Key_Minus));
 
   a_ctNavReadThrough = actionCollection()->addAction("go_readThrough");
@@ -1281,39 +1283,14 @@ void KNMainWidget::slotNetworkActive(bool b)
 //------------------------------ <Actions> --------------------------------
 
 
-void KNMainWidget::slotNavNextUnreadArt()
-{
-#if 0
-  if ( !h_drView->nextUnreadArticle() )
-    c_olView->nextGroup();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::slotNavNextUnreadThread()
-{
-#if 0
-  if ( !h_drView->nextUnreadThread() )
-    c_olView->nextGroup();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
 void KNMainWidget::slotNavReadThrough()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotNavReadThrough()";
-  if ( !mArticleViewer->atBottom() )
+  kDebug();
+  if ( !mArticleViewer->atBottom() ) {
     mArticleViewer->scrollNext();
-  else if(g_rpManager->currentGroup() != 0)
-    slotNavNextUnreadArt();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  } else if( Akobackit::manager()->groupManager()->isGroup( mMessageList->currentCollection() ) ) {
+    nextUnreadArticle();
+  }
 }
 
 
@@ -1504,12 +1481,9 @@ void KNMainWidget::slotGrpUnsubscribe()
 void KNMainWidget::slotGrpSetAllRead()
 {
   mMessageList->markAll( Akonadi::MessageStatus::statusRead() );
-#if 0
-  if ( knGlobals.settings()->markAllReadGoNext() )
-    c_olView->nextGroup();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  if ( knGlobals.settings()->markAllReadGoNext() ) {
+    mCollectionWidget->nextGroup();
+  }
 }
 
 
@@ -1786,7 +1760,7 @@ void KNMainWidget::slotArtSetThreadRead()
     if ( knGlobals.settings()->markThreadReadCloseThread() )
       closeCurrentThread();
     if ( knGlobals.settings()->markThreadReadGoNext() )
-      slotNavNextUnreadThread();
+      nextUnreadThread();
   }
 }
 
@@ -1876,7 +1850,7 @@ void KNMainWidget::slotArtToggleIgnored()
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
       closeCurrentThread();
     if ( knGlobals.settings()->ignoreThreadGoNext() )
-      slotNavNextUnreadThread();
+      mMessageList->nextUnreadThread();
   }
 }
 
@@ -2063,53 +2037,37 @@ void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 // Move to the next article
 void KNMainWidget::nextArticle()
 {
-#if 0
-  h_drView->nextArticle();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->nextArticle();
 }
 
 // Move to the previous article
 void KNMainWidget::previousArticle()
 {
-#if 0
-  h_drView->prevArticle();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->previousArticle();
 }
 
 // Move to the next unread article
 void KNMainWidget::nextUnreadArticle()
 {
-  slotNavNextUnreadArt();
+  mMessageList->nextUnreadArticle();
 }
 
 // Move to the next unread thread
 void KNMainWidget::nextUnreadThread()
 {
-  slotNavNextUnreadThread();
+  mMessageList->nextUnreadThread();
 }
 
 // Move to the next group
 void KNMainWidget::nextGroup()
 {
-#if 0
-  c_olView->nextGroup();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mCollectionWidget->nextGroup();
 }
 
 // Move to the previous group
 void KNMainWidget::previousGroup()
 {
-#if 0
-  c_olView->prevGroup();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mCollectionWidget->previousGroup();
 }
 
 void KNMainWidget::fetchHeaders()

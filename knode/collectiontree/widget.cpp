@@ -23,6 +23,7 @@
 #include "collectiontree/widget.h"
 
 #include "akobackit/akonadi_manager.h"
+#include "akobackit/group_manager.h"
 #include "collectiontree/collection_filter_proxy_model.h"
 #include "collectiontree/view.h"
 #include "knglobals.h"
@@ -157,6 +158,47 @@ QItemSelectionModel * Widget::selectionModel() const
 }
 
 
+void Widget::nextGroup()
+{
+  const QModelIndex index = mTreeView->currentIndex();
+  findNextGroup( ( index.isValid() ? index : mTreeView->rootIndex() ), 0 );
+}
+
+void Widget::previousGroup()
+{
+  // TODO
+}
+
+
+bool Widget::findNextGroup( const QModelIndex &parent, int testRow )
+{
+  const QModelIndex child = mTreeView->model()->index( testRow, 0, parent );
+  if ( child.isValid() ) {
+    const Akonadi::Collection c = child.data( Akonadi::EntityTreeModel::CollectionRole )
+                                       .value<Akonadi::Collection>();
+    if ( Akobackit::manager()->groupManager()->isGroup( c ) ) {
+      mTreeView->setCurrentIndex( child );
+      return true;
+    }
+
+    // Search among children
+    if ( findNextGroup( child, 0 ) ) {
+      return true;
+    }
+
+    // Search under next sibling
+    if ( findNextGroup( parent, testRow + 1 ) ) {
+      return true;
+    }
+  }
+
+  // Search under parent's siblings
+  if ( parent.isValid() ) {
+    return findNextGroup( parent.parent(), parent.row() + 1 );
+  }
+
+  return false;
+}
 
 }
 }

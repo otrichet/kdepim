@@ -295,8 +295,6 @@ protected:
   KToggleAction *a_ctToggleQuickSearch;
 
 protected slots:
-  void slotNavNextUnreadArt();
-  void slotNavNextUnreadThread();
   void slotNavReadThrough();
 
   void slotAccProperties();

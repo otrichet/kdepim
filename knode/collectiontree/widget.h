@@ -32,6 +32,7 @@ namespace Akonadi {
 }
 class KXMLGUIClient;
 class QItemSelectionModel;
+class QModelIndex;
 
 namespace KNode {
 namespace CollectionTree {
@@ -67,6 +68,17 @@ class Widget : public QSplitter
      */
     QItemSelectionModel * selectionModel() const;
 
+
+  public slots:
+    /**
+     * Go to the next group.
+     */
+    void nextGroup();
+    /**
+     * Go to the previous group.
+     */
+    void previousGroup();
+
   signals:
     /**
      * This signal is emitted when the selected collection changes.
@@ -93,6 +105,8 @@ class Widget : public QSplitter
     View *mTreeView;
     Akonadi::EntityTreeViewStateSaver *mViewSaver;
     Akonadi::SelectionProxyModel *mSelectionModel;
+
+    bool findNextGroup( const QModelIndex &parent, int testRow );
 };
 
 }

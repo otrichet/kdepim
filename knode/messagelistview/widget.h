@@ -68,6 +68,33 @@ class Widget : public MessageList::Widget
      */
     bool toggleThread( const Akonadi::MessageStatus &newStatus );
 
+  signals:
+    /**
+     * This signal is emitted to indicate that the navigation of the user
+     * should continue on another collection.
+     */
+    void messagelistEndReached();
+
+  public slots:
+    // navigation
+    /**
+     * Selects the article following the currently selected one.
+      */
+    void nextArticle();
+    /**
+     * Selects the article preceding the currently selected one.
+     */
+    void previousArticle();
+    /**
+     * Jumps to the next unread article in the collection
+     * and make it the current item.
+     */
+    void nextUnreadArticle();
+    /**
+     * Jumps to the next unread article that belongs
+     * to another thread.
+     */
+    void nextUnreadThread();
 
   protected:
     virtual void viewMessageListContextPopupRequest(const QList< MessageList::Core::MessageItem* >& selectedItems, const QPoint& globalPos);
