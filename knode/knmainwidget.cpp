@@ -1141,9 +1141,9 @@ void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
   slotArticleSelected( Akonadi::Item() );
 
   // mark all articles in current group as not new/read
-  if ( knGlobals.settings()->leaveGroupMarkAsRead() )
-    a_rtManager->setAllRead( true );
-  a_rtManager->setAllNotNew();
+  if ( knGlobals.settings()->leaveGroupMarkAsRead() ) {
+    mMessageList->markAll( Akonadi::MessageStatus::statusRead() );
+  }
 
   Akobackit::CollectionType collectionType = Akobackit::manager()->type( col );
 
