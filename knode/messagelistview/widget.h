@@ -96,6 +96,20 @@ class Widget : public MessageList::Widget
      */
     void nextUnreadThread();
 
+    // Threading, aggregations, filters, etc.
+    /**
+     * Collapses every thread and/or aggregation.
+      */
+    void collapseAll();
+    /**
+     * Expands every thread and/or aggregation.
+     */
+    void expandAll();
+    /**
+     * Collapse the current thread.
+     */
+    void closeCurrentThread();
+
   protected:
     virtual void viewMessageListContextPopupRequest(const QList< MessageList::Core::MessageItem* >& selectedItems, const QPoint& globalPos);
 

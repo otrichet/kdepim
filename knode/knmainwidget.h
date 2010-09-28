@@ -176,11 +176,7 @@ protected:
   bool eventFilter(QObject *, QEvent *);
 
   // convenience methods...
-  void getSelectedArticles( KNArticle::List &l );
-  void getSelectedArticles( KNRemoteArticle::List &l );
-  void getSelectedThreads( KNRemoteArticle::List &l );
   void getSelectedArticles( KNLocalArticle::List &l );
-  void closeCurrentThread();
 
   //GUI
   //KAccel          *a_ccel;
@@ -342,8 +338,6 @@ protected slots:
   void slotArtSortHeaders(int i);
   void slotArtSortHeadersKeyb();
   void slotArtSearch();
-  void slotArtCollapseAll();
-  void slotArtExpandAll();
   void slotArtToggleThread();
   void slotArtToggleShowThreads();
 

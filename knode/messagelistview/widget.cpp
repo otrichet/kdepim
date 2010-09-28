@@ -188,5 +188,37 @@ void Widget::nextUnreadThread()
 }
 
 
+
+
+void Widget::collapseAll()
+{
+  // Collapses groups of aggregation
+  view()->slotCollapseAllGroups();
+  // .. and thread
+  view()->setAllThreadsExpanded( false );
+
+  if ( view()->currentMessageItem() ) {
+    view()->ensureDisplayedWithParentsExpanded( view()->currentMessageItem() );
+  }
+}
+
+void Widget::expandAll()
+{
+  // Expands groups of aggregation
+  view()->slotExpandAllGroups();
+  // ... and thread
+  view()->setAllThreadsExpanded( true );
+
+  if ( view()->currentMessageItem() ) {
+    view()->ensureDisplayedWithParentsExpanded( view()->currentMessageItem() );
+  }
+}
+
+void Widget::closeCurrentThread()
+{
+  view()->setCurrentThreadExpanded( false );
+}
+
+
 }
 }

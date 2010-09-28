@@ -704,11 +704,11 @@ void KNMainWidget::initActions()
 
   a_ctArtCollapseAll = actionCollection()->addAction("view_CollapseAll");
   a_ctArtCollapseAll->setText(i18n("&Collapse All Threads"));
-  connect(a_ctArtCollapseAll, SIGNAL(triggered(bool) ), SLOT(slotArtCollapseAll()));
+  connect( a_ctArtCollapseAll, SIGNAL( triggered( bool ) ), mMessageList, SLOT( collapseAll() ) );
 
   a_ctArtExpandAll = actionCollection()->addAction("view_ExpandAll");
   a_ctArtExpandAll->setText(i18n("E&xpand All Threads"));
-  connect(a_ctArtExpandAll, SIGNAL(triggered(bool) ), SLOT(slotArtExpandAll()));
+  connect( a_ctArtExpandAll, SIGNAL( triggered( bool ) ), mMessageList, SLOT( expandAll() ) );
 
   a_ctArtToggleThread = actionCollection()->addAction("thread_toggle");
   a_ctArtToggleThread->setText(i18n("&Toggle Subthread"));
@@ -984,53 +984,6 @@ bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
 }
 
 
-void KNMainWidget::getSelectedArticles(KNArticle::List &l)
-{
-#if 0
-  if(!g_rpManager->currentGroup() && !f_olManager->currentFolder())
-    return;
-
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNArticle>( static_cast<KNHdrViewItem*>( i )->art ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::getSelectedArticles(KNRemoteArticle::List &l)
-{
-#if 0
-  if(!g_rpManager->currentGroup()) return;
-
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::getSelectedThreads(KNRemoteArticle::List &l)
-{
-#if 0
-  KNRemoteArticle::Ptr art;
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive())) {
-      art = boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>( i )->art );
-      // ignore the article if it is already in the list
-      // (multiple aritcles are selected in one thread)
-      if ( !l.contains(art)  )
-        art->thread(l);
-    }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
 void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
 {
 #if 0
@@ -1044,22 +997,6 @@ void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
 #endif
 }
 
-
-void KNMainWidget::closeCurrentThread()
-{
-#if 0
-  Q3ListViewItem *item = h_drView->currentItem();
-  if (item) {
-    while (item->parent())
-      item = item->parent();
-    h_drView->setCurrentItem(item);
-    item->setOpen(false);
-    h_drView->ensureItemVisible(item);
-  }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
 
 void KNMainWidget::slotArticleSelected( const Akonadi::Item &item )
 {
@@ -1675,35 +1612,6 @@ void KNMainWidget::slotArtSearch()
 }
 
 
-void KNMainWidget::slotArtCollapseAll()
-{
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtCollapseAll()";
-
-  closeCurrentThread();
-  a_rtManager->setAllThreadsOpen(false);
-  if (h_drView->currentItem())
-    h_drView->ensureItemVisible(h_drView->currentItem());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNMainWidget::slotArtExpandAll()
-{
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtExpandAll()";
-
-  a_rtManager->setAllThreadsOpen(true);
-  if (h_drView->currentItem())
-    h_drView->ensureItemVisible(h_drView->currentItem());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
 void KNMainWidget::slotArtToggleThread()
 {
 #if 0
@@ -1765,7 +1673,7 @@ void KNMainWidget::slotArtSetThreadRead()
 
   if ( mMessageList->currentMessageItem() ) {
     if ( knGlobals.settings()->markThreadReadCloseThread() )
-      closeCurrentThread();
+      mMessageList->closeCurrentThread();
     if ( knGlobals.settings()->markThreadReadGoNext() )
       nextUnreadThread();
   }
@@ -1855,7 +1763,7 @@ void KNMainWidget::slotArtToggleIgnored()
 
   if ( mMessageList->currentMessageItem() && !revert ) {
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
-      closeCurrentThread();
+      mMessageList->closeCurrentThread();
     if ( knGlobals.settings()->ignoreThreadGoNext() )
       mMessageList->nextUnreadThread();
   }
