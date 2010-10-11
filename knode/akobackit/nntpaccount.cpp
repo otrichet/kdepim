@@ -79,7 +79,7 @@ QVariant NntpAccount::loadProperty( const QString &key )
 void NntpAccount::save()
 {
   if ( mProperties.contains( "name" ) ) {
-    const QVariant name = mProperties.take( "name " );
+    const QVariant name = mProperties.take( "name" );
     mAgent.setName( name.toString() );
   }
 
