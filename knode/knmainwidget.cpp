@@ -80,7 +80,6 @@ using namespace KNode;
 
 KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   KVBox( parent ),
-  b_lockui( false ),
   m_GUIClient( client ),
   mCollectionWidget( 0 )
 {
@@ -211,8 +210,6 @@ KNMainWidget::~KNMainWidget()
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
 
-  //delete a_ccel;
-
   delete a_rtManager;
   kDebug(5003) <<"KNMainWidget::~KNMainWidget() : Article Manager deleted";
 
@@ -302,7 +299,7 @@ void KNMainWidget::disableAccels(bool b)
 #ifdef __GNUC__
 #warning Port me!
 #endif
-  /*a_ccel->setEnabled(!b);
+  /*
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KAccel *naccel = mainWin ? mainWin->accel() : 0;
   if ( naccel )
@@ -311,38 +308,6 @@ void KNMainWidget::disableAccels(bool b)
     installEventFilter(this);
   else
     removeEventFilter(this);
-}
-
-
-// processEvents with some blocking
-void KNMainWidget::secureProcessEvents()
-{
-  b_lockui = true;
-  KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
-  KMenuBar *mbar =  mainWin ? mainWin->menuBar() : 0;
-  if ( mbar )
-    mbar->setEnabled(false);
-#ifdef __GNUC__
-#warning Port me!
-#endif
-  /*a_ccel->setEnabled(false);
-  KAccel *naccel = mainWin ? mainWin->accel() : 0;
-  if ( naccel )
-    naccel->setEnabled(false);*/
-  installEventFilter(this);
-
-  qApp->processEvents();
-
-  b_lockui = false;
-  if ( mbar )
-    mbar->setEnabled(true);
-#ifdef __GNUC__
-#warning Port me!
-#endif
-//  a_ccel->setEnabled(true);
-//   if ( naccel )
-//     naccel->setEnabled(true);
-  removeEventFilter(this);
 }
 
 
@@ -473,8 +438,6 @@ void KNMainWidget::configChanged()
 
 void KNMainWidget::initActions()
 {
-  //a_ccel=new KAccel(this);
-
   //navigation
   a_ctNavNextArt = actionCollection()->addAction("go_nextArticle" );
   a_ctNavNextArt->setText(i18n("&Next Article"));
@@ -945,9 +908,6 @@ void KNMainWidget::prepareShutdown()
 
 bool KNMainWidget::queryClose()
 {
-  if(b_lockui)
-    return false;
-
   if(!requestShutdown())
     return false;
 
@@ -974,11 +934,10 @@ void KNMainWidget::paletteChange( const QPalette & )
 
 bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
 {
-  if (((e->type() == QEvent::KeyPress) ||
+  if ((e->type() == QEvent::KeyPress) ||
        (e->type() == QEvent::KeyRelease) ||
        (e->type() == QEvent::Shortcut) ||
-       (e->type() == QEvent::ShortcutOverride)) &&
-       b_lockui)
+       (e->type() == QEvent::ShortcutOverride))
     return true;
   return QWidget::eventFilter(o, e);
 }
@@ -1001,8 +960,6 @@ void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
 void KNMainWidget::slotArticleSelected( const Akonadi::Item &item )
 {
   kDebug();
-  if(b_lockui)
-    return;
 
   RemoteArticle::Ptr selectedArticle;
   if ( item.isValid() ) {
@@ -1072,8 +1029,6 @@ void KNMainWidget::slotArticleSelectionChanged()
 void KNMainWidget::slotCollectionSelected( const Akonadi::Collection &col )
 {
   kDebug() << "Enter";
-  if(b_lockui)
-    return;
 
   slotArticleSelected( Akonadi::Item() );
 
@@ -1182,9 +1137,6 @@ void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
 void KNMainWidget::slotOpenArticle( const Akonadi::Item &item )
 {
 #if 0
-  if(b_lockui)
-    return;
-
   if (item) {
     KNArticle::Ptr art = (static_cast<KNHdrViewItem*>(item))->art;
 

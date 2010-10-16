@@ -197,7 +197,7 @@ void KNArticleManager::showHdrs(bool clear)
 
   ScopedCursorOverride cursor( Qt::WaitCursor );
   knGlobals.setStatusMsg(i18n(" Creating list..."));
-  knGlobals.top->secureProcessEvents();
+//   knGlobals.top->secureProcessEvents();
 
 
   // *** Begin: AKONADI PORT: Hackish code replacement ***

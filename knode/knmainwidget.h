@@ -75,8 +75,6 @@ public:
    */
   void updateCaption();
   void disableAccels(bool b=true);
-  /** processEvents with some blocking */
-  void secureProcessEvents();
 
   /** useful default value */
   virtual QSize sizeHint() const;
@@ -179,10 +177,8 @@ protected:
   void getSelectedArticles( KNLocalArticle::List &l );
 
   //GUI
-  //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
   KNode::MessageListView::Widget *mMessageList;
-  bool b_lockui;
 
   //Core
   KNConfigManager   *c_fgManager;
