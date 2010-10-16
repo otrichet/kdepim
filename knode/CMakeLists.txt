@@ -73,6 +73,7 @@ set(knodecommon_LIB_SRCS
    collectiontree/collection_filter_proxy_model.cpp
    collectiontree/widget.cpp
    collectiontree/view.cpp
+   composer/attachment.cpp
    composer/attachment_view.cpp
    composer/followupto_combobox.cpp
    configuration/identity_widget.cpp

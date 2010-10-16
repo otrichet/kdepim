@@ -959,7 +959,7 @@ void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
 
 void KNMainWidget::slotArticleSelected( const Akonadi::Item &item )
 {
-  kDebug();
+  kDebug() << "valid item:" << item.isValid();
 
   RemoteArticle::Ptr selectedArticle;
   if ( item.isValid() ) {
@@ -1799,16 +1799,10 @@ void KNMainWidget::slotArtSendNow()
 
 void KNMainWidget::slotArtEdit()
 {
-#if 0
-  kDebug(5003) <<"KNodeVew::slotArtEdit()";
-  if (!f_olManager->currentFolder())
-    return;
-
-  if ( mArticleViewer->article() && mArticleViewer->article()->type() == KNArticle::ATlocal )
-    a_rtFactory->edit( boost::static_pointer_cast<KNLocalArticle>( mArticleViewer->article() ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  kDebug();
+  if ( mArticleViewer->article() && mArticleViewer->article()->type() == RemoteArticle::ATlocal ) {
+    a_rtFactory->edit( boost::static_pointer_cast<LocalArticle>( mArticleViewer->article() ) );
+  }
 }
 
 

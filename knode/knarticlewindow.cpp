@@ -45,6 +45,7 @@ bool ArticleWindow::closeAllWindowsForCollection( KNArticleCollection::Ptr col, 
   return true;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return false;
 #endif
 }
 
@@ -63,6 +64,7 @@ bool ArticleWindow::closeAllWindowsForArticle( KNArticle::Ptr art, bool force )
   return true;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return false;
 #endif
 }
 
@@ -80,6 +82,7 @@ bool ArticleWindow::raiseWindowForArticle( RemoteArticle::Ptr art )
   return false;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return false;
 #endif
 }
 
@@ -99,6 +102,7 @@ bool ArticleWindow::raiseWindowForArticle( const QByteArray &mid )
   return false;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return false;
 #endif
 }
 

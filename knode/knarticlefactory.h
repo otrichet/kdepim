@@ -15,6 +15,7 @@
 #ifndef KNARTICLEFACTORY_H
 #define KNARTICLEFACTORY_H
 
+#include "akobackit/item_local_article.h"
 #include "legacy_include.h"
 
 #include <QByteArray>
@@ -26,9 +27,10 @@ class QLabel;
 class KNComposer;
 class KNSendErrorDialog;
 
+using namespace KNode;
 
 /** Article factory, responsible for creating and sending news articles. */
-class KNArticleFactory : public QObject , public KNJobConsumer
+class KNArticleFactory : public QObject
 {
 
   Q_OBJECT
@@ -52,14 +54,14 @@ class KNArticleFactory : public QObject , public KNJobConsumer
     void sendMailExternal( const QString &address = QString(), const QString &subject = QString(), const QString &body = QString() );
 
     //article handling
-    void edit( KNLocalArticle::Ptr a );
-    void sendArticles( KNLocalArticle::List &l, bool now = true );
+    void edit( LocalArticle::Ptr a );
+    void sendArticles( LocalArticle::List &l, bool now = true );
     void sendOutbox();
 
     //composer handling
     bool closeComposeWindows();    // try to close all composers, return false if user objects
-    void deleteComposerForArticle( KNLocalArticle::Ptr a );
-    KNComposer* findComposer( KNLocalArticle::Ptr a );
+    void deleteComposerForArticle( LocalArticle::Ptr a );
+    KNComposer* findComposer( LocalArticle::Ptr a );
     void configChanged();
 
   protected:
@@ -73,7 +75,7 @@ class KNArticleFactory : public QObject , public KNJobConsumer
       @param withXHeaders
       @param origPost original article (in case of reply).
     */
-    KNLocalArticle::Ptr newArticle( KNCollection::Ptr col, const QByteArray &defChset, bool withXHeaders = true, KNArticle::Ptr origPost = KNArticle::Ptr() );
+    LocalArticle::Ptr newArticle( const Akonadi::Collection &col, const QByteArray &defChset, bool withXHeaders = true, KNArticle::Ptr origPost = KNArticle::Ptr() );
 
     //cancel & supersede
     bool cancelAllowed( KNArticle::Ptr a );

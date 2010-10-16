@@ -29,6 +29,7 @@
 
 #include <Akonadi/AgentManager>
 #include <Akonadi/AgentInstanceCreateJob>
+#include <Akonadi/Collection>
 #include <KLocalizedString>
 #include <KMessageBox>
 #include <QDBusInterface>
@@ -73,6 +74,23 @@ NntpAccount::Ptr NntpAccountManager::account( const Akonadi::AgentInstance &agen
 {
   return NntpAccount::Ptr( new NntpAccount( agent ) );
 }
+
+NntpAccount::Ptr NntpAccountManager::account( const QString &resourceId )
+{
+  Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance( resourceId );
+  if ( agent.isValid() ) {
+    return account( agent );
+  } else {
+    return NntpAccount::Ptr();
+  }
+}
+
+NntpAccount::Ptr NntpAccountManager::account( const Akonadi::Collection &collection )
+{
+  Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance( collection.resource() );
+  return account( agent );
+}
+
 
 
 

@@ -36,29 +36,20 @@ namespace Composer {
 AttachmentView::AttachmentView( QWidget *parent )
   : QTreeWidget( parent )
 {
-#if 0
   QHeaderView *h = header();
   h->setMovable( false );
   h->setResizeMode( QHeaderView::Interactive );
   h->setStretchLastSection( true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 AttachmentView::~AttachmentView()
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void AttachmentView::removeCurrentAttachment()
 {
-#if 0
   QList<QTreeWidgetItem *> items = selectedItems();
   foreach( QTreeWidgetItem *item, items ) {
     takeTopLevelItem( indexOfTopLevelItem( item ) );
@@ -68,14 +59,10 @@ void AttachmentView::removeCurrentAttachment()
     emit attachmentRemoved( avi->mAttachment, lastItem );
   }
   qDeleteAll( items );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void AttachmentView::editCurrentAttachment()
 {
-#if 0
   QList<QTreeWidgetItem *> items = selectedItems();
   if ( items.isEmpty() ) {
     return;
@@ -91,16 +78,12 @@ void AttachmentView::editCurrentAttachment()
     item->emitDataChanged(); // notify the changes
   }
   delete dlg;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 const QList<KNAttachment::Ptr> AttachmentView::attachments()
 {
-#if 0
   QList<KNAttachment::Ptr> al;
   KNAttachment::Ptr a;
   QTreeWidgetItemIterator it( this, QTreeWidgetItemIterator::All );
@@ -110,16 +93,12 @@ const QList<KNAttachment::Ptr> AttachmentView::attachments()
     ++it;
   }
   return al;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void AttachmentView::keyPressEvent( QKeyEvent *event )
 {
-#if 0
   if ( !selectedItems().isEmpty() ) {
     switch ( event->key() ) {
       case Qt::Key_Delete:
@@ -133,14 +112,10 @@ void AttachmentView::keyPressEvent( QKeyEvent *event )
   }
 
   QTreeView::keyPressEvent( event );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void AttachmentView::contextMenuEvent( QContextMenuEvent* event )
 {
-#if 0
   QTreeWidgetItem *item = itemAt( event->pos() );
   if ( item ) {
     setCurrentItem( item );
@@ -149,9 +124,6 @@ void AttachmentView::contextMenuEvent( QContextMenuEvent* event )
   }
 
   QAbstractScrollArea::contextMenuEvent( event );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -162,24 +134,15 @@ AttachmentViewItem::AttachmentViewItem( AttachmentView *parent, KNAttachment::Pt
   : QTreeWidgetItem( parent ),
     mAttachment( attachment )
 {
-#if 0
   Q_ASSERT( mAttachment );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 AttachmentViewItem::~AttachmentViewItem()
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 QVariant AttachmentViewItem::data( int column, int role ) const
 {
-#if 0
   if ( role == Qt::DisplayRole ) {
     switch ( column ) {
       case AttachmentView::File:
@@ -196,9 +159,6 @@ QVariant AttachmentViewItem::data( int column, int role ) const
   }
 
   return QTreeWidgetItem::data( column, role );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

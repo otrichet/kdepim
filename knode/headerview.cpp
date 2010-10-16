@@ -336,6 +336,7 @@ bool KNHeaderView::nextUnreadArticle()
   return false;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return false;
 #endif
 }
 
@@ -384,10 +385,10 @@ bool KNHeaderView::nextUnreadThread()
     }
     return true;
   }
-  return false;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  return false;
 }
 
 

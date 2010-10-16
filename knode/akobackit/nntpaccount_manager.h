@@ -28,6 +28,9 @@
 
 #include <QObject>
 
+namespace Akonadi {
+  class Collection;
+}
 class KJob;
 
 namespace KNode {
@@ -56,7 +59,17 @@ class NntpAccountManager : public QObject
      * Returns the account for @p agent.
      */
     NntpAccount::Ptr account( const Akonadi::AgentInstance &agent );
-
+    /**
+     * Returns the account with resource id @p resourceId or a null-pointer
+     * if it is not the identifier of a valid resource.
+     */
+    NntpAccount::Ptr account( const QString &resourceId );
+    /**
+     * Returns the account for a @p collection.
+     * @param collection A collection mapping to a group or account.
+     * @return The account the collection belongs to.
+     */
+    NntpAccount::Ptr account( const Akonadi::Collection &collection );
 
     /**
      * Creates and then configures an account.

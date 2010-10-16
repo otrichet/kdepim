@@ -72,6 +72,22 @@ class KNODE_EXPORT LocalArticle : public RemoteArticle
 
 
   public:
+    /**
+     * Id if the resource to use to post this article.
+     */
+    QString postingResource() const;
+
+    /**
+     * Change the resource to use to post this article.
+     * @param resourceId Id of the resource.
+     */
+    void setPostingResource( const QString &resourceId );
+
+  private:
+    QString mPostingResource;
+
+
+  public:
 #ifdef __GNUC__
   #warning AKONADI PORT: is this code still usefull after the port?
 #endif
@@ -102,6 +118,11 @@ class KNODE_EXPORT LocalArticle : public RemoteArticle
     /** The article was canceled? */
     LOCAL_ITEM_FLAG_METHOD( canceled, setCanceled, Akobackit::ARTICLE_FLAG_CANCELED )
 #undef LOCAL_ITEM_FLAG_METHOD
+    /// Article needs to be either posted or mailed.
+    bool isPending()
+    {
+      return ( ( !posted() && doPost() ) || ( !mailed() && doMail() ) );
+    }
 };
 
 }

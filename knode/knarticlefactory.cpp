@@ -15,6 +15,11 @@
 
 #include "knarticlefactory.h"
 
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/folder_manager.h"
+#include "akobackit/group_manager.h"
+#include "akobackit/items_deletion_job.h"
+#include "akobackit/nntpaccount_manager.h"
 #include "knglobals.h"
 #include "knarticlemanager.h"
 #include "kncomposer.h"
@@ -23,6 +28,8 @@
 #include "settings.h"
 #include "utils/locale.h"
 
+#include <Akonadi/ItemFetchJob>
+#include <Akonadi/ItemFetchScope>
 #include <QByteArray>
 #include <QList>
 #include <QListWidget>
@@ -37,7 +44,6 @@
 #include <ktoolinvocation.h>
 #include <kvbox.h>
 #include <mailtransport/transportmanager.h>
-
 
 using namespace KNode;
 using namespace KNode::Utilities;
@@ -63,7 +69,7 @@ void KNArticleFactory::createPosting( KNNntpAccount::Ptr a )
   if(!a)
     return;
 
-  KNLocalArticle::Ptr art = newArticle( a, Locale::defaultCharset() );
+  LocalArticle::Ptr art = newArticle( a, Locale::defaultCharset() );
 
   if(!art)
     return;
@@ -89,7 +95,7 @@ void KNArticleFactory::createPosting( KNGroup::Ptr g )
     return;
 
   QByteArray chset = Locale::defaultCharset( g );
-  KNLocalArticle::Ptr art = newArticle( g, chset );
+  LocalArticle::Ptr art = newArticle( g, chset );
 
   if(!art)
     return;
@@ -124,7 +130,7 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   }
 
   //create new article
-  KNLocalArticle::Ptr art = newArticle( g, chset, true, a );
+  LocalArticle::Ptr art = newArticle( g, chset, true, a );
 
   if(!art)
     return;
@@ -299,7 +305,7 @@ void KNArticleFactory::createForward( KNArticle::Ptr a )
     chset = a->contentType()->charset();
 
   //create new article
-  KNLocalArticle::Ptr art = newArticle( knGlobals.groupManager()->currentGroup(), chset );
+  LocalArticle::Ptr art = newArticle( knGlobals.groupManager()->currentGroup(), chset );
   if(!art)
     return;
 
@@ -397,7 +403,7 @@ void KNArticleFactory::createCancel( KNArticle::Ptr a )
   if ( !a->newsgroups()->isEmpty() )
     grp = knGlobals.groupManager()->group(a->newsgroups()->groups().first(), nntp);
 
-  KNLocalArticle::Ptr art = newArticle( grp, "us-ascii", false );
+  LocalArticle::Ptr art = newArticle( grp, "us-ascii", false );
 
   if(!art)
     return;
@@ -432,7 +438,7 @@ void KNArticleFactory::createCancel( KNArticle::Ptr a )
   art->assemble();
 
   //send
-  KNLocalArticle::List lst;
+  LocalArticle::List lst;
   lst.append(art);
   sendArticles( lst, sendNow );
 #else
@@ -476,7 +482,7 @@ void KNArticleFactory::createSupersede( KNArticle::Ptr a )
     grp = knGlobals.groupManager()->group(a->newsgroups()->groups().first(), nntp);
 
   //new article
-  KNLocalArticle::Ptr art = newArticle( grp, a->contentType()->charset() );
+  LocalArticle::Ptr art = newArticle( grp, a->contentType()->charset() );
 
   if(!art)
     return;
@@ -529,7 +535,7 @@ void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
   }
 
   //create new article
-  KNLocalArticle::Ptr art = newArticle( knGlobals.groupManager()->currentGroup(), Locale::defaultCharset() );
+  LocalArticle::Ptr art = newArticle( knGlobals.groupManager()->currentGroup(), Locale::defaultCharset() );
   if(!art)
     return;
 
@@ -578,9 +584,8 @@ void KNArticleFactory::sendMailExternal(const QString &address, const QString &s
 }
 
 
-void KNArticleFactory::edit( KNLocalArticle::Ptr a )
+void KNArticleFactory::edit( LocalArticle::Ptr a )
 {
-#if 0
   if(!a)
     return;
 
@@ -598,62 +603,75 @@ void KNArticleFactory::edit( KNLocalArticle::Ptr a )
   }
 
   //load article body
-  if(!a->hasContent())
+  if ( !a->hasContent() ) {
+#if 0
     knGlobals.articleManager()->loadArticle(a);
+#else
+  kDebug() << "AKONADI PORT: Not implemented" << Q_FUNC_INFO;
+#endif
+  }
 
   //open composer
   com = new KNComposer( a, QString() );
   mCompList.append( com );
   connect(com, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   com->show();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
-void KNArticleFactory::sendArticles( KNLocalArticle::List &l, bool now )
+void KNArticleFactory::sendArticles( LocalArticle::List &l, bool now )
 {
-#if 0
   KNJobData *job=0;
   KNServerInfo::Ptr ser;
 
-  KNLocalArticle::List unsent, sent;
-  for ( KNLocalArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
-    if ( (*it)->pending() )
-      unsent.append( (*it) );
-    else
-      sent.append( (*it) );
+  LocalArticle::List unsent, sent;
+  foreach ( const LocalArticle::Ptr &art, l ) {
+    if ( art->isPending() ) {
+      unsent.append( art );
+    } else {
+      sent.append( art );
+    }
   }
 
   if(!sent.isEmpty()) {
     showSendErrorDialog();
-    for ( KNLocalArticle::List::Iterator it = sent.begin(); it != sent.end(); ++it )
-      s_endErrDlg->append( (*it)->subject()->asUnicodeString(), i18n("Article has already been sent.") );
+    foreach ( const LocalArticle::Ptr &art, sent ) {
+      s_endErrDlg->append( art->subject()->asUnicodeString(), i18n( "Article has already been sent." ) );
+    }
   }
 
-  if(!now) {
-    knGlobals.articleManager()->moveIntoFolder(unsent, knGlobals.folderManager()->outbox());
+  if ( !now ) {
+    Akobackit::FolderManager *folderManager = Akobackit::manager()->folderManager();
+    folderManager->moveIntoFolder( unsent, folderManager->outboxFolder() );
     return;
   }
 
 
-  for ( KNLocalArticle::List::Iterator it = unsent.begin(); it != unsent.end(); ++it ) {
-
-    if ( (*it)->isLocked() )
+  foreach ( const LocalArticle::Ptr &art, unsent ) {
+#if 0
+    if ( art->isLocked() )
       continue;
+#else
+  kDebug() << "AKONADI PORT: Check if a lock is necessary to prevent multiple sending in" << Q_FUNC_INFO;
+#endif
 
-    if ( !(*it)->hasContent() ) {
-      if ( !knGlobals.articleManager()->loadArticle( (*it) ) ) {
+    if ( !art->hasContent() ) {
+#if 0
+      if ( !knGlobals.articleManager()->loadArticle( art ) ) {
+#else
+  kDebug() << "AKONADI PORT: Check if Akonadi load the payload in every case" << Q_FUNC_INFO;
+#endif
         showSendErrorDialog();
-        s_endErrDlg->append( (*it)->subject()->asUnicodeString(), i18n("Unable to load article.") );
+        s_endErrDlg->append( art->subject()->asUnicodeString(), i18n( "Unable to load article." ) );
         continue;
+#if 0
       }
+#endif
     }
 
 
     // filter out internal headers
-    QByteArray head = (*it)->head();
+    QByteArray head = art->head();
     KMime::Headers::Base *header = 0;
     while ( true ) {
       header = KMime::HeaderParsing::extractFirstHeader( head );
@@ -661,48 +679,52 @@ void KNArticleFactory::sendArticles( KNLocalArticle::List &l, bool now )
         break;
       }
       if ( qstrncmp( header->type(), "X-KNode", 7 ) == 0 ) {
-        (*it)->removeHeader( header->type() );
+        art->removeHeader( header->type() );
       }
     }
-    (*it)->assemble(); // Validate change made above
+    art->assemble(); // Validate change made above
 
-
-    if ( (*it)->doPost() && !(*it)->posted() ) {
-      ser = knGlobals.accountManager()->account( (*it)->serverId() );
-      job = new ArticlePostJob( this, ser, (*it) );
+#if 0
+    if ( art->doPost() && !art->posted() ) {
+      ser = knGlobals.accountManager()->account( art->serverId() );
+      job = new ArticlePostJob( this, ser, art );
       emitJob(job);
     }
-    if ( (*it)->doMail() && !(*it)->mailed() ) {
+    if ( art->doMail() && !art->mailed() ) {
       int transportId = TransportManager::self()->defaultTransportId();
-      job = new MailSendJob( this, transportId, (*it) );
+      job = new MailSendJob( this, transportId, art );
       emitJob(job);
     }
-  }
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  }
 }
 
 
 void KNArticleFactory::sendOutbox()
 {
-#if 0
-  KNLocalArticle::List lst;
-  KNFolder::Ptr ob;
-
-  if(!knGlobals.folderManager()->loadOutbox()) {
+  const Akonadi::Collection outbox = Akobackit::manager()->folderManager()->outboxFolder();
+  if ( !outbox.isValid() ) {
     KMessageBox::error(knGlobals.topWidget, i18n("Unable to load the outbox-folder."));
     return;
   }
 
-  ob=knGlobals.folderManager()->outbox();
-  for(int i=0; i< ob->length(); i++)
-    lst.append(ob->at(i));
+  Akonadi::ItemFetchJob *job = new Akonadi::ItemFetchJob( outbox );
+  job->fetchScope().fetchFullPayload();
+  job->fetchScope().fetchAllAttributes();
+  if ( !job->exec() ) {
+    KMessageBox::error( knGlobals.topWidget, i18n( "Unable to load the outbox-folder." ) );
+    return;
+  }
+
+  LocalArticle::List lst;
+  const Akonadi::Item::List items = job->items();
+  foreach ( const Akonadi::Item &item, items ) {
+    lst << LocalArticle::Ptr( new LocalArticle( item ) );
+  }
 
   sendArticles( lst, true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -718,21 +740,17 @@ bool KNArticleFactory::closeComposeWindows()
 }
 
 
-void KNArticleFactory::deleteComposerForArticle( KNLocalArticle::Ptr a )
+void KNArticleFactory::deleteComposerForArticle( LocalArticle::Ptr a )
 {
-#if 0
   KNComposer *com = findComposer( a );
   if ( com ) {
     mCompList.removeAll( com );
     com->deleteLater();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
-KNComposer* KNArticleFactory::findComposer( KNLocalArticle::Ptr a )
+KNComposer* KNArticleFactory::findComposer( LocalArticle::Ptr a )
 {
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     if ( (*it)->article() == a )
@@ -809,26 +827,27 @@ void KNArticleFactory::processJob(KNJobData *j)
 }
 
 
-KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const QByteArray &defChset, bool withXHeaders, KNArticle::Ptr origPost )
+LocalArticle::Ptr KNArticleFactory::newArticle( const Akonadi::Collection &col, const QByteArray &defChset, bool withXHeaders, KNArticle::Ptr origPost )
 {
-#if 0
   if ( knGlobals.settings()->generateMessageID() && knGlobals.settings()->hostname().isEmpty() ) {
     KMessageBox::sorry(knGlobals.topWidget, i18n("Please set a hostname for the generation\nof the message-id or disable it."));
-    return KNLocalArticle::Ptr();
+    return LocalArticle::Ptr();
   }
 
-  KNLocalArticle::Ptr art( new KNLocalArticle( KNArticleCollection::Ptr() ) );
+  LocalArticle::Ptr art( new LocalArticle( Akonadi::Item() ) );
   KPIMIdentities::Identity id;
 
-  if (col) {
-    if (col->type() == KNCollection::CTgroup) {
-      id = boost::static_pointer_cast<KNGroup>( col )->identity();
-      if ( id.isNull() ) {
-        id = boost::static_pointer_cast<KNGroup>( col )->account()->identity();
-      }
-    } else if (col->type() == KNCollection::CTnntpAccount) {
-      id = boost::static_pointer_cast<KNNntpAccount>( col )->identity();
+  Akobackit::CollectionType colType = Akobackit::manager()->type( col );
+  if ( colType ==  Akobackit::NewsGroup ) {
+    Akobackit::GroupManager *groupMngr = Akobackit::manager()->groupManager();
+    const Group::Ptr group = groupMngr->group( col );
+    id = group->identity();
+    if ( id.isNull() ) {
+      id = groupMngr->account( group )->identity();
     }
+  } else if ( colType == Akobackit::NntpServer ) {
+    const NntpAccount::Ptr account = Akobackit::manager()->accountManager()->account( col );
+    id = account->identity();
   }
   if ( id.isNull() ) {
     id = KNGlobals::self()->settings()->identity();
@@ -853,7 +872,7 @@ KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const Q
                               "identity named <emphasis>%1</emphasis> "
                               "at the identity section of the configuration dialog.</qt>",
                               id.identityName() ) );
-    return KNLocalArticle::Ptr();
+    return LocalArticle::Ptr();
   }
 
   //Reply-To
@@ -919,9 +938,6 @@ KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const Q
   }
 
   return art;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1010,9 +1026,9 @@ void KNArticleFactory::showSendErrorDialog()
 
 void KNArticleFactory::slotComposerDone(KNComposer *com)
 {
-#if 0
   bool delCom=true;
-  KNLocalArticle::List lst;
+  Akobackit::FolderManager *folderMngr = Akobackit::manager()->folderManager();
+  LocalArticle::List lst;
   lst.append(com->article());
 
   switch(com->result()) {
@@ -1039,15 +1055,27 @@ void KNArticleFactory::slotComposerDone(KNComposer *com)
 
     case KNComposer::CRsave :
       com->applyChanges();
+#if 0
       knGlobals.articleManager()->moveIntoFolder(lst, knGlobals.folderManager()->drafts());
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
     break;
 
-    case KNComposer::CRdelAsk:
-      delCom=knGlobals.articleManager()->deleteArticles(lst, true);
+    case KNComposer::CRdelAsk: {
+      Akonadi::Item::List list;
+      list << com->article()->item();
+      Akobackit::ItemsDeletionJob *job = new Akobackit::ItemsDeletionJob( list, KNGlobals::self()->topWidget );
+      delCom = job->exec();
+    }
     break;
 
-    case KNComposer::CRdel:
-      delCom=knGlobals.articleManager()->deleteArticles(lst, false);
+    case KNComposer::CRdel: {
+      Akonadi::Item::List list;
+      list << com->article()->item();
+      Akobackit::ItemsDeletionJob *job = new Akobackit::ItemsDeletionJob( list, 0 );
+      delCom = job->exec();
+    }
     break;
 
     case KNComposer::CRcancel:
@@ -1065,9 +1093,6 @@ void KNArticleFactory::slotComposerDone(KNComposer *com)
 #ifdef Q_OS_UNIX
   else
     KWindowSystem::activateWindow(com->winId());
-#endif
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
 }
 

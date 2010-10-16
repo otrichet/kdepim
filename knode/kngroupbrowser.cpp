@@ -211,6 +211,7 @@ bool KNGroupBrowser::itemInListView(Q3ListView *view, const KNGroupInfo &gi)
   return false;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return false;
 #endif
 }
 

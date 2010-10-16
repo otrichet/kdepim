@@ -68,13 +68,6 @@ class KNLocalArticle : public KNArticle
     typedef QList<KNLocalArticle::Ptr> List;
 };
 
-class KNAttachment
-{
-  public:
-    typedef boost::shared_ptr<KNAttachment> Ptr;
-
-};
-
 /***************************************
  *           kncollection.h
  ***************************************/

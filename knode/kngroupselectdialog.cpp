@@ -124,6 +124,7 @@ QString KNGroupSelectDialog::selectedGroups()const
   return ret;
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+  return QString();
 #endif
 }
 

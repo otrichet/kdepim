@@ -68,8 +68,7 @@ Group::Ptr GroupManager::group( const Akonadi::Collection &collection )
 
 NntpAccount::Ptr GroupManager::account( const Group::Ptr &group )
 {
-  Akonadi::AgentInstance agent = Akonadi::AgentManager::self()->instance( group->mCollection.resource() );
-  return Akobackit::manager()->accountManager()->account( agent );
+  return Akobackit::manager()->accountManager()->account( group->mCollection );
 }
 
 

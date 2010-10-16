@@ -39,5 +39,16 @@ bool LocalArticle::isValid() const
 }
 
 
+void LocalArticle::setPostingResource( const QString &resourceId )
+{
+  mPostingResource = resourceId;
+}
+
+QString LocalArticle::postingResource() const
+{
+  return mPostingResource;
+}
+
+
 }
 

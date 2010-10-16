@@ -14,6 +14,17 @@
 
 #include "kncomposer.h"
 
+#include "akobackit/akonadi_manager.h"
+#include "akobackit/nntpaccount_manager.h"
+#include "kncomposerview.h"
+#include "knglobals.h"
+#include "kngroupselectdialog.h"
+#include "knmainwidget.h"
+#include "settings.h"
+#include "utilities.h"
+#include "utils/locale.h"
+
+#include <Akonadi/ItemModifyJob>
 #include <KPIMUtils/Email>
 #include <KPIMIdentities/Identity>
 #include <KPIMIdentities/IdentityManager>
@@ -21,7 +32,7 @@
 #include <QLabel>
 #include <QtDBus/QtDBus>
 #include <qgroupbox.h>
-#include "recentaddresses.h"
+#include <recentaddresses.h>
 using KPIM::RecentAddresses;
 #include <akonadi/contact/emailaddressselectiondialog.h>
 #include <kcharsets.h>
@@ -41,13 +52,7 @@ using KPIM::RecentAddresses;
 #include <klocale.h>
 #include <kselectaction.h>
 #include <ktoggleaction.h>
-#include "kngroupselectdialog.h"
-#include "utilities.h"
-#include "knglobals.h"
-#include "knmainwidget.h"
-#include "settings.h"
-#include "kncomposerview.h"
-#include "utils/locale.h"
+
 
 using namespace KNode::Utilities;
 using namespace KNode::Composer;
@@ -57,39 +62,26 @@ KNLineEdit::KNLineEdit( View *parent, bool useCompletion )
   : KABC::AddressLineEdit( parent, useCompletion ),
     composerView( parent )
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 KNLineEdit::KNLineEdit( QWidget *parent, bool useCompletion )
   : KABC::AddressLineEdit( parent, useCompletion )
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNLineEdit::contextMenuEvent( QContextMenuEvent*e )
 {
-#if 0
    QMenu *popup = KLineEdit::createStandardContextMenu();
    popup->addSeparator();
    popup->addAction( i18n( "Edit Recent Addresses..." ),
 		   this, SLOT( editRecentAddresses() ) );
    popup->exec( e->globalPos() );
    delete popup;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEdit::editRecentAddresses()
 {
-#if 0
   KPIM::RecentAddressDialog dlg( this );
   dlg.setAddresses( RecentAddresses::self( knGlobals.config() )->addresses() );
   if ( dlg.exec() ) {
@@ -101,28 +93,20 @@ void KNLineEdit::editRecentAddresses()
 
     loadAddresses();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEdit::loadAddresses()
 {
-#if 0
     KABC::AddressLineEdit::loadAddresses();
 
     QStringList recent = RecentAddresses::self(knGlobals.config())->addresses();
     QStringList::Iterator it = recent.begin();
     for ( ; it != recent.end(); ++it )
         addAddress( *it );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEdit::keyPressEvent(QKeyEvent *e)
 {
-#if 0
     // ---sven's Return is same Tab and arrow key navigation start ---
   if ((e->key() == Qt::Key_Enter || e->key() == Qt::Key_Return) &&
         !completionBox()->isVisible())
@@ -142,81 +126,53 @@ void KNLineEdit::keyPressEvent(QKeyEvent *e)
     }
     // ---sven's Return is same Tab and arrow key navigation end ---
   KABC::AddressLineEdit::keyPressEvent(e);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNLineEditSpell::KNLineEditSpell( View *parent, bool useCompletion )
   : KNLineEdit( parent, useCompletion )
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 KNLineEditSpell::KNLineEditSpell( QWidget *parent, bool useCompletion )
   : KNLineEdit( parent, useCompletion )
 {
-#if 0
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEditSpell::highLightWord( unsigned int length, unsigned int pos )
 {
-#if 0
     setSelection ( pos, length );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEditSpell::spellCheckDone( const QString &s )
 {
-#if 0
     if( s != text() )
 	setText( s );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEditSpell::spellCheckerMisspelling( const QString &_text, const QStringList &, unsigned int pos)
 {
-#if 0
      highLightWord( _text.length(),pos );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNLineEditSpell::spellCheckerCorrected( const QString &old, const QString &corr, unsigned int pos)
 {
-#if 0
     if( old!= corr )
     {
         setSelection ( pos, old.length() );
         insert( corr );
         setSelection ( pos, corr.length() );
     }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
-KNComposer::KNComposer( KNLocalArticle::Ptr a, const QString &text, const QString &unwraped, bool firstEdit, bool dislikesCopies, bool createCopy, bool allowMail )
+KNComposer::KNComposer( LocalArticle::Ptr a, const QString &text, const QString &unwraped, bool firstEdit, bool dislikesCopies, bool createCopy, bool allowMail )
     : KXmlGuiWindow(0), r_esult(CRsave), a_rticle(a),
       u_nwraped(unwraped),
       n_eeds8Bit(true), v_alidated(false), a_uthorDislikesMailCopies(dislikesCopies), e_xternalEdited(false), e_xternalEditor(0),
       e_ditorTempfile(0), a_ttChanged(false),
       mFirstEdit( firstEdit )
 {
-#if 0
   setObjectName( "composerWindow" );
 
   if( knGlobals.componentData().isValid() )
@@ -436,15 +392,11 @@ KNComposer::KNComposer( KNLocalArticle::Ptr a, const QString &text, const QStrin
   // starting the external editor
   if ( knGlobals.settings()->useExternalEditor() )
     slotExternalEditor();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNComposer::~KNComposer()
 {
-#if 0
   // prevent slotEditorFinished from being called
   if (e_xternalEditor)
     e_xternalEditor->disconnect();
@@ -456,24 +408,16 @@ KNComposer::~KNComposer()
 
   KNGlobals::self()->settings()->setAutoSpellChecking( a_ctAutoSpellChecking->isChecked() );
   KNGlobals::self()->settings()->writeConfig();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotUpdateCheckSpellChecking(bool _b)
 {
-#if 0
   a_ctAutoSpellChecking->setChecked(_b);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotUndo()
 {
-#if 0
     QWidget* fw = focusWidget();
     if (!fw) return;
 
@@ -481,14 +425,10 @@ void KNComposer::slotUndo()
         ((KTextEdit*)fw)->undo();
     else if (fw->inherits("QLineEdit"))
         ((QLineEdit*)fw)->undo();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotRedo()
 {
-#if 0
     QWidget* fw = focusWidget();
     if (!fw) return;
 
@@ -496,14 +436,10 @@ void KNComposer::slotRedo()
         ((KTextEdit*)fw)->redo();
     else if (fw->inherits("QLineEdit"))
         ((QLineEdit*)fw)->redo();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotCut()
 {
-#if 0
   QWidget* fw = focusWidget();
   if (!fw) return;
 
@@ -512,14 +448,10 @@ void KNComposer::slotCut()
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->cut();
   else kDebug(5003) <<"wrong focus widget";
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotCopy()
 {
-#if 0
   QWidget* fw = focusWidget();
   if (!fw) return;
 
@@ -528,16 +460,11 @@ void KNComposer::slotCopy()
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->copy();
   else kDebug(5003) <<"wrong focus widget";
-
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotPaste()
 {
-#if 0
   QWidget* fw = focusWidget();
   if (!fw) return;
 
@@ -546,14 +473,10 @@ void KNComposer::slotPaste()
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->paste();
   else kDebug(5003) <<"wrong focus widget";
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotSelectAll()
 {
-#if 0
   QWidget* fw = focusWidget();
   if (!fw) return;
 
@@ -561,15 +484,11 @@ void KNComposer::slotSelectAll()
       ((QLineEdit*)fw)->selectAll();
   else if (fw->inherits("KTextEdit"))
     ((KTextEdit*)fw)->selectAll();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::setConfig(bool onlyFonts)
 {
-#if 0
   if (!onlyFonts) {
     a_ctWordWrap->setChecked( knGlobals.settings()->wordWrap() );
     slotToggleWordWrap();
@@ -582,15 +501,11 @@ void KNComposer::setConfig(bool onlyFonts)
   v_iew->setComposingFont( knGlobals.settings()->composerFont() );
 
   slotUpdateStatusBar();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::setMessageMode(MessageMode mode)
 {
-#if 0
   m_ode = mode;
   a_ctDoPost->setChecked(m_ode!=mail);
   a_ctDoMail->setChecked(m_ode!=news);
@@ -614,15 +529,11 @@ void KNComposer::setMessageMode(MessageMode mode)
   }
 #endif
   slotUpdateStatusBar();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 bool KNComposer::hasValidData()
 {
-#if 0
   v_alidated=false;
   n_eeds8Bit=false;
 
@@ -778,11 +689,16 @@ bool KNComposer::hasValidData()
   if ( a_ctPGPsign->isChecked() ) {
     // try to get the signing key
     QByteArray signingKey = KNGlobals::self()->settings()->identity().pgpSigningKey();
-    KNNntpAccount::Ptr acc = knGlobals.accountManager()->account( a_rticle->serverId() );
+    NntpAccount::Ptr acc = Akobackit::manager()->accountManager()->account( a_rticle->postingResource() );
     if ( acc ) {
       KMime::Headers::Newsgroups *grps = a_rticle->newsgroups();
       if ( !grps->isEmpty() ) {
-        KNGroup::Ptr grp = knGlobals.groupManager()->group( grps->groups().first(), acc );
+#if 0
+        Group::Ptr grp = knGlobals.groupManager()->group( grps->groups().first(), acc );
+#else
+  kDebug() << "AKONADI PORT: code needs porting in" << Q_FUNC_INFO;
+        Group::Ptr grp;
+#endif
         if ( grp && !grp->identity().isNull() ) {
           signingKey = grp->identity().pgpSigningKey();
         } else if ( !acc->identity().isNull() ) {
@@ -810,15 +726,11 @@ bool KNComposer::hasValidData()
 
   v_alidated=true;
   return true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 bool KNComposer::applyChanges()
 {
-#if 0
   KMime::Content *text=0;
   bool result = true; // no error occurs ?
 
@@ -975,44 +887,41 @@ bool KNComposer::applyChanges()
   //text is set and all attached contents have been assembled => now set lines
   a_rticle->lines()->setNumberOfLines(a_rticle->lineCount());
 
-  a_rticle->assemble();
-  a_rticle->updateListItem();
+  Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( a_rticle->item() );
+  if ( !job->exec() ) {
+    result = false;
+  }
 
   return result;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::setCharset( const QString &charset )
 {
-#if 0
   mCharset = Locale::toMimeCharset( charset );
   slotUpdateStatusBar();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::closeEvent(QCloseEvent *e)
 {
-#if 0
   if(!v_iew->editor()->document()->isModified() && !a_ttChanged) {  // nothing to save, don't show nag screen
-    if(a_rticle->id()==-1)
+    if ( !a_rticle->isValid() ) {
       r_esult=CRdel;
-    else
+    } else {
       r_esult=CRcancel;
-  }
-  else {
+    }
+  } else {
     switch ( KMessageBox::warningYesNoCancel( this, i18n("Do you want to save this article in the draft folder?"),
                                               QString(), KStandardGuiItem::save(), KStandardGuiItem::discard() ) ) {
       case KMessageBox::Yes :
         r_esult=CRsave;
         break;
       case KMessageBox::No :
-        if (a_rticle->id()==-1) r_esult=CRdel;
-          else r_esult=CRcancel;
+        if ( !a_rticle->isValid() ) {
+          r_esult = CRdel;
+        } else {
+          r_esult = CRcancel;
+        }
         break;
       default:            // cancel
         e->ignore();
@@ -1020,18 +929,14 @@ void KNComposer::closeEvent(QCloseEvent *e)
     }
   }
 
-    e->accept();
+  e->accept();
   emit composerDone(this);
   // we're dead at this point, don't access members!
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::initData(const QString &text)
 {
-#if 0
   // Identity
   KPIMIdentities::IdentityManager *idManager = KNGlobals::self()->identityManager();
   KPIMIdentities::Identity identity = idManager->defaultIdentity();
@@ -1113,9 +1018,6 @@ void KNComposer::initData(const QString &text)
       v_iew->addAttachment( KNAttachment::Ptr( new KNAttachment( c ) ) );
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 // inserts at cursor position if clear is false, replaces content otherwise
@@ -1123,7 +1025,6 @@ void KNComposer::initData(const QString &text)
 // "file" is already open for reading
 void KNComposer::insertFile( QFile *file, bool clear, bool box, const QString &boxTitle )
 {
-#if 0
   QString temp;
   bool ok=true;
   QTextCodec *codec=KGlobal::charsets()->codecForName( mCharset, ok);
@@ -1160,16 +1061,12 @@ void KNComposer::insertFile( QFile *file, bool clear, bool box, const QString &b
     v_iew->editor()->setText(temp);
   else
     v_iew->editor()->insertPlainText(temp);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 // ask for a filename, handle network urls
 void KNComposer::insertFile(bool clear, bool box)
 {
-#if 0
   KNLoadHelper helper(this);
   QFile *file = helper.getFile(i18n("Insert File"));
   KUrl url;
@@ -1185,9 +1082,6 @@ void KNComposer::insertFile(bool clear, bool box)
 
     insertFile(file,clear,box,boxName);
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1196,84 +1090,55 @@ void KNComposer::insertFile(bool clear, bool box)
 
 void KNComposer::addRecentAddress()
 {
-#if 0
   if ( m_ode == mail || m_ode == news_mail ) {
     RecentAddresses::self( knGlobals.config() )->add( v_iew->emailRecipient() );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotSendNow()
 {
-#if 0
   r_esult=CRsendNow;
   addRecentAddress();
   emit composerDone(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotSendLater()
 {
-#if 0
   r_esult=CRsendLater;
   addRecentAddress();
   emit composerDone(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotSaveAsDraft()
 {
-#if 0
   r_esult=CRsave;
   addRecentAddress();
   emit composerDone(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotArtDelete()
 {
-#if 0
   r_esult=CRdelAsk;
   emit composerDone(this);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotInsertFile()
 {
-#if 0
   insertFile(false,false);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotInsertFileBoxed()
 {
-#if 0
   insertFile(false,true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotAttachFile()
 {
-#if 0
   KNLoadHelper *helper = new KNLoadHelper(this);
 
   if (helper->getFile(i18n("Attach File"))) {
@@ -1286,15 +1151,11 @@ void KNComposer::slotAttachFile()
   } else {
     delete helper;
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotAttachmentRemoved( KNAttachment::Ptr attachment, bool last )
 {
-#if 0
    if( !attachment ) {
     return;
   }
@@ -1309,25 +1170,17 @@ void KNComposer::slotAttachmentRemoved( KNAttachment::Ptr attachment, bool last 
   }
 
   a_ttChanged = true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotAttachmentChanged()
 {
-#if 0
   a_ttChanged = true;
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void KNComposer::slotToggleDoPost()
 {
-#if 0
   if (a_ctDoPost->isChecked()) {
     if (a_ctDoMail->isChecked())
       m_ode=news_mail;
@@ -1342,15 +1195,11 @@ void KNComposer::slotToggleDoPost()
     }
   }
   setMessageMode(m_ode);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotToggleDoMail()
 {
-#if 0
   if (a_ctDoMail->isChecked()) {
     if (a_uthorDislikesMailCopies) {
       if ( KMessageBox::warningContinueCancel( this, i18n("The poster does not want a mail copy of your reply (Mail-Copies-To: nobody);\nplease respect their request."),
@@ -1392,78 +1241,54 @@ void KNComposer::slotToggleDoMail()
     }
   }
   setMessageMode(m_ode);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotSetCharset(const QString &s)
 {
-#if 0
   if(s.isEmpty())
     return;
 
   QString charset = KGlobal::charsets()->encodingForName( s );
   setCharset( charset );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotSetCharsetKeyboard()
 {
-#if 0
   int newCS = KNHelper::selectDialog(this, i18n("Select Charset"), a_ctSetCharset->items(), a_ctSetCharset->currentItem());
   if (newCS != -1) {
     a_ctSetCharset->setCurrentItem(newCS);
     QString charset = KGlobal::charsets()->encodingForName( a_ctSetCharset->items()[ newCS ] );
     setCharset( charset );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotToggleWordWrap()
 {
-#if 0
   if ( a_ctWordWrap->isChecked() )
     v_iew->editor()->enableWordWrap( knGlobals.settings()->maxLineLength() );
   else
     v_iew->editor()->disableWordWrap();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotAutoSpellCheckingToggled()
 {
-#if 0
   v_iew->editor()->setCheckSpellingEnabled( a_ctAutoSpellChecking->isChecked() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotUndoRewrap()
 {
-#if 0
   if (KMessageBox::warningContinueCancel( this, i18n("This will replace all text you have written.")) == KMessageBox::Continue) {
     v_iew->editor()->setText(u_nwraped);
     v_iew->appendSignature();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotExternalEditor()
 {
-#if 0
   if(e_xternalEditor)   // in progress...
     return;
 
@@ -1527,14 +1352,10 @@ void KNComposer::slotExternalEditor()
   a_ctExternalEditor->setEnabled(false);   // block other edit action while the editor is running...
   a_ctSpellCheck->setEnabled(false);
   v_iew->showExternalNotification();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotUpdateStatusBar()
 {
-#if 0
   QString typeDesc;
   switch (m_ode) {
     case news:  typeDesc = i18n("News Article");
@@ -1554,54 +1375,35 @@ void KNComposer::slotUpdateStatusBar()
   statusBar()->changeItem(overwriteDesc, 3);
   statusBar()->changeItem(i18n(" Column: %1 ", v_iew->editor()->columnNumber () + 1), 4);
   statusBar()->changeItem(i18n(" Line: %1 ", v_iew->editor()->linePosition() + 1), 5);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotUpdateCursorPos()
 {
-#if 0
   statusBar()->changeItem(i18n(" Column: %1 ", v_iew->editor()->columnNumber () + 1), 4);
   statusBar()->changeItem(i18n(" Line: %1 ", v_iew->editor()->linePosition() + 1), 5);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotConfKeys()
 {
-#if 0
   KShortcutsDialog::configure(actionCollection(), KShortcutsEditor::LetterShortcutsAllowed, this, true);
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotConfToolbar()
 {
-#if 0
   saveMainWindowSettings(knGlobals.config()->group( "composerWindow_options") );
   KEditToolBar dlg(guiFactory(),this);
   connect(&dlg,SIGNAL( newToolBarConfig() ), this, SLOT( slotNewToolbarConfig() ));
   dlg.exec();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::slotNewToolbarConfig()
 {
-#if 0
   createGUI("kncomposerui.rc");
 
   applyMainWindowSettings(knGlobals.config()->group("composerWindow_options"));
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 //-------------------------------- </Actions> -----------------------------------
@@ -1609,7 +1411,6 @@ void KNComposer::slotNewToolbarConfig()
 
 void KNComposer::slotSubjectChanged(const QString &t)
 {
-#if 0
   // replace newlines
   QString subject = t;
   subject.replace( '\n', ' ' );
@@ -1621,15 +1422,11 @@ void KNComposer::slotSubjectChanged(const QString &t)
     setCaption( subject );
   else
     setCaption( i18n("No Subject") );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotToBtnClicked()
 {
-#if 0
   Akonadi::EmailAddressSelectionDialog dlg( this );
   dlg.view()->view()->setSelectionMode( QAbstractItemView::MultiSelection );
 
@@ -1646,9 +1443,6 @@ void KNComposer::slotToBtnClicked()
   to += addresses.join( ", " );
 
   v_iew->setEmailRecipient( to );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1687,11 +1481,11 @@ void KNComposer::slotGroupsBtnClicked()
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+
 }
 
 void KNComposer::slotEditorFinished(int, QProcess::ExitStatus exitStatus)
 {
-#if 0
   if(exitStatus == QProcess::NormalExit) {
     e_ditorTempfile->flush();
     e_ditorTempfile->seek(0);
@@ -1700,15 +1494,11 @@ void KNComposer::slotEditorFinished(int, QProcess::ExitStatus exitStatus)
   }
 
   slotCancelEditor();   // cleanup...
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotCancelEditor()
 {
-#if 0
   if (e_xternalEditor)
     e_xternalEditor->deleteLater();  // this also kills the editor process if it's still running
   e_xternalEditor=0;
@@ -1718,39 +1508,27 @@ void KNComposer::slotCancelEditor()
   a_ctExternalEditor->setEnabled(true);
   a_ctSpellCheck->setEnabled(true);
   v_iew->hideExternalNotification();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::slotAttachmentPopup( const QPoint &point )
 {
-#if 0
   QMenu *menu = static_cast<QMenu*>( factory()->container( "attachment_popup", this ) );
   if ( menu ) {
     menu->popup( point );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::dragEnterEvent( QDragEnterEvent *event )
 {
-#if 0
   if ( KUrl::List::canDecode( event->mimeData() ) ) {
     event->setDropAction( Qt::CopyAction );
     event->accept();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void KNComposer::dropEvent( QDropEvent *event )
 {
-#if 0
   KUrl::List urls = KUrl::List::fromMimeData( event->mimeData() );
 
   foreach ( const KUrl &url, urls ) {
@@ -1767,9 +1545,6 @@ void KNComposer::dropEvent( QDropEvent *event )
       delete helper;
     }
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1780,7 +1555,6 @@ KNComposer::AttachmentPropertiesDlg::AttachmentPropertiesDlg( KNAttachment::Ptr 
   KDialog( parent ), a_ttachment(a),
   n_onTextAsText(false)
 {
-#if 0
   //init GUI
   setCaption( i18n("Attachment Properties") );
   setButtons( Help | Ok | Cancel );
@@ -1852,37 +1626,25 @@ KNComposer::AttachmentPropertiesDlg::AttachmentPropertiesDlg( KNAttachment::Ptr 
   setFixedHeight(sizeHint().height());
   KNHelper::restoreWindowSize("attProperties", this, QSize(300,250));
   setHelp("anc-knode-editor-advanced");
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 KNComposer::AttachmentPropertiesDlg::~AttachmentPropertiesDlg()
 {
-#if 0
   KNHelper::saveWindowSize("attProperties", this->size());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::AttachmentPropertiesDlg::apply()
 {
-#if 0
   a_ttachment->setDescription(d_escription->text());
   a_ttachment->setMimeType(m_imeType->text());
   a_ttachment->setCte(e_ncoding->currentIndex());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::AttachmentPropertiesDlg::accept()
 {
-#if 0
   if ( m_imeType->text().indexOf('/') == -1 ) {
     KMessageBox::sorry(this, i18n("You have set an invalid mime-type.\nPlease change it."));
     return;
@@ -1896,15 +1658,11 @@ void KNComposer::AttachmentPropertiesDlg::accept()
   apply();
 
   KDialog::accept();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void KNComposer::AttachmentPropertiesDlg::slotMimeTypeTextChanged(const QString &text)
 {
-#if 0
     enableButtonOk( !text.isEmpty() );
   if(text.left(5)!="text/") {
     n_onTextAsText=a_ttachment->isFixedBase64();
@@ -1915,9 +1673,6 @@ void KNComposer::AttachmentPropertiesDlg::slotMimeTypeTextChanged(const QString 
     e_ncoding->setCurrentIndex(a_ttachment->cte());
     e_ncoding->setEnabled(true);
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
