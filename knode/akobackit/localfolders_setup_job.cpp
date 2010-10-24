@@ -65,8 +65,7 @@ Akonadi::AgentInstance LocalFoldersSetupJob::instance() const
 
 void LocalFoldersSetupJob::start()
 {
-//   QTimer::singleShot( 0, this, SLOT( doStart() ) );
-  emitResult();
+  QTimer::singleShot( 0, this, SLOT( doStart() ) );
 }
 
 void LocalFoldersSetupJob::doStart()
@@ -249,11 +248,11 @@ void LocalFoldersSetupJob::ensureSpecialCollectionExists()
   // Find existing collection with suitable name and reused them
   foreach ( const Akonadi::Collection &c, mCollections ) {
     Akonadi::SpecialMailCollections::Type type = Akonadi::SpecialMailCollections::Invalid;
-    if ( c.remoteId().compare( "outbox", Qt::CaseInsensitive ) ) {
+    if ( c.remoteId().compare( "outbox", Qt::CaseInsensitive ) == 0 ) {
       type = Akonadi::SpecialMailCollections::Outbox;
-    } else if ( c.remoteId().compare( "sent-mail", Qt::CaseInsensitive ) ) {
+    } else if ( c.remoteId().compare( "sent-mail", Qt::CaseInsensitive ) == 0 ) {
       type = Akonadi::SpecialMailCollections::SentMail;
-    } else if ( c.remoteId().compare( "drafts", Qt::CaseInsensitive ) ) {
+    } else if ( c.remoteId().compare( "drafts", Qt::CaseInsensitive ) == 0 ) {
       type = Akonadi::SpecialMailCollections::Drafts;
     }
 
