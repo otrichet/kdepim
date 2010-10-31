@@ -67,6 +67,7 @@ set(knodecommon_LIB_SRCS
    akobackit/item_local_article.cpp
    akobackit/item_merge_job.cpp
    akobackit/item_remote_article.cpp
+   akobackit/items_deletion_job.cpp
    akobackit/localfolders_setup_job.cpp
    akobackit/nntpaccount.cpp
    akobackit/nntpaccount_manager.cpp

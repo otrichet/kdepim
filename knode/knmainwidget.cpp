@@ -943,19 +943,6 @@ bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
 }
 
 
-void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
-{
-#if 0
-  if(!f_olManager->currentFolder()) return;
-
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNLocalArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
 
 void KNMainWidget::slotArticleSelected( const Akonadi::Item &item )
 {
@@ -1760,40 +1747,29 @@ void KNMainWidget::slotArtSendOutbox()
 
 void KNMainWidget::slotArtDelete()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtDelete()";
-  if (!f_olManager->currentFolder())
+  kDebug();
+  Akobackit::AkoManager *manager = Akobackit::manager();
+  const bool isFolder = manager->folderManager()->isFolder( mCollectionWidget->selectedCollection() );
+  if ( !isFolder ) {
     return;
+  }
 
-  KNLocalArticle::List lst;
-  getSelectedArticles(lst);
-
-  if(!lst.isEmpty())
-    a_rtManager->deleteArticles(lst);
-
-  if(h_drView->currentItem())
-    h_drView->setActive( h_drView->currentItem() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  mMessageList->deleteSelection();
 }
 
 
 void KNMainWidget::slotArtSendNow()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtSendNow()";
-  if (!f_olManager->currentFolder())
+  kDebug();
+  const bool isFolder = Akobackit::manager()->folderManager()->isFolder( mCollectionWidget->selectedCollection() );
+  if ( !isFolder ) {
     return;
+  }
 
-  KNLocalArticle::List lst;
-  getSelectedArticles(lst);
-
-  if(!lst.isEmpty())
-    a_rtFactory->sendArticles( lst, true );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  const LocalArticle::List selection = mMessageList->selectionAsArticleList();
+  if ( !selection.isEmpty() ) {
+    a_rtFactory->sendArticles( selection, true );
+  }
 }
 
 

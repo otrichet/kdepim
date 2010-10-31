@@ -619,7 +619,7 @@ void KNArticleFactory::edit( LocalArticle::Ptr a )
 }
 
 
-void KNArticleFactory::sendArticles( LocalArticle::List &l, bool now )
+void KNArticleFactory::sendArticles( const LocalArticle::List &l, bool now )
 {
   KNJobData *job=0;
   KNServerInfo::Ptr ser;

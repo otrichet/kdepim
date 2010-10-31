@@ -25,6 +25,7 @@
 #include "akobackit/akonadi_manager.h"
 #include "akobackit/folder_manager.h"
 #include "akobackit/group_manager.h"
+#include "akobackit/items_deletion_job.h"
 
 #include <KLocalizedString>
 #include <KXMLGUIClient>
@@ -112,6 +113,46 @@ bool Widget::toggleThread( const Akonadi::MessageStatus& newStatus )
 {
   const Akonadi::Item::List items = currentThreadAsMessageList();
   return Akobackit::manager()->toggleStatus( items, newStatus );
+}
+
+void Widget::deleteSelection()
+{
+  const MessageList::Core::MessageItemSetReference ref = selectionAsPersistentSet( true );
+
+  markMessageItemsAsAboutToBeRemoved( ref, true );
+
+  const Akonadi::Item::List items = itemListFromPersistentSet( ref );
+
+  Akobackit::ItemsDeletionJob *job = new Akobackit::ItemsDeletionJob( items, this );
+  job->setProperty( "ItemReferenceSet", QVariant::fromValue<qlonglong>( ref ) );
+  connect( job, SIGNAL( result( KJob * ) ), this, SLOT( deleteSelectionDone( KJob * ) ) );
+  job->start();
+}
+
+void Widget::deleteSelectionDone( KJob *job )
+{
+  const QVariant vRef = job->property( "ItemReferenceSet" );
+  Q_ASSERT( vRef.isValid() );
+  const MessageList::Core::MessageItemSetReference ref = vRef.toLongLong();
+  markMessageItemsAsAboutToBeRemoved( ref, false );
+  deletePersistentSet( ref );
+
+  if ( job->error() != KJob::NoError ) {
+    kWarning() << job->error() << job->errorString();
+  }
+}
+
+
+
+
+LocalArticle::List Widget::selectionAsArticleList( bool includeCollapsedChildren ) const
+{
+  const Akonadi::Item::List items = selectionAsMessageItemList( includeCollapsedChildren );
+  LocalArticle::List articles;
+  foreach ( const Akonadi::Item item, items ) {
+    LocalArticle::Ptr art( new LocalArticle( item ) );
+  }
+  return articles;
 }
 
 

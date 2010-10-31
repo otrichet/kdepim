@@ -55,7 +55,7 @@ class KNArticleFactory : public QObject
 
     //article handling
     void edit( LocalArticle::Ptr a );
-    void sendArticles( LocalArticle::List &l, bool now = true );
+    void sendArticles( const LocalArticle::List &l, bool now = true );
     void sendOutbox();
 
     //composer handling

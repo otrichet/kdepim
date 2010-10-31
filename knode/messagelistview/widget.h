@@ -24,11 +24,14 @@
 #ifndef KNODE_MESSAGELIST_WIDGET_H
 #define KNODE_MESSAGELIST_WIDGET_H
 
+#include "akobackit/item_local_article.h"
+
 #include <messagelist/widget.h>
 
 namespace Akonadi {
   class MessageStatus;
 }
+class KJob;
 
 
 namespace KNode {
@@ -67,6 +70,13 @@ class Widget : public MessageList::Widget
      * @return true if any change were made.
      */
     bool toggleThread( const Akonadi::MessageStatus &newStatus );
+    /**
+     * Delete the selected articles.
+     */
+    void deleteSelection();
+
+
+    LocalArticle::List selectionAsArticleList( bool includeCollapsedChildren = true ) const;
 
   signals:
     /**
@@ -119,6 +129,10 @@ class Widget : public MessageList::Widget
      * This does not work when done in the construtor
      */
     void initAggregation();
+    /**
+     * Result slot of ItemsDeletionJob.
+     */
+    void deleteSelectionDone( KJob * job );
 
   private:
     KXMLGUIClient *mGuiClient;

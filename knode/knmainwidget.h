@@ -173,9 +173,6 @@ protected:
 
   bool eventFilter(QObject *, QEvent *);
 
-  // convenience methods...
-  void getSelectedArticles( KNLocalArticle::List &l );
-
   //GUI
   KNode::ArticleWidget *mArticleViewer;
   KNode::MessageListView::Widget *mMessageList;
