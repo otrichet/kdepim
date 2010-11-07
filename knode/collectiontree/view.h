@@ -54,6 +54,17 @@ class View : public Akonadi::EntityTreeView
      */
     virtual void contextMenuEvent( QContextMenuEvent *event );
 
+
+  private slots:
+    /**
+     * Displays the context menu on the header at @p pos.
+     */
+    void displayHeaderContextMenu( const QPoint &pos );
+    /**
+     * Result slot of the header context menu.
+     */
+    void showHideColumnRequest( QAction *selectedAction );
+
   private:
     KXMLGUIClient *mGuiClient;
 };

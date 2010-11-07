@@ -27,9 +27,13 @@
 
 #include <Akonadi/EntityTreeModel>
 #include <Akonadi/KMime/SpecialMailCollections>
+#include <KAction>
+#include <KLocalizedString>
+#include <KMenu>
 #include <KXMLGUIClient>
 #include <KXMLGUIFactory>
 #include <QContextMenuEvent>
+#include <QHeaderView>
 #include <QMenu>
 
 namespace KNode {
@@ -39,6 +43,11 @@ View::View( KXMLGUIClient *xmlGuiClient, QWidget *parent )
   : EntityTreeView( xmlGuiClient, parent ),
     mGuiClient( xmlGuiClient )
 {
+  setObjectName( QLatin1String( "CollectionTree/View" ) );
+
+  header()->setContextMenuPolicy( Qt::CustomContextMenu );
+  connect( header(), SIGNAL( customContextMenuRequested( const QPoint & ) ),
+           this, SLOT( displayHeaderContextMenu( const QPoint & ) ) );
 }
 
 View::~View()
@@ -89,6 +98,51 @@ void View::contextMenuEvent( QContextMenuEvent *event )
   }
 
   Akonadi::EntityTreeView::contextMenuEvent(event);
+}
+
+
+void View::displayHeaderContextMenu( const QPoint &pos )
+{
+  KMenu *menu = new KMenu( this );
+  menu->addTitle( i18n( "View columns" ) );
+
+  const int columnCount = header()->count();
+  for ( int i = 0 ; i < columnCount ; ++i ) {
+    if ( i == View::NameColumn ) { // Never hide the name column
+      continue;
+    }
+    if ( i == View::SizeColumn ) { // Always hidden in CollectionTree::Widget
+      continue;
+    }
+    const QString name = model()->headerData( i, Qt::Horizontal, Qt::DisplayRole ).toString();
+    KAction *action = new KAction( name, menu );
+    action->setCheckable( true );
+    action->setChecked( !isColumnHidden( i ) );
+    action->setData( i );
+    menu->addAction( action );
+  }
+  connect( menu, SIGNAL( triggered( QAction * ) ),
+           this, SLOT( showHideColumnRequest( QAction * ) ) );
+
+  menu->popup( mapToGlobal( pos ) );
+}
+
+void View::showHideColumnRequest( QAction *selectedAction )
+{
+  kDebug() << selectedAction;
+  Q_ASSERT( selectedAction );
+  const QVariant d = selectedAction->data();
+  Q_ASSERT( d.isValid() );
+  bool ok;
+  const int columnIndex = d.toInt( &ok );
+  Q_ASSERT( ok );
+
+  if ( columnIndex == View::NameColumn ) {
+    // Should never happen, but better be safe.
+    return;
+  }
+
+  setColumnHidden( columnIndex, !isColumnHidden( columnIndex ) );
 }
 
 

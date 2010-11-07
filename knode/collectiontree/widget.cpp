@@ -52,6 +52,7 @@ Widget::Widget( KXMLGUIClient *guiClient, QWidget *parent )
     mViewSaver( 0 ),
     mSelectionModel( 0 )
 {
+  setObjectName( QLatin1String( "CollectionTree/Widget" ) );
   addWidget( mTreeView );
   setContentsMargins( 0, 0, 0, 0 );
 
@@ -73,7 +74,7 @@ void Widget::init()
   Akonadi::StatisticsProxyModel *statisticsModel = new Akonadi::StatisticsProxyModel( this );
   statisticsModel->setSourceModel( Akobackit::manager()->entityModel() );
   statisticsModel->setDynamicSortFilter( true );
-//   statisticsModel->setToolTipEnabled( true );
+  statisticsModel->setToolTipEnabled( true );
   // filter collections containing news articles
   CollectionFilterProxyModel *filterModel = new CollectionFilterProxyModel( this );
   filterModel->setSourceModel( statisticsModel );
@@ -88,16 +89,13 @@ void Widget::init()
   mSelectionModel->setSourceModel( Akobackit::manager()->entityModel() );
 
   // Restore/save view layout
-  // FIXME: disabled until the crash it induce is fixed. Seems like the connnection
-  //        between currentChanged(Ak::Collection) and selectedCollectionChanged(Ak::Collection)
-  //        triggers this crash.
-//   connect( mTreeView->model(), SIGNAL( modelAboutToBeReset() ),
-//            this, SLOT( saveState() ) );
-//   connect( mTreeView->model(), SIGNAL( modelReset() ),
-//            this, SLOT( restoreState() ) );
-//   connect( qApp, SIGNAL( aboutToQuit() ),
-//            this, SLOT( saveState() ) );
-//   restoreState();
+  connect( mTreeView->model(), SIGNAL( modelAboutToBeReset() ),
+           this, SLOT( saveState() ) );
+  connect( mTreeView->model(), SIGNAL( modelReset() ),
+           this, SLOT( restoreState() ) );
+  connect( qApp, SIGNAL( aboutToQuit() ),
+           this, SLOT( saveState() ) );
+  restoreState();
 }
 
 void Widget::restoreState()

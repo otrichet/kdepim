@@ -784,6 +784,7 @@ void KNMainWidget::initActions()
   a_ctToggleQuickSearch = actionCollection()->add<KToggleAction>("settings_show_quickSearch");
   a_ctToggleQuickSearch->setText(i18n("Show Quick Search"));
   connect( a_ctToggleQuickSearch, SIGNAL( triggered( bool ) ), mMessageList, SLOT( changeQuicksearchVisibility() ) );
+  a_ctToggleQuickSearch->setChecked( !mMessageList->quickSearch()->isVisible() );
 }
 
 bool KNMainWidget::firstStart()
@@ -805,51 +806,39 @@ bool KNMainWidget::firstStart()
 void KNMainWidget::readOptions()
 {
 #if 0
-  KConfigGroup conf(knGlobals.config(), "APPEARANCE");
-
-  if (conf.readEntry("quicksearch", true))
-    a_ctToggleQuickSearch->setChecked(true);
-  else
-    q_uicksearch->hide();
-  c_olView->readConfig();
-  h_drView->readConfig();
+  mCollectionWidget->readConfig();
+  mMessageList->readConfig();
   a_ctArtSortHeaders->setCurrentItem( h_drView->sortColumn() );
 
-  resize(787,478);  // default optimized for 800x600
-  //applyMainWindowSettings(KGlobal::config(),"mainWindow_options");
-
-  KPIM::UiStateSaver::restoreState( this, KConfigGroup( knGlobals.config(), "UI State" ) );
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  resize(787,478);  // default optimized for 800x600
+
+  KPIM::UiStateSaver::restoreState( this, KConfigGroup( knGlobals.config(), "UI State" ) );
 }
 
 
 void KNMainWidget::saveOptions()
 {
 #if 0
-  KConfigGroup conf(knGlobals.config(), "APPEARANCE");
-
-  conf.writeEntry("quicksearch", !q_uicksearch->isHidden());
-  //saveMainWindowSettings(KGlobal::config(),"mainWindow_options");
-
-  c_olView->writeConfig();
-  h_drView->writeConfig();
+  mCollectionWidget->writeConfig();
+  mMessageList->writeConfig();
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
   mArticleViewer->writeConfig();
 
   KConfigGroup cfg( knGlobals.config(), "UI State" );
   KPIM::UiStateSaver::saveState( this, cfg );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 bool KNMainWidget::requestShutdown()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::requestShutdown()";
 
+#if 0
   if( a_rtFactory->jobsPending() &&
       KMessageBox::No==KMessageBox::warningYesNo(this, i18n(
 "KNode is currently sending articles. If you quit now you might lose these \
@@ -869,9 +858,9 @@ articles.\nDo you want to quit anyway?"), QString(), KStandardGuiItem::quit(), K
 
 void KNMainWidget::prepareShutdown()
 {
-#if 0
   kDebug(5003) <<"KNMainWidget::prepareShutdown()";
 
+#if 0
   //cleanup article-views
   ArticleWidget::cleanup();
 
@@ -891,8 +880,12 @@ void KNMainWidget::prepareShutdown()
 
   delete cup;
 
+#else
+  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
+#endif
   saveOptions();
   RecentAddresses::self(knGlobals.config())->save( knGlobals.config() );
+#if 0
   c_fgManager->syncConfig();
   a_rtManager->deleteTempFiles();
   g_rpManager->syncGroups();
