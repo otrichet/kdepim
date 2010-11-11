@@ -93,9 +93,8 @@ void KNArticleManager::saveContentToFile(KMime::Content *c, QWidget *parent)
 }
 
 
-void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
+void KNArticleManager::saveArticleToFile( const KMime::Message::Ptr &a, QWidget *parent )
 {
-#if 0
   QString fName = a->subject()->asUnicodeString();
   QString s = "";
 
@@ -115,9 +114,6 @@ void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
     if ( file->write(tmp.data(), tmp.size()) == -1 )
       KNHelper::displayExternalFileError( parent );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 

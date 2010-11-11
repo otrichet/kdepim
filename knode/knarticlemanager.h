@@ -18,6 +18,7 @@
 #include "legacy_include.h"
 
 #include <Akonadi/Collection>
+#include <KMime/Message>
 #include <QList>
 #include <QObject>
 
@@ -48,7 +49,7 @@ class KNArticleManager : public QObject, public KNJobConsumer
     //content handling
     void deleteTempFiles();
     void saveContentToFile(KMime::Content *c, QWidget *parent);
-    void saveArticleToFile( KNArticle::Ptr a, QWidget *parent );
+    void saveArticleToFile( const KMime::Message::Ptr &a, QWidget *parent );
     QString saveContentToTemp(KMime::Content *c);
     void openContent(KMime::Content *c);
 

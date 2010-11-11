@@ -13,10 +13,12 @@
 
 #include "articlewidget.h"
 
+#include "akobackit/akonadi_manager.h"
 #include "utilities.h"
 #include "utils/locale.h"
 
 
+#include <akonadi/kmime/messagestatus.h>
 #include <QBuffer>
 #include <QClipboard>
 #include <QDir>
@@ -582,7 +584,6 @@ void ArticleWidget::displayArticle()
 
 void ArticleWidget::displayErrorMessage( const QString &msg )
 {
-#if 0
   mViewer->begin();
   mViewer->setUserStyleSheet( mCSSHelper->cssDefinitions( mFixedFontToggle->isChecked() ) );
   mViewer->write( mCSSHelper->htmlHead( mFixedFontToggle->isChecked() ) );
@@ -595,9 +596,6 @@ void ArticleWidget::displayErrorMessage( const QString &msg )
   mViewer->end();
 
   disableActions();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -872,7 +870,6 @@ void ArticleWidget::displaySigFooter( const QString &signClass )
 
 void ArticleWidget::displayAttachment( KMime::Content *att, int partNum )
 {
-#if 0
   if ( mAttachmentStyle == "hide" )
     return;
 
@@ -939,9 +936,6 @@ void ArticleWidget::displayAttachment( KMime::Content *att, int partNum )
             "</a></div><div>" + comment + "</div><br>";
   }
   mViewer->write( html );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1012,7 +1006,6 @@ bool ArticleWidget::canDecodeText( const QByteArray &charset ) const
 
 void ArticleWidget::updateContents()
 {
-#if 0
   // save current scrollbar position
   float savedPosition = (float)mViewer->view()->contentsY() / (float)mViewer->view()->contentsHeight();
   if ( mArticle && mArticle->hasContent() )
@@ -1021,9 +1014,6 @@ void ArticleWidget::updateContents()
     clear();
   // restore scrollbar position
   mViewer->view()->setContentsPos( 0, qRound(  mViewer->view()->contentsHeight() * savedPosition ) );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1147,27 +1137,10 @@ void ArticleWidget::articleLoadError( RemoteArticle::Ptr article, const QString 
     (*it)->displayErrorMessage( error );
 }
 
-
-void ArticleWidget::collectionRemoved( KNArticleCollection::Ptr coll )
-{
-#if 0
-  for ( InstanceIterator it = mInstances.constBegin(); it != mInstances.constEnd(); ++it )
-    if ( (*it)->article() && (*it)->article()->collection() == coll )
-      (*it)->setArticle( KNArticle::Ptr() );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
 void ArticleWidget::cleanup()
 {
-#if 0
   for ( InstanceIterator it = mInstances.constBegin(); it != mInstances.constEnd(); ++it )
-    (*it)->setArticle( KNArticle::Ptr() ); //delete orphant articles => avoid crash in destructor
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+    (*it)->setArticle( RemoteArticle::Ptr() ); //delete orphant articles => avoid crash in destructor
 }
 
 
@@ -1280,27 +1253,20 @@ void ArticleWidget::slotURLPopup( const QString &url, const QPoint &point )
 
 void ArticleWidget::slotTimeout()
 {
-#if 0
-  if ( mArticle && mArticle->type() == KNArticle::ATremote && !mArticle->isOrphant() ) {
-    KNRemoteArticle::List l;
-    l.append( boost::static_pointer_cast<KNRemoteArticle>( mArticle ) );
-    knGlobals.articleManager()->setRead( l, true );
+  if ( mArticle && mArticle->type() == RemoteArticle::ATremote && mArticle->item().isValid() ) {
+    Akonadi::Item::List l;
+    l.append( mArticle->item() );
+    // FIXME: mark cross-posted article as read in each group.
+    Akobackit::manager()->changeStatus( l, Akonadi::MessageStatus::statusRead() );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 
 void ArticleWidget::slotSave()
 {
-#if 0
   if ( mArticle )
     knGlobals.articleManager()->saveArticleToFile( mArticle, this );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 void ArticleWidget::slotPrint( )
@@ -1473,7 +1439,6 @@ void ArticleWidget::slotToggleRot13()
 
 void ArticleWidget::slotSetCharset( const QString &charset )
 {
-#if 0
   if ( charset.isEmpty() )
     return;
 
@@ -1490,24 +1455,17 @@ void ArticleWidget::slotSetCharset( const QString &charset )
     mArticle->setForceDefaultCharset( mForceCharset );     // when we disable the overdrive
     updateContents();
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
 void ArticleWidget::slotSetCharsetKeyboard( )
 {
-#if 0
   int charset = KNHelper::selectDialog( this, i18n("Select Charset"),
     mCharsetSelect->items(), mCharsetSelect->currentItem() );
   if ( charset != -1 ) {
     mCharsetSelect->setCurrentItem( charset );
     slotSetCharset( mCharsetSelect->items()[charset] );
   }
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1558,7 +1516,6 @@ void ArticleWidget::slotOpenAttachment()
 
 void ArticleWidget::slotSaveAttachment()
 {
-#if 0
   if ( mCurrentURL.protocol() != "file" && mCurrentURL.protocol() != "part" )
     return;
   int partNum = 0;
@@ -1573,9 +1530,6 @@ void ArticleWidget::slotSaveAttachment()
   if ( !c )
     return;
   knGlobals.articleManager()->saveContentToFile( c, this );
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 #include "articlewidget.moc"

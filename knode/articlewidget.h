@@ -87,10 +87,6 @@ class ArticleWidget : public QWidget//, public KNJobConsumer
      * @param error The error message.
      */
     static void articleLoadError( RemoteArticle::Ptr article, const QString &error );
-    /** notify all instances that the given collection has been removed
-     * @param coll The removed article collection (a group or a folder).
-     */
-    static void collectionRemoved( KNArticleCollection::Ptr coll );
     /// cleanup all instances
     static void cleanup();
 
