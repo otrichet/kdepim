@@ -30,6 +30,8 @@
 
 #include <Akonadi/AgentManager>
 #include <Akonadi/Collection>
+#include <Akonadi/CollectionFetchJob>
+#include <Akonadi/CollectionFetchScope>
 
 
 namespace KNode {
@@ -65,6 +67,24 @@ Group::Ptr GroupManager::group( const Akonadi::Collection &collection )
 {
   return Group::Ptr( new Group( collection ) );
 }
+
+Group::Ptr GroupManager::group( const QString &groupName, NntpAccount::Ptr account )
+{
+  Akonadi::Collection collection;
+  collection.setRemoteId( groupName );
+  Akonadi::CollectionFetchJob *job = new Akonadi::CollectionFetchJob( collection,
+                                                                      Akonadi::CollectionFetchJob::Base );
+  job->fetchScope().setIncludeUnsubscribed( true );
+  job->fetchScope().setResource( account->agent().identifier() );
+
+  if ( job->exec() ) {
+    Q_ASSERT( job->collections().size() == 1 );
+    return Group::Ptr( new Group( job->collections().at( 0 ) ) );
+  } else {
+    return Group::Ptr();
+  }
+}
+
 
 NntpAccount::Ptr GroupManager::account( const Group::Ptr &group )
 {

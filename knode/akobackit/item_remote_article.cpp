@@ -48,6 +48,16 @@ Akonadi::Item RemoteArticle::item()
   return mItem;
 }
 
+void RemoteArticle::updateItem( const Akonadi::Item &updatedItem )
+{
+  Q_ASSERT( mItem.id() == updatedItem.id() ); // The method must be used when the revision of the Item changes.
+  mItem = updatedItem;
+  if ( mItem.isValid() ) {
+    setContent( mItem.payloadData() );
+    parse();
+  }
+}
+
 
 }
 

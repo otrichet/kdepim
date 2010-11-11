@@ -75,6 +75,9 @@ class KNODE_EXPORT RemoteArticle : public KMime::NewsArticle
      */
     Akonadi::Item item();
 
+    void updateItem( const Akonadi::Item &updatedItem );
+
+
   protected:
     Akonadi::Item mItem;
 };

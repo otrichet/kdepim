@@ -42,8 +42,12 @@ class KNArticleFactory : public QObject
     ~KNArticleFactory();
 
     //factory methods
-    void createPosting( KNNntpAccount::Ptr a );
-    void createPosting( KNGroup::Ptr g );
+    /**
+     * Opens a composer to post a new article.
+     * @param collection A collection used to guess transport, target groups, etc. to create
+     * this article.
+     */
+    void createPosting( const Akonadi::Collection &collection );
     void createReply( KNRemoteArticle::Ptr a, const QString &selectedText = QString(), bool post = true, bool mail = false );
     void createForward( KNArticle::Ptr a );
     void createCancel( KNArticle::Ptr a );

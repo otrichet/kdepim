@@ -1296,11 +1296,11 @@ void ArticleWidget::slotFind()
 
 void ArticleWidget::slotViewSource()
 {
-#if 0
   // local article can be shown directly
-  if ( mArticle && mArticle->type() == KNArticle::ATlocal && mArticle->hasContent() ) {
+  if ( mArticle && mArticle->type() == RemoteArticle::ATlocal && mArticle->hasContent() ) {
     new KNSourceViewWindow( mArticle->encodedContent( false ) );
   } else {
+#if 0
     // download remote article
     if ( mArticle && mArticle->type() == KNArticle::ATremote ) {
       KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( mArticle->collection() );
@@ -1310,10 +1310,10 @@ void ArticleWidget::slotViewSource()
       a->setArticleNumber( boost::static_pointer_cast<KNRemoteArticle>( mArticle )->articleNumber() );
       emitJob( new ArticleFetchJob( this, g->account(), a, false ) );
     }
-  }
 #else
   kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
 #endif
+  }
 }
 
 

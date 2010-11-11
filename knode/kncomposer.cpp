@@ -16,6 +16,7 @@
 
 #include "akobackit/akonadi_manager.h"
 #include "akobackit/nntpaccount_manager.h"
+#include "akobackit/group_manager.h"
 #include "kncomposerview.h"
 #include "knglobals.h"
 #include "kngroupselectdialog.h"
@@ -693,12 +694,7 @@ bool KNComposer::hasValidData()
     if ( acc ) {
       KMime::Headers::Newsgroups *grps = a_rticle->newsgroups();
       if ( !grps->isEmpty() ) {
-#if 0
-        Group::Ptr grp = knGlobals.groupManager()->group( grps->groups().first(), acc );
-#else
-  kDebug() << "AKONADI PORT: code needs porting in" << Q_FUNC_INFO;
-        Group::Ptr grp;
-#endif
+        Group::Ptr grp = Akobackit::manager()->groupManager()->group( grps->groups().first(), acc );;
         if ( grp && !grp->identity().isNull() ) {
           signingKey = grp->identity().pgpSigningKey();
         } else if ( !acc->identity().isNull() ) {
@@ -887,9 +883,14 @@ bool KNComposer::applyChanges()
   //text is set and all attached contents have been assembled => now set lines
   a_rticle->lines()->setNumberOfLines(a_rticle->lineCount());
 
-  Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( a_rticle->item() );
-  if ( !job->exec() ) {
-    result = false;
+  if ( a_rticle->isValid() ) {
+    Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( a_rticle->item() );
+    if ( !job->exec() ) {
+      result = false;
+    } else {
+      // Ensure item's revision is updated.
+      a_rticle->updateItem( job->item() );
+    }
   }
 
   return result;

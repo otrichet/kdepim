@@ -1267,15 +1267,8 @@ void KNMainWidget::slotAccGetNewHdrsAll()
 
 void KNMainWidget::slotAccPostNewArticle()
 {
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotAccPostNewArticle()";
-  if(g_rpManager->currentGroup())
-    a_rtFactory->createPosting(g_rpManager->currentGroup());
-  else if(a_ccManager->currentAccount())
-    a_rtFactory->createPosting(a_ccManager->currentAccount());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+  kDebug();
+  a_rtFactory->createPosting( mCollectionWidget->selectedCollection() );
 }
 
 

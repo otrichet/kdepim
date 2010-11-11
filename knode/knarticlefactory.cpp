@@ -16,6 +16,7 @@
 #include "knarticlefactory.h"
 
 #include "akobackit/akonadi_manager.h"
+#include "akobackit/constant.h"
 #include "akobackit/folder_manager.h"
 #include "akobackit/group_manager.h"
 #include "akobackit/items_deletion_job.h"
@@ -63,54 +64,46 @@ KNArticleFactory::~KNArticleFactory()
 }
 
 
-void KNArticleFactory::createPosting( KNNntpAccount::Ptr a )
+void KNArticleFactory::createPosting( const Akonadi::Collection &collection )
 {
-#if 0
-  if(!a)
+  NntpAccount::Ptr account;
+  Group::Ptr group;
+
+  const Akobackit::CollectionType type = Akobackit::manager()->type( collection );
+  switch ( type ) {
+    case Akobackit::NewsGroup:
+      group = Akobackit::manager()->groupManager()->group( collection );
+      account = Akobackit::manager()->groupManager()->account( group );
+      break;
+    case Akobackit::NntpServer:
+      account = Akobackit::manager()->accountManager()->account( collection );
+      break;
+    default:
+      kDebug() << "Invalid collection for posting" << collection.id() << collection.name();
+      return;
+  }
+
+  QByteArray charset = Locale::defaultCharset();
+  if ( group ) {
+    charset = Locale::defaultCharset( group );
+  }
+  LocalArticle::Ptr art = newArticle( collection, charset );
+
+  if ( !art ) {
     return;
+  }
 
-  LocalArticle::Ptr art = newArticle( a, Locale::defaultCharset() );
-
-  if(!art)
-    return;
-
-  art->setServerId(a->id());
+  art->setPostingResource( account->agent().identifier() );
   art->setDoPost(true);
   art->setDoMail(false);
+  if ( group ) {
+    art->newsgroups()->fromUnicodeString( group->groupName(), art->defaultCharset() );
+  }
 
   KNComposer *c = new KNComposer( art, QString(), QString(), true, false, false, false );
   mCompList.append( c );
-  connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
+  connect( c, SIGNAL( composerDone( KNComposer * ) ), this, SLOT( slotComposerDone( KNComposer * ) ) );
   c->show();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
-}
-
-
-void KNArticleFactory::createPosting( KNGroup::Ptr g )
-{
-#if 0
-  if(!g)
-    return;
-
-  QByteArray chset = Locale::defaultCharset( g );
-  LocalArticle::Ptr art = newArticle( g, chset );
-
-  if(!art)
-    return;
-
-  art->setServerId(g->account()->id());
-  art->setDoPost(true);
-  art->setDoMail(false);
-  art->newsgroups()->fromUnicodeString(g->groupname(), art->defaultCharset());
-  KNComposer *c = new KNComposer( art, QString(), QString(), true, false, false, false );
-  mCompList.append( c );
-  connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
-  c->show();
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
 }
 
 
@@ -1053,13 +1046,11 @@ void KNArticleFactory::slotComposerDone(KNComposer *com)
       }
     break;
 
-    case KNComposer::CRsave :
+    case KNComposer::CRsave: {
       com->applyChanges();
-#if 0
-      knGlobals.articleManager()->moveIntoFolder(lst, knGlobals.folderManager()->drafts());
-#else
-  kDebug() << "AKONADI PORT: Disabled code in" << Q_FUNC_INFO;
-#endif
+      Akobackit::FolderManager *folderManager = Akobackit::manager()->folderManager();
+      folderManager->moveIntoFolder( lst, folderManager->draftsFolder() );
+    }
     break;
 
     case KNComposer::CRdelAsk: {

@@ -64,6 +64,12 @@ class GroupManager : public QObject
     Group::Ptr group( const Akonadi::Collection &collection );
 
     /**
+     * Returns a group in @p account whose name is @p groupName.
+     * @return a null pointer if none is found or a group named @p groupNamed.
+     */
+    Group::Ptr group( const QString &groupName, NntpAccount::Ptr account );
+
+    /**
      * Returns the account that contains the group @p group.
      */
     NntpAccount::Ptr account( const Group::Ptr &group );
