@@ -22,8 +22,9 @@
 
 #include "akobackit/item_merge_job.h"
 
-#include <Akonadi/ItemModifyJob>
 #include <Akonadi/ItemCreateJob>
+#include <Akonadi/ItemModifyJob>
+#include <Akonadi/ItemMoveJob>
 #include <KDebug>
 #include <QtCore/QTimer>
 
@@ -49,19 +50,24 @@ void ItemsMergeJob::doStart()
     emitResult();
   }
 
+  Akonadi::Item::List itemsToMove;
+
   foreach ( LocalArticle::Ptr art, mArticles ) {
     Akonadi::Item item = art->item();
     if ( item.isValid() ) {
-      if ( mDestination.isValid() ) {
-        item.setParentCollection( mDestination );
-      }
       Akonadi::ItemModifyJob *job = new Akonadi::ItemModifyJob( item, this );
       addSubjob( job );
+      itemsToMove << item;
     } else {
       Q_ASSERT( mDestination.isValid() );
       Akonadi::ItemCreateJob *job = new Akonadi::ItemCreateJob( item, mDestination, this );
       addSubjob( job );
     }
+  }
+
+  if ( mDestination.isValid() && !itemsToMove.isEmpty() ) {
+    Akonadi::ItemMoveJob *job = new Akonadi::ItemMoveJob( itemsToMove, mDestination );
+    addSubjob( job );
   }
 
   TransactionSequence::doStart();
