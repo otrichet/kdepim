@@ -25,7 +25,6 @@
 
 
 class Q3ListViewItem;
-class QLineEdit;
 class QSplitter;
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -49,6 +48,9 @@ class KNFilterManager;
 class KNFilterSelectAction;
 namespace KNode {
   class ArticleWidget;
+  namespace MessageList {
+    class HeadersWidget;
+  }
 }
 class KActionCollection;
 
@@ -85,7 +87,7 @@ public:
   /** Returns the folder tree widget. */
   KNCollectionView* collectionView()const  { return c_olView; }
   /** Returns the article list view. */
-  KNHeaderView*       headerView()const      { return h_drView; }
+  KNode::MessageList::HeadersWidget* headerView() const { return mHeadersView; }
   /** Returns the article viewer. */
   KNode::ArticleWidget* articleViewer() const     { return mArticleViewer; }
   KSqueezedTextLabel*  statusBarLabelGroup() const { return s_tatusGroup; }
@@ -187,10 +189,9 @@ protected:
   //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
   KNCollectionView *c_olView;
-  KNHeaderView      *h_drView;
+  KNode::MessageList::HeadersWidget *mHeadersView;
   bool b_lockui;
   KToolBar        *q_uicksearch;
-  QLineEdit       *s_earchLineEdit;
 
   //Core
   KNConfigManager   *c_fgManager;

@@ -104,6 +104,11 @@ class KNArticleManager : public QObject, public KNJobConsumer {
      */
     void aboutToShowFolder();
 
+    /**
+     * Emitted to indicates that the content of a group has changed.
+     */
+    void groupChanged(const KNGroup::Ptr group);
+
   protected:
     void processJob(KNJobData *j);
     void createThread( KNRemoteArticle::Ptr a );

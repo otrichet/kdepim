@@ -53,7 +53,6 @@ set(knodecommon_LIB_SRCS
    kndisplayedheader.cpp
    knsourceviewwindow.cpp
    knarticlewindow.cpp
-   knhdrviewitem.cpp
    kncomposer.cpp
    kncomposerview.cpp
    kncomposereditor.cpp
@@ -67,7 +66,6 @@ set(knodecommon_LIB_SRCS
    knfilterdialog.cpp
    knsearchdialog.cpp
    utilities.cpp
-   headerview.cpp
    knmainwidget.cpp
    aboutdata.cpp
    knglobals.cpp
@@ -80,6 +78,8 @@ set(knodecommon_LIB_SRCS
    configuration/identity_edition_dialog.cpp
    utils/locale.cpp
    utils/startup.cpp
+   messagelist/headers_widget.cpp
+   messagelist/headers_model.cpp
    treewidget.cpp
    foldertreewidget.cpp
 )

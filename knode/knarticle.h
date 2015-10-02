@@ -324,4 +324,7 @@ class KNAttachment {
           f_b64;
 };
 
+
+Q_DECLARE_METATYPE(KNArticle::Ptr);
+
 #endif //KNARTICLE_H

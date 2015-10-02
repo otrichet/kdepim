@@ -14,8 +14,6 @@
 
 #include "knmainwidget.h"
 
-#include "headerview.h"
-
 #include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
@@ -57,7 +55,7 @@ using MailTransport::TransportManager;
 #include "knarticlewindow.h"
 #include "kncollectionview.h"
 #include "kncollectionviewitem.h"
-#include "knhdrviewitem.h"
+#include "messagelist/headers_widget.h"
 
 //Core
 #include "articlewidget.h"
@@ -131,32 +129,17 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   accel->connectItem( accel->insertItem(Qt::Key_PageDown), mArticleViewer, SLOT(scrollNext()) );
 
   //header view
-  QWidget *dummy = new QWidget( mSecondSplitter );
-  QVBoxLayout *vlay = new QVBoxLayout(dummy);
-  vlay->setSpacing( 0 );
-  vlay->setMargin( 0 );
-  h_drView = new KNHeaderView( dummy );
+  mHeadersView = new MessageList::HeadersWidget( mSecondSplitter );
 
-  q_uicksearch = new KToolBar( dummy );
-  QLabel *lbl = new QLabel(i18n("&Search:"),dummy);
-  lbl->setObjectName("kde toolbar widget");
-  q_uicksearch->addWidget( lbl );
-  s_earchLineEdit = new K3ListViewSearchLine( q_uicksearch, h_drView );
-  q_uicksearch->addWidget( s_earchLineEdit );
-  lbl->setBuddy(s_earchLineEdit);
-
-  vlay->addWidget(q_uicksearch);
-  vlay->addWidget(h_drView);
-
-  connect(h_drView, SIGNAL(itemSelected(Q3ListViewItem*)),
+  connect(mHeadersView, SIGNAL(itemSelected(Q3ListViewItem*)),
           SLOT(slotArticleSelected(Q3ListViewItem*)));
-  connect(h_drView, SIGNAL(selectionChanged()),
+  connect(mHeadersView, SIGNAL(selectionChanged()),
           SLOT(slotArticleSelectionChanged()));
-  connect(h_drView, SIGNAL(contextMenu(K3ListView*,Q3ListViewItem*,QPoint)),
+  connect(mHeadersView, SIGNAL(contextMenu(K3ListView*,Q3ListViewItem*,QPoint)),
           SLOT(slotArticleRMB(K3ListView*,Q3ListViewItem*,QPoint)));
-  connect(h_drView, SIGNAL(doubleClick(Q3ListViewItem*)),
+  connect(mHeadersView, SIGNAL(doubleClick(Q3ListViewItem*)),
           SLOT(slotOpenArticle(Q3ListViewItem*)));
-  connect(h_drView, SIGNAL(sortingChanged(int)),
+  connect(mHeadersView, SIGNAL(sortingChanged(int)),
           SLOT(slotHdrViewSortingChanged(int)));
 
   //actions
@@ -165,7 +148,7 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   // splitter setup
   mPrimarySplitter->addWidget( c_olView );
   mPrimarySplitter->addWidget( mSecondSplitter );
-  mSecondSplitter->addWidget( dummy );
+  mSecondSplitter->addWidget( mHeadersView );
   mSecondSplitter->addWidget( mArticleViewer );
 
   //-------------------------------- </GUI> ------------------------------------
@@ -181,7 +164,10 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   //Article Manager
   a_rtManager = knGlobals.articleManager();
+kDebug() << "Port";
+#if 0
   a_rtManager->setView(h_drView);
+#endif
 
   //Group Manager
   g_rpManager = knGlobals.groupManager();
@@ -234,7 +220,10 @@ KNMainWidget::~KNMainWidget()
 
   knGlobals.reset(); // cleanup
 
+kDebug() << "Port";
+#if 0
   h_drView->clear(); //avoid some random crashes in KNHdrViewItem::~KNHdrViewItem()
+#endif
 }
 
 void KNMainWidget::initStatusBar()
@@ -458,7 +447,10 @@ void KNMainWidget::openURL(const KUrl &url)
 // update fonts and colors
 void KNMainWidget::configChanged()
 {
+kDebug() << "Port";
+#if 0
   h_drView->readConfig();
+#endif
   c_olView->readConfig();
   a_rtManager->updateListViewItems();
 }
@@ -473,13 +465,13 @@ void KNMainWidget::initActions()
   a_ctNavNextArt->setText(i18n("&Next Article"));
   a_ctNavNextArt->setToolTip(i18n("Go to next article"));
   a_ctNavNextArt->setShortcuts(KShortcut("N; Right"));
-  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), h_drView, SLOT(nextArticle()));
+  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), mHeadersView, SLOT(nextArticle()));
 
   a_ctNavPrevArt = actionCollection()->addAction("go_prevArticle" );
   a_ctNavPrevArt->setText(i18n("&Previous Article"));
   a_ctNavPrevArt->setShortcuts(KShortcut("P; Left"));
   a_ctNavPrevArt->setToolTip(i18n("Go to previous article"));
-  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), h_drView, SLOT(prevArticle()));
+  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), mHeadersView, SLOT(prevArticle()));
 
   a_ctNavNextUnreadArt = actionCollection()->addAction("go_nextUnreadArticle");
   a_ctNavNextUnreadArt->setIcon(KIcon("go-next"));
@@ -525,6 +517,8 @@ void KNMainWidget::initActions()
   connect(action, SIGNAL(triggered(bool)), c_olView, SLOT(selectCurrentFolder()));
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
 
+kDebug() << "Port";
+#if 0
   action = actionCollection()->addAction("inc_current_article");
   action->setText(i18n("Focus on Next Article"));
   connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(incCurrentArticle()));
@@ -539,6 +533,7 @@ void KNMainWidget::initActions()
   action->setText(i18n("Select Article with Focus"));
   connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(selectCurrentArticle()));
   action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Space));
+#endif
 
   //collection-view - accounts
   a_ctAccProperties = actionCollection()->addAction("account_properties");
@@ -827,6 +822,8 @@ void KNMainWidget::readOptions()
 {
   KConfigGroup conf(knGlobals.config(), "APPEARANCE");
 
+kDebug() << "Port";
+#if 0
   if (conf.readEntry("quicksearch", true))
     a_ctToggleQuickSearch->setChecked(true);
   else
@@ -834,6 +831,7 @@ void KNMainWidget::readOptions()
   c_olView->readConfig();
   h_drView->readConfig();
   a_ctArtSortHeaders->setCurrentItem( h_drView->sortColumn() );
+#endif
 
   resize(787,478);  // default optimized for 800x600
   //applyMainWindowSettings(KGlobal::config(),"mainWindow_options");
@@ -846,11 +844,17 @@ void KNMainWidget::saveOptions()
 {
   KConfigGroup conf(knGlobals.config(), "APPEARANCE");
 
+kDebug() << "Port";
+#if 0
   conf.writeEntry("quicksearch", !q_uicksearch->isHidden());
+#endif
   //saveMainWindowSettings(KGlobal::config(),"mainWindow_options");
 
   c_olView->writeConfig();
+kDebug() << "Port";
+#if 0
   h_drView->writeConfig();
+#endif
   mArticleViewer->writeConfig();
 
   KConfigGroup cfg( knGlobals.config(), "UI State" );
@@ -956,9 +960,12 @@ void KNMainWidget::getSelectedArticles(KNArticle::List &l)
   if(!g_rpManager->currentGroup() && !f_olManager->currentFolder())
     return;
 
+kDebug() << "Port";
+#if 0
   for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
     if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
       l.append( boost::static_pointer_cast<KNArticle>( static_cast<KNHdrViewItem*>( i )->art ) );
+#endif
 }
 
 
@@ -966,14 +973,19 @@ void KNMainWidget::getSelectedArticles(KNRemoteArticle::List &l)
 {
   if(!g_rpManager->currentGroup()) return;
 
+kDebug() << "Port";
+#if 0
   for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
     if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
       l.append( boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
+#endif
 }
 
 
 void KNMainWidget::getSelectedThreads(KNRemoteArticle::List &l)
 {
+kDebug() << "Port";
+#if 0
   KNRemoteArticle::Ptr art;
   for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
     if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive())) {
@@ -983,6 +995,7 @@ void KNMainWidget::getSelectedThreads(KNRemoteArticle::List &l)
       if ( !l.contains(art)  )
         art->thread(l);
     }
+#endif
 }
 
 
@@ -990,14 +1003,19 @@ void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
 {
   if(!f_olManager->currentFolder()) return;
 
+kDebug() << "Port";
+#if 0
   for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
     if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
       l.append( boost::static_pointer_cast<KNLocalArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
+#endif
 }
 
 
 void KNMainWidget::closeCurrentThread()
 {
+kDebug() << "Port";
+#if 0
   Q3ListViewItem *item = h_drView->currentItem();
   if (item) {
     while (item->parent())
@@ -1006,10 +1024,13 @@ void KNMainWidget::closeCurrentThread()
     item->setOpen(false);
     h_drView->ensureItemVisible(item);
   }
+#endif
 }
 
 void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArticleSelected(QListViewItem *i)";
   if(b_lockui)
     return;
@@ -1041,6 +1062,7 @@ void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
   a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
   a_ctArtEdit->setEnabled(enabled && ((f_olManager->currentFolder()==f_olManager->outbox())||
                                       (f_olManager->currentFolder()==f_olManager->drafts())));
+#endif
 }
 
 
@@ -1076,9 +1098,12 @@ void KNMainWidget::slotCollectionSelected()
   KNGroup::Ptr selectedGroup;
   KNFolder::Ptr selectedFolder;
 
+kDebug() << "Port";
+#if 0
   s_earchLineEdit->clear();
   h_drView->clear();
   slotArticleSelected(0);
+#endif
 
   // mark all articles in current group as not new/read
   if ( knGlobals.settings()->leaveGroupMarkAsRead() )
@@ -1096,15 +1121,17 @@ void KNMainWidget::slotCollectionSelected()
         }
       break;
       case KNCollection::CTgroup :
-        if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() )
-          h_drView->setFocus();
+        if ( !mHeadersView->hasFocus() && !mArticleViewer->hasFocus() ) {
+          mHeadersView->setFocus();
+        }
         selectedGroup = boost::static_pointer_cast<KNGroup>( c );
         selectedAccount=selectedGroup->account();
       break;
 
       case KNCollection::CTfolder :
-        if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() )
-          h_drView->setFocus();
+        if ( !mHeadersView->hasFocus() && !mArticleViewer->hasFocus() ) {
+          mHeadersView->setFocus();
+        }
         selectedFolder = boost::static_pointer_cast<KNFolder>( c );
       break;
 
@@ -1205,6 +1232,8 @@ void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
 
 void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p)
 {
+kDebug() << "Port";
+#if 0
   if(b_lockui)
     return;
 
@@ -1219,6 +1248,7 @@ void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &
     if ( popup )
       popup->popup(p);
   }
+#endif
 }
 
 
@@ -1249,6 +1279,8 @@ void KNMainWidget::slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos )
 
 void KNMainWidget::slotOpenArticle(Q3ListViewItem *item)
 {
+kDebug() << "Port";
+#if 0
   if(b_lockui)
     return;
 
@@ -1265,6 +1297,7 @@ void KNMainWidget::slotOpenArticle(Q3ListViewItem *item)
       }
     }
   }
+#endif
 }
 
 
@@ -1285,15 +1318,21 @@ void KNMainWidget::slotNetworkActive(bool b)
 
 void KNMainWidget::slotNavNextUnreadArt()
 {
+kDebug() << "Port";
+#if 0
   if ( !h_drView->nextUnreadArticle() )
     c_olView->nextGroup();
+#endif
 }
 
 
 void KNMainWidget::slotNavNextUnreadThread()
 {
+kDebug() << "Port";
+#if 0
   if ( !h_drView->nextUnreadThread() )
     c_olView->nextGroup();
+#endif
 }
 
 
@@ -1578,18 +1617,24 @@ void KNMainWidget::slotFolMBoxExport()
 
 void KNMainWidget::slotArtSortHeaders(int i)
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeaders(int i)";
   h_drView->setSorting( i );
+#endif
 }
 
 
 void KNMainWidget::slotArtSortHeadersKeyb()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeadersKeyb()";
 
   int newCol = KNHelper::selectDialog(this, i18n("Select Sort Column"), a_ctArtSortHeaders->items(), a_ctArtSortHeaders->currentItem());
   if (newCol != -1)
     h_drView->setSorting( newCol );
+#endif
 }
 
 
@@ -1609,32 +1654,41 @@ void KNMainWidget::slotArtRefreshList()
 
 void KNMainWidget::slotArtCollapseAll()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtCollapseAll()";
 
   closeCurrentThread();
   a_rtManager->setAllThreadsOpen(false);
   if (h_drView->currentItem())
     h_drView->ensureItemVisible(h_drView->currentItem());
+#endif
 }
 
 
 void KNMainWidget::slotArtExpandAll()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtExpandAll()";
 
   a_rtManager->setAllThreadsOpen(true);
   if (h_drView->currentItem())
     h_drView->ensureItemVisible(h_drView->currentItem());
+#endif
 }
 
 
 void KNMainWidget::slotArtToggleThread()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtToggleThread()";
   if( mArticleViewer->article() && mArticleViewer->article()->listItem()->isExpandable() ) {
     bool o = !(mArticleViewer->article()->listItem()->isOpen());
     mArticleViewer->article()->listItem()->setOpen( o );
   }
+#endif
 }
 
 
@@ -1674,6 +1728,8 @@ void KNMainWidget::slotArtSetArtUnread()
 
 void KNMainWidget::slotArtSetThreadRead()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"slotArtSetThreadRead()";
   if( !g_rpManager->currentGroup() )
     return;
@@ -1688,6 +1744,7 @@ void KNMainWidget::slotArtSetThreadRead()
     if ( knGlobals.settings()->markThreadReadGoNext() )
       slotNavNextUnreadThread();
   }
+#endif
 }
 
 
@@ -1704,6 +1761,8 @@ void KNMainWidget::slotArtSetThreadUnread()
 
 void KNMainWidget::slotArtToggleIgnored()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtToggleIgnored()";
   if( !g_rpManager->currentGroup() )
     return;
@@ -1718,6 +1777,7 @@ void KNMainWidget::slotArtToggleIgnored()
     if ( knGlobals.settings()->ignoreThreadGoNext() )
       slotNavNextUnreadThread();
   }
+#endif
 }
 
 
@@ -1755,6 +1815,8 @@ void KNMainWidget::slotArtSendOutbox()
 
 void KNMainWidget::slotArtDelete()
 {
+kDebug() << "Port";
+#if 0
   kDebug(5003) <<"KNMainWidget::slotArtDelete()";
   if (!f_olManager->currentFolder())
     return;
@@ -1767,6 +1829,7 @@ void KNMainWidget::slotArtDelete()
 
   if(h_drView->currentItem())
     h_drView->setActive( h_drView->currentItem() );
+#endif
 }
 
 
@@ -1833,10 +1896,13 @@ void KNMainWidget::slotFetchArticleWithID()
 
 void KNMainWidget::slotToggleQuickSearch()
 {
+kDebug() << "Port";
+#if 0
   if (q_uicksearch->isHidden())
     q_uicksearch->show();
   else
     q_uicksearch->hide();
+#endif
 }
 
 
@@ -1895,13 +1961,19 @@ void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 // Move to the next article
 void KNMainWidget::nextArticle()
 {
+kDebug() << "Port";
+#if 0
   h_drView->nextArticle();
+#endif
 }
 
 // Move to the previous article
 void KNMainWidget::previousArticle()
 {
+kDebug() << "Port";
+#if 0
   h_drView->prevArticle();
+#endif
 }
 
 // Move to the next unread article

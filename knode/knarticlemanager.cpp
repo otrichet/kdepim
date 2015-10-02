@@ -185,14 +185,20 @@ void KNArticleManager::showHdrs(bool clear)
   bool showThreads=knGlobals.settings()->showThreads();
   bool expandThreads=knGlobals.settings()->defaultToExpandedThreads();
 
+kDebug() << "Port";
+#if 0
   if(clear)
     v_iew->clear();
+#endif
 
   ScopedCursorOverride cursor( Qt::WaitCursor );
   knGlobals.setStatusMsg(i18n(" Creating list..."));
   knGlobals.top->secureProcessEvents();
 
   if(g_roup) {
+      emit groupChanged(g_roup);
+kDebug() << "Port" << "Done in the slot connect to the above signal!";
+#if 0
     KNRemoteArticle::Ptr art, ref, current;
 
     current = boost::static_pointer_cast<KNRemoteArticle>( knGlobals.top->articleViewer()->article() );
@@ -296,9 +302,12 @@ void KNArticleManager::showHdrs(bool clear)
 
     if (g_roup->isLocked())
       knGlobals.scheduler()->nntpMutex().unlock();
+#endif
   }
 
   else if (f_older) {
+kDebug() << "Port";
+#if 0
 
     KNLocalArticle::Ptr art;
     if(f_ilter) {
@@ -319,13 +328,16 @@ void KNArticleManager::showHdrs(bool clear)
       } else if(art->listItem())
         art->updateListItem();
     }
-
+#endif
   }
 
+kDebug() << "Port";
+#if 0
   if(setFirstChild && v_iew->firstChild()) {
     v_iew->setCurrentItem(v_iew->firstChild());
     knGlobals.top->articleViewer()->setArticle( KNArticle::Ptr() );
   }
+#endif
 
   knGlobals.setStatusMsg( QString() );
   updateStatusString();
@@ -905,6 +917,8 @@ void KNArticleManager::processJob(KNJobData *j)
 
 void KNArticleManager::createThread( KNRemoteArticle::Ptr a )
 {
+kDebug() << "Port";
+#if 0
   KNRemoteArticle::Ptr ref = a->displayedReference();
 
   if(ref) {
@@ -917,11 +931,14 @@ void KNArticleManager::createThread( KNRemoteArticle::Ptr a )
 
   a->setThreadMode( knGlobals.settings()->showThreads() );
   a->initListItem();
+#endif
 }
 
 
 void KNArticleManager::createCompleteThread( KNRemoteArticle::Ptr a )
 {
+kDebug() << "Port";
+#if 0
   KNRemoteArticle::Ptr ref = a->displayedReference();
   if ( !ref ) {
     return;
@@ -963,6 +980,7 @@ void KNArticleManager::createCompleteThread( KNRemoteArticle::Ptr a )
 
   if ( knGlobals.settings()->totalExpandThreads() )
     top->listItem()->expandChildren();
+#endif
 }
 
 
@@ -1019,6 +1037,8 @@ void KNArticleManager::slotSearchDialogDone()
 
 void KNArticleManager::slotItemExpanded(Q3ListViewItem *p)
 {
+kDebug() << "Port";
+#if 0
   if (d_isableExpander)  // we don't want to call this method recursively
     return;
   d_isableExpander = true;
@@ -1062,15 +1082,19 @@ void KNArticleManager::slotItemExpanded(Q3ListViewItem *p)
     hdrItem->expandChildren();
 
   d_isableExpander = false;
+#endif
 }
 
 
 void KNArticleManager::setView(KNHeaderView* v) {
+kDebug() << "Port";
+#if 0
   v_iew = v;
   if(v) {
     connect(v, SIGNAL(expanded(Q3ListViewItem*)), this,
       SLOT(slotItemExpanded(Q3ListViewItem*)));
   }
+#endif
 }
 
 //-----------------------------
