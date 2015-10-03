@@ -28,6 +28,7 @@
 
 #include <QFont>
 #include <KDE/KDebug>
+#include <KDE/KLocalizedString>
 
 #include "settings.h"
 
@@ -149,6 +150,27 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
 
     return QVariant();
 }
+
+QVariant HeadersModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(orientation == Qt::Horizontal) {
+        switch(role) {
+            case Qt::DisplayRole:
+                switch(section) {
+                    case COLUMN_SUBJECT:
+                        return i18n("Subject");
+                    case COLUMN_FROM:
+                        return i18n("From");
+                    case COLUMN_DATE:
+                        return i18n("Date");
+                }
+                break;
+        }
+    }
+
+    return QAbstractItemModel::headerData(section, orientation, role);
+}
+
 
 QModelIndex HeadersModel::index(int row, int column, const QModelIndex& parent) const
 {
