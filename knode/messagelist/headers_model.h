@@ -56,6 +56,15 @@ class HeadersModel : public QAbstractItemModel
         };
 
     public:
+        /**
+         * Custom role for the #data() method.
+         */
+        enum HeadersRole
+        {
+            ArticleRole = Qt::UserRole,  ///< The Article::Ptr.
+        };
+
+    public:
         explicit HeadersModel(QObject* parent = 0);
         virtual ~HeadersModel();
 

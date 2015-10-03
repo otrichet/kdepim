@@ -80,6 +80,7 @@ set(knodecommon_LIB_SRCS
    utils/startup.cpp
    messagelist/headers_widget.cpp
    messagelist/headers_model.cpp
+   messagelist/headers_view.cpp
    treewidget.cpp
    foldertreewidget.cpp
 )

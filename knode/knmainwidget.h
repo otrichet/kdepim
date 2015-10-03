@@ -203,9 +203,8 @@ protected:
   KNFilterManager   *f_ilManager;
 
 protected slots:
-  //listview slots
-  void slotArticleSelected(Q3ListViewItem*);
-  void slotArticleSelectionChanged();
+  /** Called when the selected articles change. */
+  void slotArticlesSelected(const KNArticle::List articles);
   /** Called when the selection collection changed. */
   void slotCollectionSelected();
   /** Called when a collection is renamed. */

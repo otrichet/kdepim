@@ -146,6 +146,9 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
             return font;
         }
         break;
+    case ArticleRole:
+        return QVariant::fromValue(art);
+        break;
     }
 
     return QVariant();

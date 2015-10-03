@@ -131,10 +131,8 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   //header view
   mHeadersView = new MessageList::HeadersWidget( mSecondSplitter );
 
-  connect(mHeadersView, SIGNAL(itemSelected(Q3ListViewItem*)),
-          SLOT(slotArticleSelected(Q3ListViewItem*)));
-  connect(mHeadersView, SIGNAL(selectionChanged()),
-          SLOT(slotArticleSelectionChanged()));
+  connect(mHeadersView, SIGNAL(articlesSelected(const KNArticle::List)),
+          SLOT(slotArticlesSelected(const KNArticle::List)));
   connect(mHeadersView, SIGNAL(contextMenu(K3ListView*,Q3ListViewItem*,QPoint)),
           SLOT(slotArticleRMB(K3ListView*,Q3ListViewItem*,QPoint)));
   connect(mHeadersView, SIGNAL(doubleClick(Q3ListViewItem*)),
@@ -1027,64 +1025,37 @@ kDebug() << "Port";
 #endif
 }
 
-void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
+void KNMainWidget::slotArticlesSelected(const KNArticle::List articles)
 {
-kDebug() << "Port";
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArticleSelected(QListViewItem *i)";
+  kDebug();
+
   if(b_lockui)
     return;
+
   KNArticle::Ptr selectedArticle;
 
-  if(i)
-    selectedArticle=(static_cast<KNHdrViewItem*>(i))->art;
+  if(!articles.isEmpty()) {
+    selectedArticle = articles.first();
+  }
 
   mArticleViewer->setArticle( selectedArticle );
 
   //actions
-  bool enabled;
-
-  enabled=( selectedArticle && selectedArticle->type()==KNArticle::ATremote );
-  if(a_ctArtSetArtRead->isEnabled() != enabled) {
-    a_ctArtSetArtRead->setEnabled(enabled);
-    a_ctArtSetArtUnread->setEnabled(enabled);
-    a_ctArtSetThreadRead->setEnabled(enabled);
-    a_ctArtSetThreadUnread->setEnabled(enabled);
-    a_ctArtToggleIgnored->setEnabled(enabled);
-    a_ctArtToggleWatched->setEnabled(enabled);
-  }
-
-  a_ctArtOpenNewWindow->setEnabled( selectedArticle && (f_olManager->currentFolder()!=f_olManager->outbox())
-                                                    && (f_olManager->currentFolder()!=f_olManager->drafts()));
-
-  enabled=( selectedArticle && selectedArticle->type()==KNArticle::ATlocal );
-  a_ctArtDelete->setEnabled(enabled);
-  a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
-  a_ctArtEdit->setEnabled(enabled && ((f_olManager->currentFolder()==f_olManager->outbox())||
-                                      (f_olManager->currentFolder()==f_olManager->drafts())));
-#endif
-}
-
-
-void KNMainWidget::slotArticleSelectionChanged()
-{
-  // enable all actions that work with multiple selection
-
-  //actions
   bool enabled = (g_rpManager->currentGroup()!=0);
-
-  if(a_ctArtSetArtRead->isEnabled() != enabled) {
-    a_ctArtSetArtRead->setEnabled(enabled);
-    a_ctArtSetArtUnread->setEnabled(enabled);
-    a_ctArtSetThreadRead->setEnabled(enabled);
-    a_ctArtSetThreadUnread->setEnabled(enabled);
-    a_ctArtToggleIgnored->setEnabled(enabled);
-    a_ctArtToggleWatched->setEnabled(enabled);
-  }
+  a_ctArtSetArtRead->setEnabled(enabled);
+  a_ctArtSetArtUnread->setEnabled(enabled);
+  a_ctArtSetThreadRead->setEnabled(enabled);
+  a_ctArtSetThreadUnread->setEnabled(enabled);
+  a_ctArtToggleIgnored->setEnabled(enabled);
+  a_ctArtToggleWatched->setEnabled(enabled);
 
   enabled = (f_olManager->currentFolder()!=0);
   a_ctArtDelete->setEnabled(enabled);
   a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
+  a_ctArtEdit->setEnabled(enabled && ((f_olManager->currentFolder()==f_olManager->outbox())||
+                                      (f_olManager->currentFolder()==f_olManager->drafts())));
+  a_ctArtOpenNewWindow->setEnabled( selectedArticle && (f_olManager->currentFolder()!=f_olManager->outbox())
+                                                    && (f_olManager->currentFolder()!=f_olManager->drafts()));
 }
 
 
@@ -1102,8 +1073,8 @@ kDebug() << "Port";
 #if 0
   s_earchLineEdit->clear();
   h_drView->clear();
-  slotArticleSelected(0);
 #endif
+  slotArticlesSelected(KNArticle::List());
 
   // mark all articles in current group as not new/read
   if ( knGlobals.settings()->leaveGroupMarkAsRead() )

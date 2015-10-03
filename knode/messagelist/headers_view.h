@@ -23,40 +23,29 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef KNODE_HEADERS_WIDGET_H
-#define KNODE_HEADERS_WIDGET_H
+#ifndef KNODE_HEADERS_VIEW_H
+#define KNODE_HEADERS_VIEW_H
 
-#include <QtGui/QWidget>
+#include <QtGui/QTreeView>
 
 #include "knarticle.h"
-#include "kngroup.h"
-
-class KFilterProxySearchLine;
 
 namespace KNode {
 namespace MessageList {
 
-class HeadersModel;
-class HeadersView;
-
-class HeadersWidget : public QWidget
+class HeadersView : public QTreeView
 {
     Q_OBJECT
 
     public:
-        explicit HeadersWidget(QWidget* parent = 0);
-        ~HeadersWidget();
+        explicit HeadersView(QWidget* parent = 0);
+        virtual ~HeadersView();
 
-    public Q_SLOTS:
-        void showGroup(const KNGroup::Ptr group);
+    protected Q_SLOTS:
+        virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
     Q_SIGNALS:
-        void articlesSelected(const KNArticle::List article);
-
-    private:
-      KFilterProxySearchLine* mSearch;
-      HeadersView* mView;
-      HeadersModel* mModel;
+        void articlesSelected(const KNArticle::List articles);
 };
 
 }

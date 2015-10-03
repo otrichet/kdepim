@@ -25,11 +25,12 @@
 
 #include "headers_widget.h"
 
-#include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
 #include <KDE/KFilterProxySearchLine>
 
 #include "headers_model.h"
+#include "headers_view.h"
+
 #include "knarticlemanager.h"
 #include "knglobals.h"
 
@@ -40,18 +41,19 @@ HeadersWidget::HeadersWidget(QWidget* parent)
   : QWidget(parent)
 {
     mSearch = new KFilterProxySearchLine(this);
-    mHeaders = new QTreeView(this);
+    mView = new HeadersView(this);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(mSearch);
-    layout->addWidget(mHeaders);
+    layout->addWidget(mView);
 
     mModel = new HeadersModel();
-    mHeaders->setModel(mModel);
+    mView->setModel(mModel);
 
     connect(KNGlobals::self()->articleManager(), SIGNAL(groupChanged(const KNGroup::Ptr)),
             this, SLOT(showGroup(const KNGroup::Ptr)));
-
+    connect(mView, SIGNAL(articlesSelected(const KNArticle::List)),
+            this, SIGNAL(articlesSelected(const KNArticle::List)));
 }
 
 HeadersWidget::~HeadersWidget()
