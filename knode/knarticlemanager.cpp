@@ -39,7 +39,6 @@
 #include "knhdrviewitem.h"
 #include "scheduler.h"
 #include "knnntpaccount.h"
-#include "knscoring.h"
 #include "knmemorymanager.h"
 #include "knarticlefactory.h"
 #include "knarticlewindow.h"
@@ -868,37 +867,6 @@ bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
 
   return ignore;
 }
-
-
-void  KNArticleManager::rescoreArticles(KNRemoteArticle::List &l)
-{
-  if ( l.isEmpty() )
-    return;
-
-  KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( l.first()->collection() );
-  KScoringManager *sm = knGlobals.scoringManager();
-  sm->initCache(g->groupname());
-
-  for ( KNRemoteArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
-    int defScore = 0;
-    if ( (*it)->isIgnored())
-      defScore = knGlobals.settings()->ignoredThreshold();
-    else if ( (*it)->isWatched() )
-      defScore = knGlobals.settings()->watchedThreshold();
-    (*it)->setScore(defScore);
-
-    bool read = (*it)->isRead();
-
-    KNScorableArticle sa( (*it) );
-    sm->applyRules(sa);
-    (*it)->updateListItem();
-    (*it)->setChanged( true );
-
-    if ( !read && (*it)->isRead() != read )
-      g_roup->incReadCount();
-  }
-}
-
 
 void KNArticleManager::processJob(KNJobData *j)
 {

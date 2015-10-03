@@ -24,7 +24,6 @@
 #include "utilities.h"
 #include "knfiltermanager.h"
 #include "knarticlefilter.h"
-#include "knscoring.h"
 #include "ui_postnewscomposerwidget_base.h"
 #include "ui_readnewsnavigationwidget_base.h"
 #include "ui_readnewsviewerwidget_base.h"
@@ -37,7 +36,6 @@
 #include <kmessagebox.h>
 #include <kcolordialog.h>
 #include <kfontdialog.h>
-#include <kscoringeditor.h>
 #include <sonnet/configwidget.h>
 #include <kcombobox.h>
 #include <libkpgp/kpgpui.h>
@@ -961,43 +959,8 @@ void KNode::DisplayedHeaderConfDialog::slotNameChanged(const QString& str)
       n_ameCB[i]->setEnabled(!str.isEmpty());
 }
 
-//=============================================================================================
-
-
-KNode::ScoringWidget::ScoringWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
-{
-  QGridLayout *topL = new QGridLayout(this);
-  topL->setSpacing(5);
-  topL->setMargin(5);
-  mKsc = new KScoringEditorWidget( knGlobals.scoringManager(), this );
-  topL->addWidget( mKsc, 0, 0, 1, 2 );
-
-  topL->addItem( new QSpacerItem( 0, 10), 1, 0 );
-
-  mIgnored = new KIntSpinBox( -100000, 100000, 1, 0, this );
-  mIgnored->setObjectName( "kcfg_ignoredThreshold" );
-  QLabel *l = new QLabel( i18n("Default score for &ignored threads:"), this );
-  l->setBuddy( mIgnored );
-  topL->addWidget(l, 2, 0);
-  topL->addWidget( mIgnored, 2, 1 );
-
-  mWatched = new KIntSpinBox( -100000, 100000, 1, 0, this );
-  mWatched->setObjectName( "kcfg_watchedThreshold" );
-  l = new QLabel( i18n("Default score for &watched threads:"), this );
-  l->setBuddy( mWatched );
-  topL->addWidget(l, 3, 0);
-  topL->addWidget( mWatched, 3, 1);
-
-  topL->setColumnStretch(0, 1);
-
-  addConfig( knGlobals.settings(), this );
-  load();
-}
-
 
 //=============================================================================================
-
 
 KNode::FilterListWidget::FilterListWidget( const KComponentData &inst, QWidget *parent ) :
   KCModule( inst, parent ),

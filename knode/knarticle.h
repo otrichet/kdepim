@@ -152,8 +152,6 @@ class KNRemoteArticle : public KNArticle {
     void setThreadMode(bool b=true)               { f_lags.set(9, b); }
     unsigned char threadingLevel()                { return t_hrLevel; }
     void setThreadingLevel(unsigned char l)       { t_hrLevel=l; }
-    short score()                                 { return s_core; }
-    void setScore(short s)                        { s_core=s; }
     unsigned short newFollowUps()                 { return n_ewFups; }
     bool hasNewFollowUps()                        { return (n_ewFups>0); }
     void setNewFollowUps(unsigned short s)        { n_ewFups=s; }
@@ -193,7 +191,6 @@ class KNRemoteArticle : public KNArticle {
     int i_dRef;                      // id of a reference-article (0 == none)
     KNRemoteArticle::Ptr d_ref;      // displayed reference-article (may differ from i_dRef)
     unsigned char t_hrLevel;         // quality of threading
-    short s_core;                    // guess what ;-)
     QColor c_olor;                   // color for the header list
     unsigned short u_nreadFups,      // number of the article's unread follow-ups
                    n_ewFups;         // number of the article's new follow-ups

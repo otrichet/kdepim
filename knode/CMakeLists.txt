@@ -67,7 +67,6 @@ set(knodecommon_LIB_SRCS
    knfilterdialog.cpp
    knsearchdialog.cpp
    utilities.cpp
-   knscoring.cpp
    headerview.cpp
    knmainwidget.cpp
    aboutdata.cpp
@@ -81,8 +80,6 @@ set(knodecommon_LIB_SRCS
    configuration/identity_edition_dialog.cpp
    utils/locale.cpp
    utils/startup.cpp
-   kscoring.cpp
-   kscoringeditor.cpp
    treewidget.cpp
    foldertreewidget.cpp
 )

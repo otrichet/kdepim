@@ -89,8 +89,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     bool toggleWatched(KNRemoteArticle::List &l);
     bool toggleIgnored(KNRemoteArticle::List &l);
 
-    void rescoreArticles(KNRemoteArticle::List &l);
-
     /** Allow to delay the setup of UI elements, since the knode part may not
      * be available when the config dialog is called.
      */

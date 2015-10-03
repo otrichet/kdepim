@@ -33,10 +33,6 @@ namespace Sonnet{
 class ConfigWidget;
 }
 
-namespace KPIM {
-  class KScoringEditorWidget;
-}
-
 namespace Kpgp {
   class Config;
 }
@@ -358,22 +354,6 @@ class KNODE_EXPORT DisplayedHeaderConfDialog : public KDialog {
     void slotActivated(int);
     void slotNameChanged(const QString&);
 };
-
-
-/** Scoring configuration widget. */
-class KNODE_EXPORT ScoringWidget : public KCModule
-{
-  public:
-    /** Create a new scoring configuration widget.
-     * @param parent The QWidget parent.
-     */
-    explicit ScoringWidget( const KComponentData &inst, QWidget *parent = 0 );
-
-  private:
-    KPIM::KScoringEditorWidget *mKsc;
-    KIntSpinBox *mIgnored, *mWatched;
-};
-
 
 /** Configuration widget for filters. */
 class KNODE_EXPORT FilterListWidget : public KCModule {

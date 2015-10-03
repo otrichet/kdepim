@@ -39,8 +39,7 @@ struct KPaintInfo {
     COL_STATUS,
     COL_SIGNED,
     COL_CRYPTO,
-    COL_RECEIVER,
-    COL_SCORE
+    COL_RECEIVER
   };
 
   KPaintInfo() :
@@ -56,9 +55,7 @@ struct KPaintInfo {
     showSigned( false ),
     showCrypto( false ),
     showReceiver( false ),
-    showScore( false ),
 
-    scoreCol( -1 ),
     flagCol( -1 ),
     senderCol( -1 ),
     receiverCol( -1 ),
@@ -100,9 +97,7 @@ struct KPaintInfo {
   bool showSigned;
   bool showCrypto;
   bool showReceiver;
-  bool showScore;
 
-  int scoreCol;
   int flagCol;
   int senderCol;
   int receiverCol;
@@ -192,7 +187,6 @@ class KNHeaderView : public K3ListView  {
     KPaintInfo mPaintInfo;
     KMime::DateFormatter mDateFormatter;
     KMenu *mPopup;
-    bool mShowingFolder;
     bool mInitDone;
 
   private slots:

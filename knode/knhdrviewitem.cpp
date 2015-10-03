@@ -87,17 +87,10 @@ int KNHdrViewItem::compare( Q3ListViewItem *i, int col, bool ) const
        return text( col ).localeAwareCompare( i->text(col) );
 
     case 2:
-       if (art->type() == KNArticle::ATremote) {
-         diff = boost::static_pointer_cast<KNRemoteArticle>( art )->score() - boost::static_pointer_cast<KNRemoteArticle>( otherArticle )->score();
-         return (diff < 0 ? -1 : diff > 0 ? 1 : 0);
-       } else
-         return 0;
-
-    case 3:
        diff = art->lines()->numberOfLines() - otherArticle->lines()->numberOfLines();
        return (diff < 0 ? -1 : diff > 0 ? 1 : 0);
 
-    case 4:
+    case 3:
        date1 = art->date()->dateTime().toTime_t();
        date2 = otherArticle->date()->dateTime().toTime_t();
        if (art->type() == KNArticle::ATremote && static_cast<KNHeaderView*>( listView() )->sortByThreadChangeDate()) {
@@ -226,13 +219,6 @@ QString KNHdrViewItem::text( int col ) const
     } else {
       return QString();
     }
-  }
-
-  if ( col == hv->paintInfo()->scoreCol ) {
-    if ( art->type() == KNArticle::ATremote )
-      return QString::number( boost::static_pointer_cast<KNRemoteArticle>( art )->score() );
-    else
-      return QString();
   }
 
   if ( col == hv->paintInfo()->dateCol ) {

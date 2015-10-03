@@ -56,7 +56,6 @@ KNArticleFilter::KNArticleFilter(const KNArticleFilter& org)
 : i_d(-1), c_ount(0), l_oaded(false), e_nabled(org.e_nabled), translateName(true), s_earchFilter(org.s_earchFilter), apon(org.apon)
 {
   status = org.status;
-  score = org.score;
   age = org.age;
   lines = org.lines;
   subject = org.subject;
@@ -105,9 +104,6 @@ void KNArticleFilter::load()
   KConfigGroup group = conf.group("STATUS");
   status.load(group);
 
-  group = conf.group("SCORE");
-  score.load(group);
-
   group = conf.group("AGE");
   age.load(group);
 
@@ -153,9 +149,6 @@ void KNArticleFilter::save()
 
   group = conf.group("STATUS");
   status.save(group);
-
-  group = conf.group("SCORE");
-  score.save(group);
 
   group = conf.group("AGE");
   age.save(group);
@@ -345,7 +338,6 @@ bool KNArticleFilter::applyFilter( KNRemoteArticle::Ptr a )
   bool result=true;
 
   if(result) result=status.doFilter(a);
-  if(result) result=score.doFilter(a->score());
   if(result) result=lines.doFilter(a->lines()->numberOfLines());
   if(result) result=age.doFilter(a->date()->ageInDays());
   if(result) result=subject.doFilter(a->subject()->asUnicodeString());

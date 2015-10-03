@@ -71,7 +71,6 @@ KNode::SearchDialog::~SearchDialog()
 void KNode::SearchDialog::slotUser1()
 {
   f_ilter->status=fcw->status->filter();
-  f_ilter->score=fcw->score->filter();
   f_ilter->age=fcw->age->filter();
   f_ilter->lines=fcw->lines->filter();
   f_ilter->subject=fcw->subject->filter();

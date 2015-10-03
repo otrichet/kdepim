@@ -42,12 +42,10 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
   mSortByThreadChangeDate( false ),
   mDelayedCenter( -1 ),
   mActiveItem( 0 ),
-  mShowingFolder( false ),
   mInitDone( false )
 {
   mPaintInfo.subCol    = addColumn( i18n("Subject"), 310 );
   mPaintInfo.senderCol = addColumn( i18n("From"), 115 );
-  mPaintInfo.scoreCol  = addColumn( i18n("Score"), 42 );
   mPaintInfo.sizeCol   = addColumn( i18n("Lines"), 42 );
   mPaintInfo.dateCol   = addColumn( i18n("Date"), 102 );
 
@@ -65,7 +63,6 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
   setSorting( mPaintInfo.dateCol );
   header()->setMovingEnabled( true );
   setColumnAlignment( mPaintInfo.sizeCol, Qt::AlignRight );
-  setColumnAlignment( mPaintInfo.scoreCol, Qt::AlignRight );
 
   // due to our own column text squeezing we need to repaint on column resizing
   disconnect( header(), SIGNAL(sizeChange(int,int,int)) );
@@ -77,7 +74,6 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
   mPopup->addTitle( i18n("View Columns") );
   mPopup->setCheckable( true );
   mPopup->insertItem( i18n("Line Count"),  KPaintInfo::COL_SIZE );
-  mPopup->insertItem( i18n("Score"), KPaintInfo::COL_SCORE );
 
   connect( mPopup, SIGNAL(activated(int)), this, SLOT(toggleColumn(int)) );
 
@@ -111,8 +107,6 @@ void KNHeaderView::readConfig()
   }
 
   toggleColumn( KPaintInfo::COL_SIZE, knGlobals.settings()->showLines() );
-  if ( !mShowingFolder ) // score column is always hidden when showing a folder
-    toggleColumn( KPaintInfo::COL_SCORE, knGlobals.settings()->showScore() );
 
   mDateFormatter.setCustomFormat( knGlobals.settings()->customDateFormat() );
   mDateFormatter.setFormat( knGlobals.settings()->dateFormat() );
@@ -133,8 +127,6 @@ void KNHeaderView::writeConfig()
   saveLayout( knGlobals.config(), "HeaderView" );
 
   knGlobals.settings()->setShowLines( mPaintInfo.showSize );
-  if ( !mShowingFolder ) // score column is always hidden when showing a folder
-    knGlobals.settings()->setShowScore( mPaintInfo.showScore );
 }
 
 
@@ -398,11 +390,6 @@ void KNHeaderView::toggleColumn( int column, int mode )
       col   = &mPaintInfo.sizeCol;
       width = 42;
       break;
-    case KPaintInfo::COL_SCORE:
-      show  = &mPaintInfo.showScore;
-      col   = &mPaintInfo.scoreCol;
-      width = 42;
-      break;
     default:
       return;
   }
@@ -431,17 +418,13 @@ void KNHeaderView::toggleColumn( int column, int mode )
 
 void KNHeaderView::prepareForGroup()
 {
-  mShowingFolder = false;
   header()->setLabel( mPaintInfo.senderCol, i18n("From") );
-  toggleColumn( KPaintInfo::COL_SCORE, knGlobals.settings()->showScore() );
 }
 
 
 void KNHeaderView::prepareForFolder()
 {
-  mShowingFolder = true;
   header()->setLabel( mPaintInfo.senderCol, i18n("Newsgroups / To") );
-  toggleColumn( KPaintInfo::COL_SCORE, false ); // local folders have no score
 }
 
 

@@ -46,7 +46,6 @@ class KNFolderManager;
 class KNArticleManager;
 class KNArticleFactory;
 class KNFilterManager;
-class KNScoringManager;
 class KNFilterSelectAction;
 namespace KNode {
   class ArticleWidget;
@@ -201,7 +200,6 @@ protected:
   KNArticleFactory  *a_rtFactory;
   KNFolderManager   *f_olManager;
   KNFilterManager   *f_ilManager;
-  KNScoringManager  *s_coreManager;
 
 protected slots:
   //listview slots
@@ -285,12 +283,7 @@ protected:
     *a_ctArtSetThreadUnread,
     *a_ctArtOpenNewWindow;
 
-  // scoring
-  KAction *a_ctScoresEdit,
-    *a_ctReScore,
-    *a_ctScoreLower,
-    *a_ctScoreRaise,
-    *a_ctArtToggleIgnored,
+  KAction *a_ctArtToggleIgnored,
     *a_ctArtToggleWatched;
 
   //header-view local articles
@@ -355,10 +348,6 @@ protected slots:
   void slotArtSetThreadRead();
   void slotArtSetThreadUnread();
 
-  void slotScoreEdit();
-  void slotReScore();
-  void slotScoreLower();
-  void slotScoreRaise();
   void slotArtToggleIgnored();
   void slotArtToggleWatched();
 

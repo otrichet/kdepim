@@ -627,7 +627,6 @@ void KNGroupManager::processJob(KNJobData *j)
     if (!j->canceled()) {
       if (j->success()) {
         if(group->lastFetchCount()>0) {
-          group->scoreArticles();
           group->processXPostBuffer(true);
           emit groupUpdated( group );
           group->writeConfig();

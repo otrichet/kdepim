@@ -21,7 +21,6 @@
 #include "kngrouppropdlg.h"
 #include "utilities.h"
 #include "knmainwidget.h"
-#include "knscoring.h"
 #include "knarticlemanager.h"
 #include "kngroupmanager.h"
 #include "knnntpaccount.h"
@@ -906,62 +905,6 @@ KNRemoteArticle::Ptr KNGroup::findReference( KNRemoteArticle::Ptr a )
 }
 
 
-void KNGroup::scoreArticles(bool onlynew)
-{
-  kDebug(5003) <<"KNGroup::scoreArticles()";
-  int len=length(),
-      todo=(onlynew)? lastFetchCount():length();
-
-  if (todo) {
-    // reset the notify collection
-    delete KNScorableArticle::notifyC;
-    KNScorableArticle::notifyC = 0;
-
-    kDebug(5003) <<"scoring" << newCount() <<" articles";
-    kDebug(5003) <<"(total" << length() <<" article in group)";
-    ScopedCursorOverride cursor( Qt::WaitCursor );
-    knGlobals.setStatusMsg(i18n(" Scoring..."));
-
-    int defScore;
-    KScoringManager *sm = knGlobals.scoringManager();
-    sm->initCache(groupname());
-    for(int idx=0; idx<todo; idx++) {
-      KNRemoteArticle::Ptr a = at( len-idx-1 );
-      if ( !a ) {
-        kWarning( 5003 ) <<"found no article at" << len-idx-1;
-        continue;
-      }
-
-      defScore = 0;
-      if (a->isIgnored())
-        defScore = knGlobals.settings()->ignoredThreshold();
-      else if (a->isWatched())
-        defScore = knGlobals.settings()->watchedThreshold();
-
-      if (a->score() != defScore) {
-        a->setScore(defScore);
-        a->setChanged(true);
-      }
-
-      bool read = a->isRead();
-
-      KNScorableArticle sa(a);
-      sm->applyRules(sa);
-
-      if ( a->isRead() != read && !read )
-        incReadCount();
-    }
-
-    knGlobals.setStatusMsg( QString() );
-    cursor.restore();
-
-    //kDebug(5003) << KNScorableArticle::notifyC->collection();
-    if (KNScorableArticle::notifyC)
-      KNScorableArticle::notifyC->displayCollection(knGlobals.topWidget);
-  }
-}
-
-
 void KNGroup::reorganize()
 {
   kDebug(5003) <<"KNGroup::reorganize()";
@@ -1075,7 +1018,6 @@ void KNGroup::dynDataVer0::setData( KNRemoteArticle::Ptr a )
   idRef=a->idRef();
   thrLevel=a->threadingLevel();
   read=a->getReadFlag();
-  score=a->score();
 }
 
 
@@ -1085,7 +1027,6 @@ void KNGroup::dynDataVer0::getData( KNRemoteArticle::Ptr a )
   a->setIdRef(idRef);
   a->setRead(read);
   a->setThreadingLevel(thrLevel);
-  a->setScore(score);
 }
 
 
@@ -1095,7 +1036,6 @@ void KNGroup::dynDataVer1::setData( KNRemoteArticle::Ptr a )
   idRef=a->idRef();
   thrLevel=a->threadingLevel();
   read=a->getReadFlag();
-  score=a->score();
   ignoredWatched = 0;
   if (a->isWatched())
     ignoredWatched = 1;
@@ -1110,7 +1050,6 @@ void KNGroup::dynDataVer1::getData( KNRemoteArticle::Ptr a )
   a->setIdRef(idRef);
   a->setRead(read);
   a->setThreadingLevel(thrLevel);
-  a->setScore(score);
   a->setWatched(ignoredWatched==1);
   a->setIgnored(ignoredWatched==2);
 }

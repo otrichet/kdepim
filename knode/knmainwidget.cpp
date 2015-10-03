@@ -73,7 +73,6 @@ using MailTransport::TransportManager;
 #include "knfolder.h"
 #include "kncleanup.h"
 #include "utilities.h"
-#include "knscoring.h"
 #include "knmemorymanager.h"
 #include "scheduler.h"
 #include "settings.h"
@@ -195,11 +194,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   //Article Factory
   a_rtFactory = KNGlobals::self()->articleFactory();
-
-  // Score Manager
-  s_coreManager = knGlobals.scoringManager();
-  //connect(s_coreManager, SIGNAL(changedRules()), SLOT(slotReScore()));
-  connect(s_coreManager, SIGNAL(finishedEditing()), SLOT(slotReScore()));
 
   QDBusConnection::sessionBus().registerObject( "/", this, QDBusConnection::ExportScriptableSlots );
   //-------------------------------- </CORE> -----------------------------------
@@ -761,27 +755,6 @@ void KNMainWidget::initActions()
   connect(a_ctArtOpenNewWindow, SIGNAL(triggered(bool)), SLOT(slotArtOpenNewWindow()));
   a_ctArtOpenNewWindow->setShortcut(QKeySequence(Qt::Key_O));
 
-  // scoring
-  a_ctScoresEdit = actionCollection()->addAction("scoreedit");
-  a_ctScoresEdit->setIcon(KIcon("document-properties"));
-  a_ctScoresEdit->setText(i18n("&Edit Scoring Rules..."));
-  connect(a_ctScoresEdit, SIGNAL(triggered(bool)), SLOT(slotScoreEdit()));
-  a_ctScoresEdit->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_E));
-
-  a_ctReScore = actionCollection()->addAction("rescore");
-  a_ctReScore->setText(i18n("Recalculate &Scores"));
-  connect(a_ctReScore, SIGNAL(triggered(bool)), SLOT(slotReScore()));
-
-  a_ctScoreLower = actionCollection()->addAction("scorelower");
-  a_ctScoreLower->setText(i18n("&Lower Score for Author..."));
-  connect(a_ctScoreLower, SIGNAL(triggered(bool)), SLOT(slotScoreLower()));
-  a_ctScoreLower->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_L));
-
-  a_ctScoreRaise = actionCollection()->addAction("scoreraise");
-  a_ctScoreRaise->setText(i18n("&Raise Score for Author..."));
-  connect(a_ctScoreRaise, SIGNAL(triggered(bool)), SLOT(slotScoreRaise()));
-  a_ctScoreRaise->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_I));
-
   a_ctArtToggleIgnored = actionCollection()->addAction("thread_ignore");
   a_ctArtToggleIgnored->setIcon(KIcon("go-bottom"));
   a_ctArtToggleIgnored->setText(i18n("&Ignore Thread"));
@@ -934,7 +907,6 @@ void KNMainWidget::prepareShutdown()
   f_olManager->syncFolders();
   f_ilManager->prepareShutdown();
   a_ccManager->prepareShutdown();
-  s_coreManager->save();
 }
 
 
@@ -1059,8 +1031,6 @@ void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
     a_ctArtSetThreadUnread->setEnabled(enabled);
     a_ctArtToggleIgnored->setEnabled(enabled);
     a_ctArtToggleWatched->setEnabled(enabled);
-    a_ctScoreLower->setEnabled(enabled);
-    a_ctScoreRaise->setEnabled(enabled);
   }
 
   a_ctArtOpenNewWindow->setEnabled( selectedArticle && (f_olManager->currentFolder()!=f_olManager->outbox())
@@ -1088,8 +1058,6 @@ void KNMainWidget::slotArticleSelectionChanged()
     a_ctArtSetThreadUnread->setEnabled(enabled);
     a_ctArtToggleIgnored->setEnabled(enabled);
     a_ctArtToggleWatched->setEnabled(enabled);
-    a_ctScoreLower->setEnabled(enabled);
-    a_ctScoreRaise->setEnabled(enabled);
   }
 
   enabled = (f_olManager->currentFolder()!=0);
@@ -1199,7 +1167,6 @@ void KNMainWidget::slotCollectionSelected()
     a_ctArtCollapseAll->setEnabled(enabled);
     a_ctArtExpandAll->setEnabled(enabled);
     a_ctArtToggleShowThreads->setEnabled(enabled);
-    a_ctReScore->setEnabled(enabled);
   }
 
   a_ctFolNewChild->setEnabled(selectedFolder!=0);
@@ -1735,51 +1702,6 @@ void KNMainWidget::slotArtSetThreadUnread()
   a_rtManager->setRead(l, false);
 }
 
-
-void KNMainWidget::slotScoreEdit()
-{
-  kDebug(5003) <<"KNMainWidget::slotScoreEdit()";
-  s_coreManager->configure();
-}
-
-
-void KNMainWidget::slotReScore()
-{
-  kDebug(5003) <<"KNMainWidget::slotReScore()";
-  if( !g_rpManager->currentGroup() )
-    return;
-
-  g_rpManager->currentGroup()->scoreArticles(false);
-  a_rtManager->showHdrs(true);
-}
-
-
-void KNMainWidget::slotScoreLower()
-{
-  kDebug(5003) <<"KNMainWidget::slotScoreLower() start";
-  if( !g_rpManager->currentGroup() )
-    return;
-
-  if ( mArticleViewer->article() && mArticleViewer->article()->type() == KNArticle::ATremote ) {
-    KNRemoteArticle::Ptr ra = boost::static_pointer_cast<KNRemoteArticle>( mArticleViewer->article() );
-    s_coreManager->addRule(KNScorableArticle(ra), g_rpManager->currentGroup()->groupname(), -10);
-  }
-}
-
-
-void KNMainWidget::slotScoreRaise()
-{
-  kDebug(5003) <<"KNMainWidget::slotScoreRaise() start";
-  if( !g_rpManager->currentGroup() )
-    return;
-
-  if ( mArticleViewer->article() && mArticleViewer->article()->type() == KNArticle::ATremote ) {
-    KNRemoteArticle::Ptr ra = boost::static_pointer_cast<KNRemoteArticle>( mArticleViewer->article() );
-    s_coreManager->addRule(KNScorableArticle(ra), g_rpManager->currentGroup()->groupname(), +10);
-  }
-}
-
-
 void KNMainWidget::slotArtToggleIgnored()
 {
   kDebug(5003) <<"KNMainWidget::slotArtToggleIgnored()";
@@ -1789,7 +1711,6 @@ void KNMainWidget::slotArtToggleIgnored()
   KNRemoteArticle::List l;
   getSelectedThreads(l);
   bool revert = !a_rtManager->toggleIgnored(l);
-  a_rtManager->rescoreArticles(l);
 
   if (h_drView->currentItem() && !revert) {
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
@@ -1809,7 +1730,6 @@ void KNMainWidget::slotArtToggleWatched()
   KNRemoteArticle::List l;
   getSelectedThreads(l);
   a_rtManager->toggleWatched(l);
-  a_rtManager->rescoreArticles(l);
 }
 
 

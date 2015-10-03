@@ -37,7 +37,6 @@ class KNFolderManager;
 class QWidget;
 class KNFilterManager;
 class KNMainWidget;
-class KNScoringManager;
 class KNMemoryManager;
 namespace KNode {
   class Scheduler;
@@ -87,8 +86,6 @@ class KNODE_EXPORT KNGlobals
     KNFilterManager       *filterManager();
     /** Returns the folder manager. */
     KNFolderManager       *folderManager();
-    /** Returns the scoring manager. */
-    KNScoringManager      *scoringManager();
     /** Returns the memory manager. */
     KNMemoryManager       *memoryManager();
     /** Returns the KConfigXT generated settings object. */
@@ -118,7 +115,6 @@ class KNODE_EXPORT KNGlobals
     KNArticleManager      *mArtManager;
     KNFilterManager       *mFilManager;
     KNFolderManager       *mFolManager;
-    KNScoringManager *mScoreManager;
     KNMemoryManager       *mMemManager;
     KNode::Settings *mSettings;
     KNArticleFactory *mArticleFactory;

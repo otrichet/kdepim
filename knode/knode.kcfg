@@ -53,10 +53,6 @@
       <label>Show line count column</label>
       <default>true</default>
     </entry>
-    <entry name="showScore" key="showScore3" type="Bool">
-      <label>Show score column</label>
-      <default>true</default>
-    </entry>
     <entry name="showUnread" type="Bool">
       <label>Show unread count in thread</label>
       <default>true</default>
@@ -193,17 +189,6 @@
         <default>false</default>
       </entry>
     </group>
-  <!-- Scoring -->
-  <group name="SCORING">
-    <entry name="ignoredThreshold" type="Int">
-      <label>Default score for ignored threads</label>
-      <default>-100</default>
-    </entry>
-    <entry name="watchedThreshold" type="Int">
-      <label>Default score for watched threads</label>
-      <default>100</default>
-    </entry>
-  </group>
   <!-- Caching options -->
   <group name="CACHE">
     <entry name="collCacheSize" key="collMemSize" type="Int">

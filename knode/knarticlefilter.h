@@ -79,7 +79,7 @@ class KNArticleFilter {
     ApOn apon;
 
     KNode::StatusFilter status;
-    KNode::RangeFilter score, age, lines;
+    KNode::RangeFilter age, lines;
     KNode::StringFilter subject, from, messageId, references;
 };
 
