@@ -23,7 +23,6 @@
 
 #include <klocale.h>
 #include <kdebug.h>
-#include <kmenu.h>
 
 #include "knglobals.h"
 #include "headerview.h"
@@ -46,7 +45,6 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
 {
   mPaintInfo.subCol    = addColumn( i18n("Subject"), 310 );
   mPaintInfo.senderCol = addColumn( i18n("From"), 115 );
-  mPaintInfo.sizeCol   = addColumn( i18n("Lines"), 42 );
   mPaintInfo.dateCol   = addColumn( i18n("Date"), 102 );
 
   setDropVisualizer( false );
@@ -62,20 +60,11 @@ KNHeaderView::KNHeaderView( QWidget *parent ) :
   setRootIsDecorated( true );
   setSorting( mPaintInfo.dateCol );
   header()->setMovingEnabled( true );
-  setColumnAlignment( mPaintInfo.sizeCol, Qt::AlignRight );
 
   // due to our own column text squeezing we need to repaint on column resizing
   disconnect( header(), SIGNAL(sizeChange(int,int,int)) );
   connect( header(), SIGNAL(sizeChange(int,int,int)),
            SLOT(slotSizeChanged(int,int,int)) );
-
-  // column selection RMB menu
-  mPopup = new KMenu( this );
-  mPopup->addTitle( i18n("View Columns") );
-  mPopup->setCheckable( true );
-  mPopup->insertItem( i18n("Line Count"),  KPaintInfo::COL_SIZE );
-
-  connect( mPopup, SIGNAL(activated(int)), this, SLOT(toggleColumn(int)) );
 
   // connect to the article manager
   connect( knGlobals.articleManager(), SIGNAL(aboutToShowGroup()), SLOT(prepareForGroup()) );
@@ -106,8 +95,6 @@ void KNHeaderView::readConfig()
     mInitDone = true;
   }
 
-  toggleColumn( KPaintInfo::COL_SIZE, knGlobals.settings()->showLines() );
-
   mDateFormatter.setCustomFormat( knGlobals.settings()->customDateFormat() );
   mDateFormatter.setFormat( knGlobals.settings()->dateFormat() );
 
@@ -125,8 +112,6 @@ void KNHeaderView::writeConfig()
   KConfigGroup conf(knGlobals.config(), "HeaderView" );
   conf.writeEntry( "sortByThreadChangeDate", mSortByThreadChangeDate );
   saveLayout( knGlobals.config(), "HeaderView" );
-
-  knGlobals.settings()->setShowLines( mPaintInfo.showSize );
 }
 
 
@@ -376,46 +361,6 @@ bool KNHeaderView::nextUnreadThread()
   return false;
 }
 
-
-void KNHeaderView::toggleColumn( int column, int mode )
-{
-  bool *show = 0;
-  int  *col  = 0;
-  int  width = 0;
-
-  switch ( static_cast<KPaintInfo::ColumnIds>( column ) )
-  {
-    case KPaintInfo::COL_SIZE:
-      show  = &mPaintInfo.showSize;
-      col   = &mPaintInfo.sizeCol;
-      width = 42;
-      break;
-    default:
-      return;
-  }
-
-  if ( mode == -1 )
-    *show = !*show;
-  else
-    *show = mode;
-
-  mPopup->setItemChecked( column, *show );
-
-  if (*show) {
-    header()->setResizeEnabled( true, *col );
-    setColumnWidth( *col, width );
-  }
-  else {
-    header()->setResizeEnabled( false, *col );
-    header()->setStretchEnabled( false, *col );
-    hideColumn( *col );
-  }
-
-  if ( mode == -1 ) // save config when toggled
-    writeConfig();
-}
-
-
 void KNHeaderView::prepareForGroup()
 {
   header()->setLabel( mPaintInfo.senderCol, i18n("From") );
@@ -515,21 +460,6 @@ Q3DragObject* KNHeaderView::dragObject()
 void KNHeaderView::slotSizeChanged( int section, int, int newSize )
 {
   viewport()->repaint( header()->sectionPos(section), 0, newSize, visibleHeight() );
-}
-
-
-bool KNHeaderView::eventFilter(QObject *o, QEvent *e)
-{
-  // right click on header
-  if ( e->type() == QEvent::MouseButtonPress &&
-       static_cast<QMouseEvent*>(e)->button() == Qt::RightButton &&
-       qobject_cast<Q3Header*>( o ) )
-  {
-    mPopup->popup( static_cast<QMouseEvent*>(e)->globalPos() );
-    return true;
-  }
-
-  return K3ListView::eventFilter(o, e);
 }
 
 

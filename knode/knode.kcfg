@@ -49,10 +49,6 @@
       <label>Default to expanded threads</label>
       <default>false</default>
     </entry>
-    <entry name="showLines" key="showLines3" type="Bool">
-      <label>Show line count column</label>
-      <default>true</default>
-    </entry>
     <entry name="showUnread" type="Bool">
       <label>Show unread count in thread</label>
       <default>true</default>

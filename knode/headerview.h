@@ -22,101 +22,29 @@
 #include <k3listview.h>
 #include <kmime/kmime_dateformatter.h>
 
-class KMenu;
 class KNHdrViewItem;
 
 /** Information shared by all items in a list view */
 struct KPaintInfo {
 
-  // Popup ids for toggle-able columns
-  enum ColumnIds {
-    COL_SIZE,
-    COL_ATTACHMENT,
-    COL_IMPORTANT,
-    COL_TOACT,
-    COL_SPAM_HAM,
-    COL_WATCHED_IGNORED,
-    COL_STATUS,
-    COL_SIGNED,
-    COL_CRYPTO,
-    COL_RECEIVER
-  };
-
   KPaintInfo() :
     pixmapOn( false ),
 
-    showSize( false ),
-    showAttachment( false ),
-    showImportant( false ),
-    showToAct( false ),
-    showSpamHam( false ),
-    showWatchedIgnored( false ),
-    showStatus( false ),
-    showSigned( false ),
-    showCrypto( false ),
-    showReceiver( false ),
-
-    flagCol( -1 ),
     senderCol( -1 ),
-    receiverCol( -1 ),
     subCol( -1 ),
     dateCol( -1 ),
-    sizeCol( -1 ),
-    attachmentCol( -1 ),
-    importantCol( -1 ),
-    toActCol( -1 ),
-    spamHamCol( -1 ),
-    watchedIgnoredCol( -1 ),
-    statusCol( -1 ),
-    signedCol( -1 ),
-    cryptoCol( -1 ),
 
-    orderOfArrival( false ),
-    status( false ),
-    showCryptoIcons( false ),
-    showAttachmentIcon( false )
+    status( false )
     {}
 
   bool pixmapOn;
   QPixmap pixmap;
-  QColor colFore;
-  QColor colBack;
-  QColor colNew;
-  QColor colUnread;
-  QColor colFlag;
-  QColor colToAct;
-  QColor colCloseToQuota;
 
-  bool showSize;
-  bool showAttachment;
-  bool showImportant;
-  bool showToAct;
-  bool showSpamHam;
-  bool showWatchedIgnored;
-  bool showStatus;
-  bool showSigned;
-  bool showCrypto;
-  bool showReceiver;
-
-  int flagCol;
   int senderCol;
-  int receiverCol;
   int subCol;
   int dateCol;
-  int sizeCol;
-  int attachmentCol;
-  int importantCol;
-  int toActCol;
-  int spamHamCol;
-  int watchedIgnoredCol;
-  int statusCol;
-  int signedCol;
-  int cryptoCol;
 
-  bool orderOfArrival;
   bool status;
-  bool showCryptoIcons;
-  bool showAttachmentIcon;
 };
 
 /** Header view, displays the article listing of the currently selected
@@ -161,7 +89,6 @@ class KNHeaderView : public K3ListView  {
     void decCurrentArticle();
     void selectCurrentArticle();
 
-    void toggleColumn( int column, int mode = -1 );
     void prepareForGroup();
     void prepareForFolder();
 
@@ -175,7 +102,6 @@ class KNHeaderView : public K3ListView  {
     void contentsMousePressEvent( QMouseEvent *e );
     void contentsMouseDoubleClickEvent( QMouseEvent *e );
     void keyPressEvent( QKeyEvent *e );
-    bool eventFilter( QObject *, QEvent * );
     virtual Q3DragObject* dragObject();
 
   private:
@@ -186,7 +112,6 @@ class KNHeaderView : public K3ListView  {
     KNHdrViewItem *mActiveItem;
     KPaintInfo mPaintInfo;
     KMime::DateFormatter mDateFormatter;
-    KMenu *mPopup;
     bool mInitDone;
 
   private slots:

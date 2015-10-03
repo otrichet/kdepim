@@ -213,14 +213,6 @@ QString KNHdrViewItem::text( int col ) const
     return art->subject()->asUnicodeString();
   }
 
-  if ( col == hv->paintInfo()->sizeCol ) {
-    if ( art->lines()->numberOfLines() != 0 ) { // invalid values are read as '0' in KNGroup::insortHeaders()
-      return QString::number( art->lines()->numberOfLines() );
-    } else {
-      return QString();
-    }
-  }
-
   if ( col == hv->paintInfo()->dateCol ) {
     return hv->mDateFormatter.dateString( art->date()->dateTime().toTime_t() );
   } else
