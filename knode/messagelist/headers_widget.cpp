@@ -52,6 +52,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
 
     connect(KNGlobals::self()->articleManager(), SIGNAL(groupChanged(const KNGroup::Ptr)),
             this, SLOT(showGroup(const KNGroup::Ptr)));
+    connect(KNGlobals::self()->articleManager(), SIGNAL(filterChanged(KNArticleFilter*)),
+            this, SLOT(setFilter(KNArticleFilter*)));
     connect(mView, SIGNAL(articlesSelected(const KNArticle::List)),
             this, SIGNAL(articlesSelected(const KNArticle::List)));
 }
@@ -65,6 +67,12 @@ void HeadersWidget::showGroup(const KNGroup::Ptr group)
 {
     mModel->setGroup(group);
 }
+
+void HeadersWidget::setFilter(KNArticleFilter* filter)
+{
+    mModel->setFilter(filter);
+}
+
 
 
 }

@@ -32,6 +32,7 @@
 #include "kngroup.h"
 
 class KFilterProxySearchLine;
+class KNArticleFilter;
 
 namespace KNode {
 namespace MessageList {
@@ -49,6 +50,7 @@ class HeadersWidget : public QWidget
 
     public Q_SLOTS:
         void showGroup(const KNGroup::Ptr group);
+        void setFilter(KNArticleFilter* filter);
 
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List article);

@@ -35,6 +35,8 @@
 #include "knarticle.h"
 #include "kngroup.h"
 
+class KNArticleFilter;
+
 namespace KNode
 {
 namespace MessageList
@@ -73,6 +75,10 @@ class HeadersModel : public QAbstractItemModel
          * @param group The new group.
          */
         void setGroup(const KNGroup::Ptr group);
+        /**
+         * Change the filter.
+         */
+        void setFilter(KNArticleFilter* filter);
 
         virtual int rowCount(const QModelIndex& parent = QModelIndex()) const;
         virtual int columnCount(const QModelIndex& parent = QModelIndex()) const;
@@ -82,10 +88,15 @@ class HeadersModel : public QAbstractItemModel
         virtual QModelIndex parent(const QModelIndex& child) const;
 
     private:
+        /**
+         * Reload the internal data structure.
+         */
+        void reload(KNGroup::Ptr group);
+
         // { parent -> [ child_1, ... ] }
         QMultiHash<qint64, qint64> mChildren;
         KNGroup::Ptr mGroup;
-
+        KNArticleFilter* mFilter;
         KMime::DateFormatter mDateFormatter;
 };
 

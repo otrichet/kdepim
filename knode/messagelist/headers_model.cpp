@@ -30,6 +30,8 @@
 #include <KDE/KDebug>
 #include <KDE/KLocalizedString>
 
+#include "knarticlefilter.h"
+#include "knfiltermanager.h"
 #include "settings.h"
 
 
@@ -47,6 +49,8 @@ HeadersModel::HeadersModel(QObject* parent)
 {
     mDateFormatter.setCustomFormat(KNGlobals::self()->settings()->customDateFormat());
     mDateFormatter.setFormat(KNGlobals::self()->settings()->dateFormat());
+
+    mFilter = KNGlobals::self()->filterManager()->currentFilter();
 }
 
 HeadersModel::~HeadersModel()
@@ -55,29 +59,51 @@ HeadersModel::~HeadersModel()
     mGroup.reset();
 }
 
+void HeadersModel::setFilter(KNArticleFilter* filter)
+{
+    mFilter = filter;
+    reload(mGroup);
+}
+
+
 void HeadersModel::setGroup(const KNGroup::Ptr group)
+{
+    if(group != mGroup) {
+        reload(group);
+    }
+}
+
+void HeadersModel::reload(const KNGroup::Ptr group)
 {
     QMultiHash<qint64, qint64> newChildren;
     QHash<QByteArray, int> msgIdIndex;
 
     if(group) {
-        for(int i = 0 ; i < group->length() ; ++i) {
-            const KNArticle::Ptr art = group->at(i);
-            msgIdIndex.insert(art->messageID()->as7BitString(false), i);
+        if(mFilter) {
+            mFilter->doFilter(group);
         }
 
         for(int i = 0 ; i < group->length() ; ++i) {
-            const KNArticle::Ptr art = group->at(i);
-            int parentId = INVALID_ID;
-            KMime::Headers::References* refs = art->references();
-            if(refs && !refs->identifiers().isEmpty()) {
-                const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
-                parentId = msgIdIndex.value(parentMsgId, INVALID_ID);
-                //if(parentId == INVALID_ID) {
-                //    kDebug() << "No parent found for" << art->messageID()->as7BitString(false) << "References:" << refs->as7BitString(false);
-                //}
+            const KNRemoteArticle::Ptr art = group->at(i);
+            if(art->filterResult()) {
+                msgIdIndex.insert(art->messageID()->as7BitString(false), i);
             }
-            newChildren.insertMulti(parentId, i);
+        }
+
+        for(int i = 0 ; i < group->length() ; ++i) {
+            const KNRemoteArticle::Ptr art = group->at(i);
+            if(art->filterResult()) {
+                int parentId = INVALID_ID;
+                KMime::Headers::References* refs = art->references();
+                if(refs && !refs->identifiers().isEmpty()) {
+                    const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
+                    parentId = msgIdIndex.value(parentMsgId, INVALID_ID);
+                    //if(parentId == INVALID_ID) {
+                    //    kDebug() << "No parent found for" << art->messageID()->as7BitString(false) << "References:" << refs->as7BitString(false);
+                    //}
+                }
+                newChildren.insertMulti(parentId, i);
+            }
         }
     }
 

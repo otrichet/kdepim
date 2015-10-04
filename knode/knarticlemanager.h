@@ -123,6 +123,9 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     QList<KTemporaryFile*> mTempFiles;
     bool d_isableExpander;
 
+  Q_SIGNALS:
+    void filterChanged(KNArticleFilter *f);
+
   public slots:
     void slotFilterChanged(KNArticleFilter *f);
     void slotSearchDialogDone();

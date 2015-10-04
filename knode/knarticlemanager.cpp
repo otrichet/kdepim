@@ -1024,6 +1024,7 @@ void KNArticleManager::updateStatusString()
 void KNArticleManager::slotFilterChanged(KNArticleFilter *f)
 {
   f_ilter=f;
+  emit filterChanged(f);
   showHdrs();
 }
 
