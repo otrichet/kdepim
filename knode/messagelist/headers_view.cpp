@@ -33,6 +33,7 @@ namespace MessageList {
 HeadersView::HeadersView(QWidget* parent)
     : QTreeView(parent)
 {
+    setAlternatingRowColors(true);
 }
 
 HeadersView::~HeadersView()

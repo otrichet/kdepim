@@ -278,10 +278,6 @@
       <label>Background</label>
       <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).background().color()</default>
     </entry>
-    <entry name="alternateBackgroundColor" type="Color">
-      <label>Alternate Background</label>
-      <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).background(KColorScheme::AlternateBackground).color()</default>
-    </entry>
     <entry name="textColor" type="Color">
       <label>Normal Text</label>
       <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).foreground().color()</default>

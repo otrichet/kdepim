@@ -39,8 +39,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
 
     /// Returns the effective background color.
     QColor backgroundColor() { return effectiveColor( backgroundColorItem() ); }
-    /// Returns the effective alternate background color.
-    QColor alternateBackgroundColor() { return effectiveColor( alternateBackgroundColorItem() ); }
     /// Returns the effective text color.
     QColor textColor() { return effectiveColor( textColorItem() ); }
     /** Returns the effective quoting color.

@@ -102,7 +102,6 @@ void KNHeaderView::readConfig()
   p.setColor( QPalette::Base, knGlobals.settings()->backgroundColor() );
   p.setColor( QPalette::Text, knGlobals.settings()->textColor() );
   setPalette( p );
-  setAlternateBackground( knGlobals.settings()->alternateBackgroundColor() );
   setFont( knGlobals.settings()->articleListFont() );
 }
 
