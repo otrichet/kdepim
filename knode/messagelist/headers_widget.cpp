@@ -73,6 +73,15 @@ void HeadersWidget::setFilter(KNArticleFilter* filter)
     mModel->setFilter(filter);
 }
 
+bool HeadersWidget::selectNextUnreadMessage()
+{
+    return mView->selectNextUnread();
+}
+
+bool HeadersWidget::selectNextUnreadThread()
+{
+    return mView->selectNextUnreadThread();
+}
 
 
 }

@@ -41,11 +41,25 @@ class HeadersView : public QTreeView
         explicit HeadersView(QWidget* parent = 0);
         virtual ~HeadersView();
 
+        /**
+         * Select the next unread article.
+         * @return @code false if no unread article is found.
+         */
+        bool selectNextUnread();
+        /**
+         * Select the next unread article in the next threads.
+         * @return @code false if no unread article is found.
+         */
+        bool selectNextUnreadThread();
+
     protected Q_SLOTS:
         virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List articles);
+
+    private:
+        QModelIndex find(const QModelIndex& from, int role, const QVariant& value);
 };
 
 }

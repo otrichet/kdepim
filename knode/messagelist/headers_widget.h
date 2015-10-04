@@ -48,6 +48,17 @@ class HeadersWidget : public QWidget
         explicit HeadersWidget(QWidget* parent = 0);
         ~HeadersWidget();
 
+        /**
+         * Select the next unread article.
+         * @return @code false if no unread article is found.
+         */
+        bool selectNextUnreadMessage();
+        /**
+         * Select the first unread article starting from the next thread.
+         * @return @code false if no unread article is found.
+         */
+        bool selectNextUnreadThread();
+
     public Q_SLOTS:
         void showGroup(const KNGroup::Ptr group);
         void setFilter(KNArticleFilter* filter);

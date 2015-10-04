@@ -63,7 +63,9 @@ class HeadersModel : public QAbstractItemModel
          */
         enum HeadersRole
         {
-            ArticleRole = Qt::UserRole,  ///< The Article::Ptr.
+            InvalidRole = Qt::UserRole,
+            ArticleRole,                 ///< The Article::Ptr.
+            ReadRole,                    ///< Indicate if the article is read (bool).
         };
 
     public:

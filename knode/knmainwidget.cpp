@@ -1289,21 +1289,17 @@ void KNMainWidget::slotNetworkActive(bool b)
 
 void KNMainWidget::slotNavNextUnreadArt()
 {
-kDebug() << "Port";
-#if 0
-  if ( !h_drView->nextUnreadArticle() )
+  if(!mHeadersView->selectNextUnreadMessage()) {
     c_olView->nextGroup();
-#endif
+  }
 }
 
 
 void KNMainWidget::slotNavNextUnreadThread()
 {
-kDebug() << "Port";
-#if 0
-  if ( !h_drView->nextUnreadThread() )
+  if(!mHeadersView->selectNextUnreadThread()) {
     c_olView->nextGroup();
-#endif
+  }
 }
 
 

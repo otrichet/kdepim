@@ -175,6 +175,9 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
     case ArticleRole:
         return QVariant::fromValue(art);
         break;
+    case ReadRole:
+        return QVariant::fromValue(art->isRead());
+        break;
     }
 
     return QVariant();

@@ -27,6 +27,9 @@
 
 #include "headers_model.h"
 
+
+static void extendedSibling(QModelIndex& index);
+
 namespace KNode {
 namespace MessageList {
 
@@ -55,5 +58,91 @@ void HeadersView::selectionChanged(const QItemSelection& selected, const QItemSe
 }
 
 
+bool HeadersView::selectNextUnread()
+{
+    QModelIndex index = currentIndex();
+    if(!index.isValid()) {
+        // No current selection => search the whole group
+        index = model()->index(0, 0, rootIndex());
+    } else {
+        const QModelIndex child = index.child(0, index.column());
+        if(child.isValid()) {
+            index = child;
+        } else {
+            extendedSibling(index);
+            if(!index.isValid()) {
+                return false;
+            }
+        }
+    }
+
+    index = find(index, HeadersModel::ReadRole, false);
+    if(index.isValid()) {
+        setCurrentIndex(index);
+    }
+    return index.isValid();
 }
+
+bool HeadersView::selectNextUnreadThread()
+{
+    QModelIndex index = currentIndex();
+    if(index.isValid()) {
+        // Find the root of the thread
+        QModelIndex parent;
+        while((parent = index.parent()).isValid()) {
+            index = parent;
+        }
+        // Go to next thread
+        index = index.sibling(index.row() + 1, index.column());
+        if(!index.isValid()) {
+            return false;
+        }
+    } else {
+        index = model()->index(0, 0, rootIndex());
+    }
+
+    index = find(index, HeadersModel::ReadRole, false);
+    if(index.isValid()) {
+        setCurrentIndex(index);
+    }
+    return index.isValid();
+}
+
+
+QModelIndex HeadersView::find(const QModelIndex& from, int role, const QVariant& value)
+{
+    QModelIndex index = from;
+    do {
+        const QModelIndexList& match = model()->match(index, role, value, 1 /* hit count*/,
+                                                      Qt::MatchExactly | Qt::MatchRecursive);
+        if(!match.isEmpty()) {
+            index = match.at(0);
+            break;
+        }
+        extendedSibling(index);
+    } while(index.isValid());
+
+    return index;
+}
+
+
+}
+}
+
+
+/**
+ * Find the next sibling or if it does not exists, the next sibling
+ * of the nearest ancestor.
+ * An invalid index is returned if no such index is found.
+ */
+static void extendedSibling(QModelIndex& index)
+{
+    QModelIndex next;
+    do {
+        next = index.sibling(index.row() + 1, index.column());
+        if(!next.isValid()) {
+            index = index.parent();
+        }
+    } while(!next.isValid() && index.isValid());
+    index = next;
 }
