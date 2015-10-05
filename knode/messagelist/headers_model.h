@@ -42,6 +42,8 @@ namespace KNode
 namespace MessageList
 {
 
+class Header;
+
 class HeadersModel : public QAbstractItemModel
 {
     private:
@@ -95,8 +97,7 @@ class HeadersModel : public QAbstractItemModel
          */
         void reload(KNGroup::Ptr group);
 
-        // { parent -> [ child_1, ... ] }
-        QMultiHash<qint64, qint64> mChildren;
+        Header* mRoot;
         KNGroup::Ptr mGroup;
         KNArticleFilter* mFilter;
         KMime::DateFormatter mDateFormatter;

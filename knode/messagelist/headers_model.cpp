@@ -27,13 +27,11 @@
 #include "headers_model.h"
 
 #include <QFont>
-#include <KDE/KDebug>
 #include <KDE/KLocalizedString>
 
 #include "knarticlefilter.h"
 #include "knfiltermanager.h"
 #include "settings.h"
-
 
 namespace KNode
 {
@@ -42,9 +40,29 @@ namespace MessageList
 
 static const int INVALID_ID = -1;
 
+struct Header
+{
+    Header(KNRemoteArticle::Ptr a)
+        : article(a), parent(0), children()
+    {};
+    ~Header()
+    {
+        article.reset();
+        parent = 0;
+        qDeleteAll(children);
+        children.clear();
+    }
+
+    KNRemoteArticle::Ptr article;
+    Header* parent;
+    QList<Header*> children;
+};
+
+
+
 HeadersModel::HeadersModel(QObject* parent)
     : QAbstractItemModel(parent),
-      mChildren(),
+      mRoot(new Header(KNRemoteArticle::Ptr())),
       mGroup()
 {
     mDateFormatter.setCustomFormat(KNGlobals::self()->settings()->customDateFormat());
@@ -55,7 +73,7 @@ HeadersModel::HeadersModel(QObject* parent)
 
 HeadersModel::~HeadersModel()
 {
-    mChildren.clear();
+    delete mRoot;
     mGroup.reset();
 }
 
@@ -75,49 +93,48 @@ void HeadersModel::setGroup(const KNGroup::Ptr group)
 
 void HeadersModel::reload(const KNGroup::Ptr group)
 {
-    QMultiHash<qint64, qint64> newChildren;
-    QHash<QByteArray, int> msgIdIndex;
+    Header* root = new Header(KNRemoteArticle::Ptr());
+    QHash<QByteArray, Header*> msgIdIndex;
 
     if(group) {
         if(mFilter) {
             mFilter->doFilter(group);
         }
 
-        for(int i = 0 ; i < group->length() ; ++i) {
-            const KNRemoteArticle::Ptr art = group->at(i);
-            if(art->filterResult()) {
-                msgIdIndex.insert(art->messageID()->as7BitString(false), i);
-            }
-        }
 
         for(int i = 0 ; i < group->length() ; ++i) {
             const KNRemoteArticle::Ptr art = group->at(i);
             if(art->filterResult()) {
-                int parentId = INVALID_ID;
-                KMime::Headers::References* refs = art->references();
-                if(refs && !refs->identifiers().isEmpty()) {
-                    const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
-                    parentId = msgIdIndex.value(parentMsgId, INVALID_ID);
-                    //if(parentId == INVALID_ID) {
-                    //    kDebug() << "No parent found for" << art->messageID()->as7BitString(false) << "References:" << refs->as7BitString(false);
-                    //}
-                }
-                newChildren.insertMulti(parentId, i);
+                msgIdIndex.insert(art->messageID()->as7BitString(false),
+                                  new Header(art));
             }
+        }
+
+        Q_FOREACH(Header* hdr, msgIdIndex) {
+            Header* parent = root;
+            KMime::Headers::References* refs = hdr->article->references();
+            if(refs && !refs->identifiers().isEmpty()) {
+                const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
+                parent = msgIdIndex.value(parentMsgId, root);
+            }
+            hdr->parent = parent;
+            parent->children.append(hdr);
         }
     }
 
-    emit layoutAboutToBeChanged();
-    mChildren = newChildren;
+    Header* oldRoot = mRoot;
+    beginResetModel();
+    mRoot = root;
     mGroup = group;
-    emit layoutChanged();
+    endResetModel();
+    delete oldRoot;
 }
 
 
 int HeadersModel::rowCount(const QModelIndex& parent) const
 {
-    qint64 parentId = (parent.isValid() ? parent.internalId() : INVALID_ID);
-    return mChildren.count(parentId);
+    Header* p = parent.isValid() ? static_cast<Header*>(parent.internalPointer()) : mRoot;
+    return p->children.count();
 }
 
 int HeadersModel::columnCount(const QModelIndex& parent) const
@@ -128,15 +145,12 @@ int HeadersModel::columnCount(const QModelIndex& parent) const
 
 QVariant HeadersModel::data(const QModelIndex& index, int role) const
 {
-    if(!mGroup) {
+    if(!index.isValid()) {
         return QVariant();
     }
 
-    qint64 id = index.internalId();
-    const KNRemoteArticle::Ptr art = mGroup->at(id);
-    if(!art) {
-        return QVariant();
-    }
+    const Header* hdr = static_cast<Header*>(index.internalPointer());
+    const KNRemoteArticle::Ptr art = hdr->article;
 
     switch(role) {
     case Qt::DisplayRole:
@@ -206,12 +220,11 @@ QVariant HeadersModel::headerData(int section, Qt::Orientation orientation, int 
 
 QModelIndex HeadersModel::index(int row, int column, const QModelIndex& parent) const
 {
-    qint64 parentId = (parent.isValid() ? parent.internalId() : INVALID_ID);
-    if(row >= mChildren.count(parentId)) {
+    Header* p = parent.isValid() ? static_cast<Header*>(parent.internalPointer()) : mRoot;
+    if(row >= p->children.count()) {
         return QModelIndex();
     }
-    QHash<qint64, qint64>::const_iterator it = mChildren.find(parentId) + row;
-    return createIndex(row, column, (int)it.value());
+    return createIndex(row, column, p->children.at(row));
 }
 
 QModelIndex HeadersModel::parent(const QModelIndex& child) const
@@ -219,23 +232,17 @@ QModelIndex HeadersModel::parent(const QModelIndex& child) const
     if(!child.isValid()) {
         return QModelIndex();
     }
-    qint64 childId = child.internalId();
 
-    // NOTE: review if calling key() is efficient enough.
-    qint64 parentId = mChildren.key(childId);
-    if(parentId == INVALID_ID) {
+    Header* c = static_cast<Header*>(child.internalPointer());
+    Header* p = c->parent;
+
+    // Parent is the root
+    if(p->parent == 0) {
         return QModelIndex();
     }
 
-    qint64 grandParentId = mChildren.key(parentId);
-    QHash<qint64, qint64>::const_iterator begin = mChildren.constFind(grandParentId);
-    QHash<qint64, qint64>::const_iterator it    = mChildren.constFind(grandParentId, parentId);
-    int row = 0;
-    while(it != begin) {
-        ++row;
-        --it;
-    }
-    return createIndex(row, 0, (int)parentId);
+    int row = p->parent->children.indexOf(p);
+    return createIndex(row, 0, p);
 }
 
 
