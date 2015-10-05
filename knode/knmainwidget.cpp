@@ -1071,7 +1071,6 @@ void KNMainWidget::slotCollectionSelected()
 
 kDebug() << "Port";
 #if 0
-  s_earchLineEdit->clear();
   h_drView->clear();
 #endif
   slotArticlesSelected(KNArticle::List());

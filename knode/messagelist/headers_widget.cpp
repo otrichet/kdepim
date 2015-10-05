@@ -25,6 +25,7 @@
 
 #include "headers_widget.h"
 
+#include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QVBoxLayout>
 #include <KDE/KFilterProxySearchLine>
 
@@ -40,15 +41,20 @@ namespace MessageList {
 HeadersWidget::HeadersWidget(QWidget* parent)
   : QWidget(parent)
 {
-    mSearch = new KFilterProxySearchLine(this);
     mView = new HeadersView(this);
+
+    mModel = new HeadersModel(mView);
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(mView);
+    proxyModel->setSourceModel(mModel);
+    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    mView->setModel(proxyModel);
+
+    mSearch = new KFilterProxySearchLine(this);
+    mSearch->setProxy(proxyModel);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(mSearch);
     layout->addWidget(mView);
-
-    mModel = new HeadersModel();
-    mView->setModel(mModel);
 
     connect(KNGlobals::self()->articleManager(), SIGNAL(groupChanged(const KNGroup::Ptr)),
             this, SLOT(showGroup(const KNGroup::Ptr)));
