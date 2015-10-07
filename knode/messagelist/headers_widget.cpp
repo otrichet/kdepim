@@ -47,6 +47,9 @@ HeadersWidget::HeadersWidget(QWidget* parent)
     QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(mView);
     proxyModel->setSourceModel(mModel);
     proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    proxyModel->setSortLocaleAware(true);
+    proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    proxyModel->setSortRole(HeadersModel::SortRole);
     mView->setModel(proxyModel);
 
     mSearch = new KFilterProxySearchLine(this);
@@ -57,6 +60,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
     layout->addWidget(mView);
     layout->setSpacing(0);
     layout->setMargin(0);
+
+    mView->setSortingEnabled(true);
 
     connect(KNGlobals::self()->articleManager(), SIGNAL(groupChanged(const KNGroup::Ptr)),
             this, SLOT(showGroup(const KNGroup::Ptr)));

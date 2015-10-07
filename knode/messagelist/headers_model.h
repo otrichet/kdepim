@@ -28,13 +28,13 @@
 #define KNODE_HEADERS_MODEL_H
 
 #include <QtCore/QAbstractItemModel>
-#include <QtCore/QByteArray>
 
 #include <kmime/kmime_dateformatter.h>
 
 #include "knarticle.h"
 #include "kngroup.h"
 
+class QRegExp;
 class KNArticleFilter;
 
 namespace KNode
@@ -68,6 +68,7 @@ class HeadersModel : public QAbstractItemModel
             InvalidRole = Qt::UserRole,
             ArticleRole,                 ///< The Article::Ptr.
             ReadRole,                    ///< Indicate if the article is read (bool).
+            SortRole,                    ///< The data to sort the model on.
         };
 
     public:
@@ -101,6 +102,7 @@ class HeadersModel : public QAbstractItemModel
         KNGroup::Ptr mGroup;
         KNArticleFilter* mFilter;
         KMime::DateFormatter mDateFormatter;
+        QRegExp* mNormlizeSubject;
 };
 
 

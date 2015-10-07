@@ -58,6 +58,20 @@ struct Header
     QList<Header*> children;
 };
 
+static QVariant extractFrom(const KNArticle::Ptr& art)
+{
+    KMime::Headers::From* from = art->from();
+    if(from && !from->mailboxes().isEmpty()) {
+        const KMime::Types::Mailbox mb = from->mailboxes().first();
+        if(mb.hasName()) {
+            return mb.name();
+        } else {
+            return mb.prettyAddress(KMime::Types::Mailbox::QuoteNever);
+        }
+    }
+    return QVariant();
+}
+
 
 
 HeadersModel::HeadersModel(QObject* parent)
@@ -69,6 +83,8 @@ HeadersModel::HeadersModel(QObject* parent)
     mDateFormatter.setFormat(KNGlobals::self()->settings()->dateFormat());
 
     mFilter = KNGlobals::self()->filterManager()->currentFilter();
+
+    mNormlizeSubject = new QRegExp("^\\s*(?:tr|re[.f]?|fwd?)\\s*:\\s*", Qt::CaseInsensitive);
 }
 
 HeadersModel::~HeadersModel()
@@ -160,18 +176,9 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
                     return art->subject()->asUnicodeString();
                 }
                 break;
-            case COLUMN_FROM: {
-                KMime::Headers::From* from = art->from();
-                if(from && !from->mailboxes().isEmpty()) {
-                    const KMime::Types::Mailbox mb = from->mailboxes().first();
-                    if(mb.hasName()) {
-                        return mb.name();
-                    } else {
-                        return mb.prettyAddress(KMime::Types::Mailbox::QuoteNever);
-                    }
-                }
+            case COLUMN_FROM:
+                return extractFrom(art);
                 break;
-            }
             case COLUMN_DATE:
                 if(art->date()) {
                     return mDateFormatter.dateString(art->date()->dateTime().dateTime());
@@ -191,6 +198,21 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
         break;
     case ReadRole:
         return QVariant::fromValue(art->isRead());
+        break;
+    case SortRole:
+        switch(index.column()) {
+            case COLUMN_SUBJECT:
+                if(art->subject()) {
+                    return art->subject()->asUnicodeString().replace(*mNormlizeSubject, "");
+                }
+                break;
+            case COLUMN_FROM:
+                return extractFrom(art);
+                break;
+            case COLUMN_DATE:
+                return art->date()->dateTime().dateTime();
+                break;
+        }
         break;
     }
 
