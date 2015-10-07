@@ -55,6 +55,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(mSearch);
     layout->addWidget(mView);
+    layout->setSpacing(0);
+    layout->setMargin(0);
 
     connect(KNGlobals::self()->articleManager(), SIGNAL(groupChanged(const KNGroup::Ptr)),
             this, SLOT(showGroup(const KNGroup::Ptr)));
