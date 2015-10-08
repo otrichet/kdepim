@@ -966,37 +966,6 @@ kDebug() << "Port";
 #endif
 }
 
-
-void KNMainWidget::getSelectedArticles(KNRemoteArticle::List &l)
-{
-  if(!g_rpManager->currentGroup()) return;
-
-kDebug() << "Port";
-#if 0
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
-#endif
-}
-
-
-void KNMainWidget::getSelectedThreads(KNRemoteArticle::List &l)
-{
-kDebug() << "Port";
-#if 0
-  KNRemoteArticle::Ptr art;
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive())) {
-      art = boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>( i )->art );
-      // ignore the article if it is already in the list
-      // (multiple aritcles are selected in one thread)
-      if ( !l.contains(art)  )
-        art->thread(l);
-    }
-#endif
-}
-
-
 void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
 {
   if(!f_olManager->currentFolder()) return;
@@ -1674,8 +1643,7 @@ void KNMainWidget::slotArtSetArtRead()
   if(!g_rpManager->currentGroup())
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedArticles(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedMessages();
   a_rtManager->setRead(l, true);
 }
 
@@ -1686,24 +1654,22 @@ void KNMainWidget::slotArtSetArtUnread()
   if(!g_rpManager->currentGroup())
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedArticles(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedMessages();
   a_rtManager->setRead(l, false);
 }
 
 
 void KNMainWidget::slotArtSetThreadRead()
 {
-kDebug() << "Port";
-#if 0
   kDebug(5003) <<"slotArtSetThreadRead()";
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->setRead(l, true);
 
+kDebug() << "Port";
+#if 0
   if (h_drView->currentItem()) {
     if ( knGlobals.settings()->markThreadReadCloseThread() )
       closeCurrentThread();
@@ -1720,23 +1686,21 @@ void KNMainWidget::slotArtSetThreadUnread()
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->setRead(l, false);
 }
 
 void KNMainWidget::slotArtToggleIgnored()
 {
-kDebug() << "Port";
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtToggleIgnored()";
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   bool revert = !a_rtManager->toggleIgnored(l);
 
+kDebug() << "Port";
+#if 0
   if (h_drView->currentItem() && !revert) {
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
       closeCurrentThread();
@@ -1753,8 +1717,7 @@ void KNMainWidget::slotArtToggleWatched()
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->toggleWatched(l);
 }
 

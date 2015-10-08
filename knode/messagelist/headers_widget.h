@@ -59,6 +59,15 @@ class HeadersWidget : public QWidget
          */
         bool selectNextUnreadThread();
 
+        /**
+         * Returns the list of currently selected articles.
+         */
+        KNRemoteArticle::List getSelectedMessages();
+        /**
+         * Returns the list of threads containing selected articles.
+         */
+        KNRemoteArticle::List getSelectedThreads();
+
     public Q_SLOTS:
         void showGroup(const KNGroup::Ptr group);
         void setFilter(KNArticleFilter* filter);

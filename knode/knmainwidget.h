@@ -180,8 +180,6 @@ protected:
 
   // convenience methods...
   void getSelectedArticles( KNArticle::List &l );
-  void getSelectedArticles( KNRemoteArticle::List &l );
-  void getSelectedThreads( KNRemoteArticle::List &l );
   void getSelectedArticles( KNLocalArticle::List &l );
   void closeCurrentThread();
 

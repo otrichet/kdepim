@@ -96,6 +96,61 @@ bool HeadersWidget::selectNextUnreadThread()
     return mView->selectNextUnreadThread();
 }
 
+KNRemoteArticle::List HeadersWidget::getSelectedMessages()
+{
+    const QModelIndexList selection = mView->selectionModel()->selectedRows();
+    KNRemoteArticle::List res;
+    Q_FOREACH(const QModelIndex& index, selection) {
+        res << index.data(HeadersModel::ArticleRole).value<KNRemoteArticle::Ptr>();
+    }
+    return res;
+}
+
+
+
+/* Helper method for #getSelectedThreads().
+   Recursively add children of parent into res. */
+static void childrenArticles(KNRemoteArticle::List& res, const QModelIndex& parent)
+{
+    res << parent.data(HeadersModel::ArticleRole).value<KNRemoteArticle::Ptr>();
+    int row = 0;
+    QModelIndex child;
+    while(true) {
+        child = parent.child(row, parent.column());
+        if(child.isValid()) {
+            childrenArticles(res, child);
+        } else {
+            break;
+        }
+        ++row;
+    }
+}
+
+KNRemoteArticle::List HeadersWidget::getSelectedThreads()
+{
+    KNRemoteArticle::List res;
+
+    const QModelIndexList selection = mView->selectionModel()->selectedRows();
+    QModelIndexList topLevelParents;
+    QModelIndex i;
+    Q_FOREACH(const QModelIndex& index, selection) {
+        i = index;
+        while(i.parent().isValid()) {
+            i = i.parent();
+        }
+        if(!topLevelParents.contains(i)) {
+            topLevelParents << i;
+        }
+    }
+
+    Q_FOREACH(const QModelIndex& index, topLevelParents) {
+        childrenArticles(res, index);
+    }
+
+    return res;
+}
+
+
 
 }
 }
