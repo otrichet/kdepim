@@ -702,15 +702,18 @@ kDebug() << "Port";
 
   a_ctArtCollapseAll = actionCollection()->addAction("view_CollapseAll");
   a_ctArtCollapseAll->setText(i18n("&Collapse All Threads"));
-  connect(a_ctArtCollapseAll, SIGNAL(triggered(bool)), SLOT(slotArtCollapseAll()));
+  connect(a_ctArtCollapseAll, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(collapseAllThreads()));
 
   a_ctArtExpandAll = actionCollection()->addAction("view_ExpandAll");
   a_ctArtExpandAll->setText(i18n("E&xpand All Threads"));
-  connect(a_ctArtExpandAll, SIGNAL(triggered(bool)), SLOT(slotArtExpandAll()));
+  connect(a_ctArtExpandAll, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(expandAllThreads()));
 
   a_ctArtToggleThread = actionCollection()->addAction("thread_toggle");
   a_ctArtToggleThread->setText(i18n("&Toggle Subthread"));
-  connect(a_ctArtToggleThread, SIGNAL(triggered(bool)), SLOT(slotArtToggleThread()));
+  connect(a_ctArtToggleThread, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(toggleCurrentItemExpansion()));
   a_ctArtToggleThread->setShortcut(QKeySequence(Qt::Key_T));
 
   a_ctArtToggleShowThreads = actionCollection()->add<KToggleAction>("view_showThreads");
@@ -978,21 +981,6 @@ kDebug() << "Port";
 #endif
 }
 
-
-void KNMainWidget::closeCurrentThread()
-{
-kDebug() << "Port";
-#if 0
-  Q3ListViewItem *item = h_drView->currentItem();
-  if (item) {
-    while (item->parent())
-      item = item->parent();
-    h_drView->setCurrentItem(item);
-    item->setOpen(false);
-    h_drView->ensureItemVisible(item);
-  }
-#endif
-}
 
 void KNMainWidget::slotArticlesSelected(const KNArticle::List articles)
 {
@@ -1586,47 +1574,6 @@ void KNMainWidget::slotArtRefreshList()
   a_rtManager->showHdrs(true);
 }
 
-
-void KNMainWidget::slotArtCollapseAll()
-{
-kDebug() << "Port";
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtCollapseAll()";
-
-  closeCurrentThread();
-  a_rtManager->setAllThreadsOpen(false);
-  if (h_drView->currentItem())
-    h_drView->ensureItemVisible(h_drView->currentItem());
-#endif
-}
-
-
-void KNMainWidget::slotArtExpandAll()
-{
-kDebug() << "Port";
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtExpandAll()";
-
-  a_rtManager->setAllThreadsOpen(true);
-  if (h_drView->currentItem())
-    h_drView->ensureItemVisible(h_drView->currentItem());
-#endif
-}
-
-
-void KNMainWidget::slotArtToggleThread()
-{
-kDebug() << "Port";
-#if 0
-  kDebug(5003) <<"KNMainWidget::slotArtToggleThread()";
-  if( mArticleViewer->article() && mArticleViewer->article()->listItem()->isExpandable() ) {
-    bool o = !(mArticleViewer->article()->listItem()->isOpen());
-    mArticleViewer->article()->listItem()->setOpen( o );
-  }
-#endif
-}
-
-
 void KNMainWidget::slotArtToggleShowThreads()
 {
   kDebug(5003) <<"KNMainWidget::slotArtToggleShowThreads()";
@@ -1668,15 +1615,12 @@ void KNMainWidget::slotArtSetThreadRead()
   KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->setRead(l, true);
 
-kDebug() << "Port";
-#if 0
-  if (h_drView->currentItem()) {
+  if (!l.isEmpty()) {
     if ( knGlobals.settings()->markThreadReadCloseThread() )
-      closeCurrentThread();
+      mHeadersView->collapseCurrentThread();
     if ( knGlobals.settings()->markThreadReadGoNext() )
       slotNavNextUnreadThread();
   }
-#endif
 }
 
 
@@ -1699,15 +1643,12 @@ void KNMainWidget::slotArtToggleIgnored()
   KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   bool revert = !a_rtManager->toggleIgnored(l);
 
-kDebug() << "Port";
-#if 0
-  if (h_drView->currentItem() && !revert) {
+  if (!l.isEmpty() && !revert) {
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
-      closeCurrentThread();
+      mHeadersView->collapseCurrentThread();
     if ( knGlobals.settings()->ignoreThreadGoNext() )
       slotNavNextUnreadThread();
   }
-#endif
 }
 
 

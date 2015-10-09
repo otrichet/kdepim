@@ -72,6 +72,23 @@ class HeadersWidget : public QWidget
         void showGroup(const KNGroup::Ptr group);
         void setFilter(KNArticleFilter* filter);
 
+        /**
+         * Collapse all threads. Keep the current article visible.
+         */
+        void collapseAllThreads();
+        /**
+         * Expand all threads.
+         */
+        void expandAllThreads();
+        /**
+         * Collapse/Expand the thread below the current article.
+         */
+        void toggleCurrentItemExpansion();
+        /**
+         * Collapse the current thread.
+         */
+        void collapseCurrentThread();
+
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List article);
 

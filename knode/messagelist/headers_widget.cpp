@@ -79,6 +79,9 @@ HeadersWidget::~HeadersWidget()
 void HeadersWidget::showGroup(const KNGroup::Ptr group)
 {
     mModel->setGroup(group);
+    if(KNGlobals::self()->settings()->defaultToExpandedThreads()) {
+        expandAllThreads();
+    }
 }
 
 void HeadersWidget::setFilter(KNArticleFilter* filter)
@@ -150,6 +153,48 @@ KNRemoteArticle::List HeadersWidget::getSelectedThreads()
     return res;
 }
 
+
+void HeadersWidget::collapseAllThreads()
+{
+    mView->collapseAll();
+
+    // Ensure the current index is visible.
+    const QModelIndex index = mView->currentIndex();
+    if(index.isValid()) {
+        mView->scrollTo(index, QAbstractItemView::PositionAtCenter);
+    }
+}
+
+void HeadersWidget::expandAllThreads()
+{
+    mView->expandAll();
+
+    const QModelIndex index = mView->currentIndex();
+    if(index.isValid()) {
+        mView->scrollTo(index, QAbstractItemView::PositionAtCenter);
+    }
+}
+
+void HeadersWidget::toggleCurrentItemExpansion()
+{
+    const QModelIndex index = mView->currentIndex();
+    if(index.isValid()) {
+        mView->setExpanded(index, !mView->isExpanded(index));
+    }
+}
+
+void HeadersWidget::collapseCurrentThread()
+{
+    QModelIndex index = mView->currentIndex();
+    if(index.isValid()) {
+        while(index.parent().isValid()) {
+            index = index.parent();
+        }
+        mView->setCurrentIndex(index);
+        mView->collapse(index);
+        mView->scrollTo(index, QAbstractItemView::EnsureVisible);
+    }
+}
 
 
 }

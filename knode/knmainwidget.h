@@ -181,7 +181,6 @@ protected:
   // convenience methods...
   void getSelectedArticles( KNArticle::List &l );
   void getSelectedArticles( KNLocalArticle::List &l );
-  void closeCurrentThread();
 
   //GUI
   //KAccel          *a_ccel;
@@ -336,9 +335,6 @@ protected slots:
   void slotArtSortHeadersKeyb();
   void slotArtSearch();
   void slotArtRefreshList();
-  void slotArtCollapseAll();
-  void slotArtExpandAll();
-  void slotArtToggleThread();
   void slotArtToggleShowThreads();
 
   void slotArtSetArtRead();
