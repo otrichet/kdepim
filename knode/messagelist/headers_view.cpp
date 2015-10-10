@@ -25,10 +25,11 @@
 
 #include "headers_view.h"
 
-#include "headers_model.h"
-
 #include <QtGui/QHeaderView>
 #include <KDE/KConfigGroup>
+
+#include "headers_model.h"
+#include "settings.h"
 
 static void extendedNext(QModelIndex& index);
 
@@ -39,6 +40,9 @@ HeadersView::HeadersView(QWidget* parent)
     : QTreeView(parent)
 {
     setAlternatingRowColors(true);
+
+    connect(this, SIGNAL(expanded(QModelIndex)),
+            this, SLOT(expandChildren(QModelIndex)));
 }
 
 void HeadersView::readConfig()
@@ -186,6 +190,19 @@ void HeadersView::selectNextMessage()
 
     if(index.isValid()) {
         setCurrentIndex(index);
+    }
+}
+
+
+// Note: the call to setExpanded() will recursively call this method
+// for us (via the connection on the expanded() signal).
+void HeadersView::expandChildren(const QModelIndex& index)
+{
+    if(KNGlobals::self()->settings()->totalExpandThreads()) {
+        int rows = model()->rowCount();
+        for(int i = 0 ; i < rows ; ++i) {
+            setExpanded(index.child(i, index.column()), true);
+        }
     }
 }
 

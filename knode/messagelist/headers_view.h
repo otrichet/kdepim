@@ -61,6 +61,9 @@ class HeadersView : public QTreeView
     protected Q_SLOTS:
         virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
+    private Q_SLOTS:
+        void expandChildren(const QModelIndex& index);
+
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List articles);
 
