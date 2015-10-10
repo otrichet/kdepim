@@ -60,6 +60,15 @@ class HeadersWidget : public QWidget
         bool selectNextUnreadThread();
 
         /**
+         * Select the previous message.
+         */
+        void selectPreviousMessage();
+        /**
+         * Select the next message.
+         */
+        void selectNextMessage();
+
+        /**
          * Returns the list of currently selected articles.
          */
         KNRemoteArticle::List getSelectedMessages();

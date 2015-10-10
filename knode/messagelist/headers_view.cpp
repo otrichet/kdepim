@@ -28,7 +28,7 @@
 #include "headers_model.h"
 
 
-static void extendedSibling(QModelIndex& index);
+static void extendedNext(QModelIndex& index);
 
 namespace KNode {
 namespace MessageList {
@@ -69,7 +69,7 @@ bool HeadersView::selectNextUnread()
         if(child.isValid()) {
             index = child;
         } else {
-            extendedSibling(index);
+            extendedNext(index);
             if(!index.isValid()) {
                 return false;
             }
@@ -119,10 +119,54 @@ QModelIndex HeadersView::find(const QModelIndex& from, int role, const QVariant&
             index = match.at(0);
             break;
         }
-        extendedSibling(index);
+        extendedNext(index);
     } while(index.isValid());
 
     return index;
+}
+
+
+void HeadersView::selectPreviousMessage()
+{
+    QModelIndex index = currentIndex();
+    if(!index.isValid()) {
+        // No current selection => search the whole group
+        index = model()->index(0, 0, rootIndex());
+    } else {
+        // In the previous thread (if it exists), try to find the deepest child.
+        QModelIndex prev = index.sibling(index.row() - 1, index.column());
+        while(prev.isValid()) {
+            index = prev;
+            prev = prev.child(model()->rowCount(index) -1 , index.column());
+        }
+        // Otherwise select the parent.
+        if(index == currentIndex()) {
+            index = index.parent();
+        }
+    }
+
+    if(index.isValid()) {
+        setCurrentIndex(index);
+    }
+}
+
+void HeadersView::selectNextMessage()
+{
+    QModelIndex index = currentIndex();
+    if(!index.isValid()) {
+        // No current selection => search the whole group
+        index = model()->index(0, 0, rootIndex());
+    } else {
+        if(model()->hasChildren(index)) {
+            index = index.child(0, index.column());
+        } else {
+            extendedNext(index);
+        }
+    }
+
+    if(index.isValid()) {
+        setCurrentIndex(index);
+    }
 }
 
 
@@ -135,7 +179,7 @@ QModelIndex HeadersView::find(const QModelIndex& from, int role, const QVariant&
  * of the nearest ancestor.
  * An invalid index is returned if no such index is found.
  */
-static void extendedSibling(QModelIndex& index)
+static void extendedNext(QModelIndex& index)
 {
     QModelIndex next;
     do {

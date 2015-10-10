@@ -463,13 +463,13 @@ void KNMainWidget::initActions()
   a_ctNavNextArt->setText(i18n("&Next Article"));
   a_ctNavNextArt->setToolTip(i18n("Go to next article"));
   a_ctNavNextArt->setShortcuts(KShortcut("N; Right"));
-  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), mHeadersView, SLOT(nextArticle()));
+  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), SLOT(nextArticle()));
 
   a_ctNavPrevArt = actionCollection()->addAction("go_prevArticle" );
   a_ctNavPrevArt->setText(i18n("&Previous Article"));
   a_ctNavPrevArt->setShortcuts(KShortcut("P; Left"));
   a_ctNavPrevArt->setToolTip(i18n("Go to previous article"));
-  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), mHeadersView, SLOT(prevArticle()));
+  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), SLOT(previousArticle()));
 
   a_ctNavNextUnreadArt = actionCollection()->addAction("go_nextUnreadArticle");
   a_ctNavNextUnreadArt->setIcon(KIcon("go-next"));
@@ -1831,19 +1831,13 @@ void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 // Move to the next article
 void KNMainWidget::nextArticle()
 {
-kDebug() << "Port";
-#if 0
-  h_drView->nextArticle();
-#endif
+  mHeadersView->selectNextMessage();
 }
 
 // Move to the previous article
 void KNMainWidget::previousArticle()
 {
-kDebug() << "Port";
-#if 0
-  h_drView->prevArticle();
-#endif
+  mHeadersView->selectPreviousMessage();
 }
 
 // Move to the next unread article

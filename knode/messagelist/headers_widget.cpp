@@ -99,6 +99,17 @@ bool HeadersWidget::selectNextUnreadThread()
     return mView->selectNextUnreadThread();
 }
 
+void HeadersWidget::selectPreviousMessage()
+{
+    mView->selectPreviousMessage();
+}
+
+void HeadersWidget::selectNextMessage()
+{
+    mView->selectNextMessage();
+}
+
+
 KNRemoteArticle::List HeadersWidget::getSelectedMessages()
 {
     const QModelIndexList selection = mView->selectionModel()->selectedRows();

@@ -52,6 +52,9 @@ class HeadersView : public QTreeView
          */
         bool selectNextUnreadThread();
 
+        void selectPreviousMessage();
+        void selectNextMessage();
+
     protected Q_SLOTS:
         virtual void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
