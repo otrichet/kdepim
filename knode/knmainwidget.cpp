@@ -714,8 +714,8 @@ kDebug() << "Port";
 
   a_ctArtToggleShowThreads = actionCollection()->add<KToggleAction>("view_showThreads");
   a_ctArtToggleShowThreads->setText(i18n("Show T&hreads"));
-  connect(a_ctArtToggleShowThreads, SIGNAL(triggered(bool)), SLOT(slotArtToggleShowThreads()));
-
+  connect(a_ctArtToggleShowThreads, SIGNAL(triggered(bool)),
+          mHeadersView, SIGNAL(showThreads(bool)));
   a_ctArtToggleShowThreads->setChecked( knGlobals.settings()->showThreads() );
 
   //header-view - remote articles
@@ -1558,16 +1558,6 @@ void KNMainWidget::slotArtRefreshList()
   kDebug(5003) <<"KNMainWidget::slotArtRefreshList()";
   a_rtManager->showHdrs(true);
 }
-
-void KNMainWidget::slotArtToggleShowThreads()
-{
-  kDebug(5003) <<"KNMainWidget::slotArtToggleShowThreads()";
-  if(g_rpManager->currentGroup()) {
-    knGlobals.settings()->setShowThreads( !knGlobals.settings()->showThreads() );
-    a_rtManager->showHdrs(true);
-  }
-}
-
 
 void KNMainWidget::slotArtSetArtRead()
 {

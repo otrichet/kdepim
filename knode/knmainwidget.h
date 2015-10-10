@@ -333,7 +333,6 @@ protected slots:
   void slotArtSortHeadersKeyb();
   void slotArtSearch();
   void slotArtRefreshList();
-  void slotArtToggleShowThreads();
 
   void slotArtSetArtRead();
   void slotArtSetArtUnread();

@@ -102,13 +102,20 @@ void HeadersModel::setFilter(KNArticleFilter* filter)
     reload(mGroup);
 }
 
-
 void HeadersModel::setGroup(const KNGroup::Ptr group)
 {
     if(group != mGroup) {
         reload(group);
     }
 }
+
+void HeadersModel::showThreads(bool b)
+{
+    KNGlobals::self()->settings()->setShowThreads(b);
+    reload(mGroup);
+}
+
+
 
 void HeadersModel::reload(const KNGroup::Ptr group)
 {
@@ -131,10 +138,12 @@ void HeadersModel::reload(const KNGroup::Ptr group)
 
         Q_FOREACH(Header* hdr, msgIdIndex) {
             Header* parent = root;
-            KMime::Headers::References* refs = hdr->article->references();
-            if(refs && !refs->identifiers().isEmpty()) {
-                const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
-                parent = msgIdIndex.value(parentMsgId, root);
+            if(KNGlobals::self()->settings()->showThreads()) {
+                KMime::Headers::References* refs = hdr->article->references();
+                if(refs && !refs->identifiers().isEmpty()) {
+                    const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
+                    parent = msgIdIndex.value(parentMsgId, root);
+                }
             }
             hdr->parent = parent;
             parent->children.append(hdr);

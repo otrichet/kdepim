@@ -73,6 +73,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
             this, SIGNAL(articlesSelected(const KNArticle::List)));
     connect(mView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
             this, SLOT(sortingChanged(int,Qt::SortOrder)));
+    connect(this, SIGNAL(showThreads(bool)),
+            mModel, SLOT(showThreads(bool)));
 }
 
 HeadersWidget::~HeadersWidget()

@@ -46,6 +46,8 @@ class Header;
 
 class HeadersModel : public QAbstractItemModel
 {
+    Q_OBJECT
+
     public:
         /**
          * Column index.
@@ -93,6 +95,12 @@ class HeadersModel : public QAbstractItemModel
 
         void setSortedByThreadChangeDate(bool b) { mSortByThreadChangeDate = b; };
         bool sortedByThreadChangeDate() { return mSortByThreadChangeDate; }
+
+    public Q_SLOTS:
+        /**
+         * Show/hide threading.
+         */
+        void showThreads(bool b);
 
     private:
         /**

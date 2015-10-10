@@ -114,9 +114,9 @@ class HeadersWidget : public QWidget
     private Q_SLOTS:
         void sortingChanged(int logicalIndex, Qt::SortOrder order);
 
-
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List article);
+        void showThreads(bool b);
 
     private:
       KFilterProxySearchLine* mSearch;
