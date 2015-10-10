@@ -27,6 +27,7 @@
 
 #include <QtGui/QSortFilterProxyModel>
 #include <QtGui/QVBoxLayout>
+#include <QtGui/QHeaderView>
 #include <KDE/KFilterProxySearchLine>
 
 #include "headers_model.h"
@@ -70,6 +71,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
             this, SLOT(setFilter(KNArticleFilter*)));
     connect(mView, SIGNAL(articlesSelected(const KNArticle::List)),
             this, SIGNAL(articlesSelected(const KNArticle::List)));
+    connect(mView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),
+            this, SLOT(sortingChanged(int,Qt::SortOrder)));
 }
 
 HeadersWidget::~HeadersWidget()
@@ -80,8 +83,10 @@ void HeadersWidget::readConfig()
 {
     Settings* settings = KNGlobals::self()->settings();
     toggleSearch(settings->showHeadersSearchLine());
-    mModel->setSortedByThreadChangeDate(KNGlobals::self()->settings()->sortByThreadChangeDate());
     mView->readConfig();
+    // After "mView->readConfig()", otherwise it will call sortingChanged (via the sortIndicatorChanged() signal
+    // when restoring the state of the view; thus changing the value of sortByThreadChangeDate..
+    mModel->setSortedByThreadChangeDate(KNGlobals::self()->settings()->sortByThreadChangeDate());
 }
 void HeadersWidget::writeConfig()
 {
@@ -100,6 +105,14 @@ bool HeadersWidget::isSearchShown() const
 {
     return mSearch->isVisible();
 }
+
+void HeadersWidget::sortingChanged(int logicalIndex, Qt::SortOrder order)
+{
+    if(logicalIndex == HeadersModel::COLUMN_DATE && order == Qt::AscendingOrder) {
+        mModel->setSortedByThreadChangeDate(!mModel->sortedByThreadChangeDate());
+    }
+}
+
 
 
 void HeadersWidget::showGroup(const KNGroup::Ptr group)

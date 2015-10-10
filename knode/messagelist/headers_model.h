@@ -91,7 +91,7 @@ class HeadersModel : public QAbstractItemModel
         virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
         virtual QModelIndex parent(const QModelIndex& child) const;
 
-        void setSortedByThreadChangeDate(bool b) { mSortByThreadChangeDate = b; }
+        void setSortedByThreadChangeDate(bool b) { mSortByThreadChangeDate = b; };
         bool sortedByThreadChangeDate() { return mSortByThreadChangeDate; }
 
     private:

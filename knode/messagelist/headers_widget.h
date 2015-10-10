@@ -111,6 +111,10 @@ class HeadersWidget : public QWidget
          */
         void collapseCurrentThread();
 
+    private Q_SLOTS:
+        void sortingChanged(int logicalIndex, Qt::SortOrder order);
+
+
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List article);
 

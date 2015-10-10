@@ -43,8 +43,10 @@ static const int INVALID_ID = -1;
 struct Header
 {
     Header(KNRemoteArticle::Ptr a)
-        : article(a), parent(0), children()
-    {};
+        : article(a), parent(0), children(),
+          subThreadDate( !a ? 0 : a->date()->dateTime().dateTime().toMSecsSinceEpoch() )
+    {
+    };
     ~Header()
     {
         article.reset();
@@ -56,6 +58,7 @@ struct Header
     KNRemoteArticle::Ptr article;
     Header* parent;
     QList<Header*> children;
+    qint64 subThreadDate; // The most recent date below this header (included)
 };
 
 static QVariant extractFrom(const KNArticle::Ptr& art)
@@ -71,7 +74,6 @@ static QVariant extractFrom(const KNArticle::Ptr& art)
     }
     return QVariant();
 }
-
 
 
 HeadersModel::HeadersModel(QObject* parent)
@@ -93,20 +95,6 @@ HeadersModel::~HeadersModel()
     delete mRoot;
     mGroup.reset();
 }
-
-
-void HeadersModel::setSortedByThreadChangeDate(bool b)
-{
-    if(mSortByThreadChangeDate != b) {
-        // TODO
-    }
-}
-
-bool HeadersModel::sortedByThreadChangeDate()
-{
-    return mSortByThreadChangeDate;
-}
-
 
 void HeadersModel::setFilter(KNArticleFilter* filter)
 {
@@ -150,6 +138,13 @@ void HeadersModel::reload(const KNGroup::Ptr group)
             }
             hdr->parent = parent;
             parent->children.append(hdr);
+
+            // Update subThreadDate
+            Header* h = hdr;
+            while(h->parent && h->parent->subThreadDate < h->subThreadDate) {
+                h->parent->subThreadDate = h->subThreadDate;
+                h = h->parent;
+            }
         }
     }
 
@@ -225,7 +220,11 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
                 return extractFrom(art);
                 break;
             case COLUMN_DATE:
-                return art->date()->dateTime().dateTime();
+                if(!mSortByThreadChangeDate) {
+                    return art->date()->dateTime().dateTime();
+                } else {
+                    return hdr->subThreadDate;
+                }
                 break;
         }
         break;
@@ -245,7 +244,7 @@ QVariant HeadersModel::headerData(int section, Qt::Orientation orientation, int 
                     case COLUMN_FROM:
                         return i18n("From");
                     case COLUMN_DATE:
-                        return i18n("Date");
+                        return mSortByThreadChangeDate ? i18n("Date (thread changed)") : i18n("Date");
                 }
                 break;
         }
