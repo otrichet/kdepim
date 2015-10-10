@@ -20,7 +20,6 @@
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QSplitter>
-#include <ktoolbar.h>
 #include <kicon.h>
 #include <kactioncollection.h>
 #include <kinputdialog.h>
@@ -445,10 +444,7 @@ void KNMainWidget::openURL(const KUrl &url)
 // update fonts and colors
 void KNMainWidget::configChanged()
 {
-kDebug() << "Port";
-#if 0
-  h_drView->readConfig();
-#endif
+  mHeadersView->readConfig();
   c_olView->readConfig();
   a_rtManager->updateListViewItems();
 }
@@ -800,7 +796,8 @@ kDebug() << "Port";
 
   a_ctToggleQuickSearch = actionCollection()->add<KToggleAction>("settings_show_quickSearch");
   a_ctToggleQuickSearch->setText(i18n("Show Quick Search"));
-  connect(a_ctToggleQuickSearch, SIGNAL(triggered(bool)), SLOT(slotToggleQuickSearch()));
+  connect(a_ctToggleQuickSearch, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(toggleSearch(bool)));
 }
 
 bool KNMainWidget::firstStart()
@@ -821,16 +818,13 @@ bool KNMainWidget::firstStart()
 
 void KNMainWidget::readOptions()
 {
-  KConfigGroup conf(knGlobals.config(), "APPEARANCE");
+  c_olView->readConfig();
+  mHeadersView->readConfig();
+
+  a_ctToggleQuickSearch->setChecked(mHeadersView->isSearchShown());
 
 kDebug() << "Port";
 #if 0
-  if (conf.readEntry("quicksearch", true))
-    a_ctToggleQuickSearch->setChecked(true);
-  else
-    q_uicksearch->hide();
-  c_olView->readConfig();
-  h_drView->readConfig();
   a_ctArtSortHeaders->setCurrentItem( h_drView->sortColumn() );
 #endif
 
@@ -843,19 +837,10 @@ kDebug() << "Port";
 
 void KNMainWidget::saveOptions()
 {
-  KConfigGroup conf(knGlobals.config(), "APPEARANCE");
-
-kDebug() << "Port";
-#if 0
-  conf.writeEntry("quicksearch", !q_uicksearch->isHidden());
-#endif
   //saveMainWindowSettings(KGlobal::config(),"mainWindow_options");
 
   c_olView->writeConfig();
-kDebug() << "Port";
-#if 0
-  h_drView->writeConfig();
-#endif
+  mHeadersView->writeConfig();
   mArticleViewer->writeConfig();
 
   KConfigGroup cfg( knGlobals.config(), "UI State" );
@@ -1761,18 +1746,6 @@ void KNMainWidget::slotFetchArticleWithID()
 
   KNHelper::saveWindowSize("fetchArticleWithID",dlg->size());
   delete dlg;
-}
-
-
-void KNMainWidget::slotToggleQuickSearch()
-{
-kDebug() << "Port";
-#if 0
-  if (q_uicksearch->isHidden())
-    q_uicksearch->show();
-  else
-    q_uicksearch->hide();
-#endif
 }
 
 

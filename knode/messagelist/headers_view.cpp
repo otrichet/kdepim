@@ -27,6 +27,8 @@
 
 #include "headers_model.h"
 
+#include <QtGui/QHeaderView>
+#include <KDE/KConfigGroup>
 
 static void extendedNext(QModelIndex& index);
 
@@ -38,6 +40,24 @@ HeadersView::HeadersView(QWidget* parent)
 {
     setAlternatingRowColors(true);
 }
+
+void HeadersView::readConfig()
+{
+    const KConfigGroup conf = KNGlobals::self()->config()->group("HeaderView2");
+    const QByteArray state = conf.readEntry("ViewState", QByteArray());
+    if( !header()->restoreState(QByteArray::fromHex(state)) ) {
+        header()->setSortIndicator(HeadersModel::COLUMN_DATE, Qt::AscendingOrder);
+        header()->resizeSection(HeadersModel::COLUMN_SUBJECT, 450);
+        header()->resizeSection(HeadersModel::COLUMN_FROM, 180);
+    }
+}
+
+void HeadersView::writeConfig()
+{
+    KNGlobals::self()->config()->group("HeaderView2")
+            .writeEntry("ViewState", header()->saveState().toHex());
+}
+
 
 HeadersView::~HeadersView()
 {

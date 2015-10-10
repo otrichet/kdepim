@@ -34,6 +34,7 @@
 
 #include "knarticlemanager.h"
 #include "knglobals.h"
+#include "settings.h"
 
 namespace KNode {
 namespace MessageList {
@@ -73,6 +74,31 @@ HeadersWidget::HeadersWidget(QWidget* parent)
 
 HeadersWidget::~HeadersWidget()
 {
+}
+
+void HeadersWidget::readConfig()
+{
+    Settings* settings = KNGlobals::self()->settings();
+    toggleSearch(settings->showHeadersSearchLine());
+    mModel->setSortedByThreadChangeDate(KNGlobals::self()->settings()->sortByThreadChangeDate());
+    mView->readConfig();
+}
+void HeadersWidget::writeConfig()
+{
+    Settings* settings = KNGlobals::self()->settings();
+    settings->setShowHeadersSearchLine(isSearchShown());
+    settings->setSortByThreadChangeDate(mModel->sortedByThreadChangeDate());
+    mView->writeConfig();
+}
+
+
+void HeadersWidget::toggleSearch(bool show)
+{
+    mSearch->setVisible(show);
+}
+bool HeadersWidget::isSearchShown() const
+{
+    return mSearch->isVisible();
 }
 
 

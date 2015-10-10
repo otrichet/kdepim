@@ -77,7 +77,8 @@ static QVariant extractFrom(const KNArticle::Ptr& art)
 HeadersModel::HeadersModel(QObject* parent)
     : QAbstractItemModel(parent),
       mRoot(new Header(KNRemoteArticle::Ptr())),
-      mGroup()
+      mGroup(),
+      mSortByThreadChangeDate(false)
 {
     mDateFormatter.setCustomFormat(KNGlobals::self()->settings()->customDateFormat());
     mDateFormatter.setFormat(KNGlobals::self()->settings()->dateFormat());
@@ -92,6 +93,20 @@ HeadersModel::~HeadersModel()
     delete mRoot;
     mGroup.reset();
 }
+
+
+void HeadersModel::setSortedByThreadChangeDate(bool b)
+{
+    if(mSortByThreadChangeDate != b) {
+        // TODO
+    }
+}
+
+bool HeadersModel::sortedByThreadChangeDate()
+{
+    return mSortByThreadChangeDate;
+}
+
 
 void HeadersModel::setFilter(KNArticleFilter* filter)
 {

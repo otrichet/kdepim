@@ -48,6 +48,14 @@ class HeadersWidget : public QWidget
         explicit HeadersWidget(QWidget* parent = 0);
         ~HeadersWidget();
 
+        void readConfig();
+        void writeConfig();
+
+        /**
+         * Indicate if the search line is shown.
+         */
+        bool isSearchShown() const;
+
         /**
          * Select the next unread article.
          * @return @code false if no unread article is found.
@@ -80,6 +88,11 @@ class HeadersWidget : public QWidget
     public Q_SLOTS:
         void showGroup(const KNGroup::Ptr group);
         void setFilter(KNArticleFilter* filter);
+
+        /**
+         * Display/hide the search line.
+         */
+        void toggleSearch(bool show);
 
         /**
          * Collapse all threads. Keep the current article visible.

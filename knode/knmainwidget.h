@@ -34,7 +34,6 @@ class KToggleAction;
 class KSelectAction;
 class KSqueezedTextLabel;
 class KLineEdit;
-class KToolBar;
 class KXMLGUIClient;
 class KNHeaderView;
 class KNCollectionView;
@@ -188,7 +187,6 @@ protected:
   KNCollectionView *c_olView;
   KNode::MessageList::HeadersWidget *mHeadersView;
   bool b_lockui;
-  KToolBar        *q_uicksearch;
 
   //Core
   KNConfigManager   *c_fgManager;
@@ -355,7 +353,6 @@ protected slots:
 
   void slotFetchArticleWithID();
 
-  void slotToggleQuickSearch();
   void slotSettings();
 
   //--------------------------- </Actions> -----------------------------

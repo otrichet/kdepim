@@ -57,6 +57,14 @@
       <label>Show Threads</label>
       <default>true</default>
     </entry>
+    <entry name="showHeadersSearchLine" type="Bool">
+        <label>Show the search line of the headers view</label>
+      <default>true</default>
+    </entry>
+    <entry name="sortByThreadChangeDate" type="Bool">
+        <label>Sort articles by the date of the last article in a thread</label>
+      <default>false</default>
+    </entry>
     <entry name="dateFormat" type="Enum">
       <choices name="KMime::DateFormatter::FormatType">
         <choice name="CTime">

@@ -41,6 +41,9 @@ class HeadersView : public QTreeView
         explicit HeadersView(QWidget* parent = 0);
         virtual ~HeadersView();
 
+        void readConfig();
+        void writeConfig();
+
         /**
          * Select the next unread article.
          * @return @code false if no unread article is found.

@@ -46,7 +46,7 @@ class Header;
 
 class HeadersModel : public QAbstractItemModel
 {
-    private:
+    public:
         /**
          * Column index.
          */
@@ -59,7 +59,6 @@ class HeadersModel : public QAbstractItemModel
             COLUMN_COUNT
         };
 
-    public:
         /**
          * Custom role for the #data() method.
          */
@@ -92,6 +91,9 @@ class HeadersModel : public QAbstractItemModel
         virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
         virtual QModelIndex parent(const QModelIndex& child) const;
 
+        void setSortedByThreadChangeDate(bool b) { mSortByThreadChangeDate = b; }
+        bool sortedByThreadChangeDate() { return mSortByThreadChangeDate; }
+
     private:
         /**
          * Reload the internal data structure.
@@ -103,6 +105,7 @@ class HeadersModel : public QAbstractItemModel
         KNArticleFilter* mFilter;
         KMime::DateFormatter mDateFormatter;
         QRegExp* mNormlizeSubject;
+        bool mSortByThreadChangeDate;
 };
 
 
