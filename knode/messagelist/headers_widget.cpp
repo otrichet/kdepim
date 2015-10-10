@@ -75,6 +75,10 @@ HeadersWidget::HeadersWidget(QWidget* parent)
             this, SLOT(sortingChanged(int,Qt::SortOrder)));
     connect(this, SIGNAL(showThreads(bool)),
             mModel, SLOT(showThreads(bool)));
+
+    mView->setExpandsOnDoubleClick(false);
+    connect(mView, SIGNAL(doubleClicked(QModelIndex)),
+            this, SLOT(viewDoubleClicked(QModelIndex)));
 }
 
 HeadersWidget::~HeadersWidget()
@@ -245,6 +249,17 @@ void HeadersWidget::collapseCurrentThread()
         mView->setCurrentIndex(index);
         mView->collapse(index);
         mView->scrollTo(index, QAbstractItemView::EnsureVisible);
+    }
+}
+
+
+void HeadersWidget::viewDoubleClicked(const QModelIndex& index)
+{
+    if(index.isValid()) {
+        QVariant v = mView->model()->data(index, HeadersModel::ArticleRole);
+        if(v.isValid()) {
+            emit doubleClicked(v.value<KNRemoteArticle::Ptr>());
+        }
     }
 }
 

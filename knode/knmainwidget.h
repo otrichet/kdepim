@@ -208,7 +208,7 @@ protected slots:
   /** Display a menu on items of the collections view. */
   void slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos );
   /** Open selected article in own composer/reader window */
-  void slotOpenArticle(Q3ListViewItem *item);
+  void slotOpenArticle(KNArticle::Ptr art);
   void slotHdrViewSortingChanged(int i);
 
   //network slots

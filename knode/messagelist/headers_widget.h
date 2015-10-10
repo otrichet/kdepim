@@ -26,6 +26,7 @@
 #ifndef KNODE_HEADERS_WIDGET_H
 #define KNODE_HEADERS_WIDGET_H
 
+#include <QtCore/QModelIndex>
 #include <QtGui/QWidget>
 
 #include "knarticle.h"
@@ -113,10 +114,12 @@ class HeadersWidget : public QWidget
 
     private Q_SLOTS:
         void sortingChanged(int logicalIndex, Qt::SortOrder order);
+        void viewDoubleClicked(const QModelIndex& index);
 
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List article);
         void showThreads(bool b);
+        void doubleClicked(KNArticle::Ptr article);
 
     private:
       KFilterProxySearchLine* mSearch;

@@ -134,8 +134,8 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
           SLOT(slotArticlesSelected(const KNArticle::List)));
   connect(mHeadersView, SIGNAL(contextMenu(K3ListView*,Q3ListViewItem*,QPoint)),
           SLOT(slotArticleRMB(K3ListView*,Q3ListViewItem*,QPoint)));
-  connect(mHeadersView, SIGNAL(doubleClick(Q3ListViewItem*)),
-          SLOT(slotOpenArticle(Q3ListViewItem*)));
+  connect(mHeadersView, SIGNAL(doubleClicked(KNArticle::Ptr)),
+          this, SLOT(slotOpenArticle(KNArticle::Ptr)));
   connect(mHeadersView, SIGNAL(sortingChanged(int)),
           SLOT(slotHdrViewSortingChanged(int)));
 
@@ -1189,16 +1189,12 @@ void KNMainWidget::slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos )
 }
 
 
-void KNMainWidget::slotOpenArticle(Q3ListViewItem *item)
+void KNMainWidget::slotOpenArticle(KNArticle::Ptr art)
 {
-kDebug() << "Port";
-#if 0
   if(b_lockui)
     return;
 
-  if (item) {
-    KNArticle::Ptr art = (static_cast<KNHdrViewItem*>(item))->art;
-
+  if (art) {
     if ((art->type()==KNArticle::ATlocal) && ((f_olManager->currentFolder()==f_olManager->outbox())||
                                                (f_olManager->currentFolder()==f_olManager->drafts()))) {
       a_rtFactory->edit( boost::static_pointer_cast<KNLocalArticle>( art ) );
@@ -1209,7 +1205,6 @@ kDebug() << "Port";
       }
     }
   }
-#endif
 }
 
 
