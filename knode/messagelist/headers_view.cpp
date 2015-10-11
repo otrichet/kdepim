@@ -43,6 +43,10 @@ HeadersView::HeadersView(QWidget* parent)
 
     connect(this, SIGNAL(expanded(QModelIndex)),
             this, SLOT(expandChildren(QModelIndex)));
+
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
+            this, SLOT(contextMenu(QPoint)));
 }
 
 void HeadersView::readConfig()
@@ -66,6 +70,20 @@ void HeadersView::writeConfig()
 HeadersView::~HeadersView()
 {
 }
+
+
+void HeadersView::contextMenu(const QPoint& point)
+{
+    const QModelIndex index = indexAt(point);
+    if(index.isValid()) {
+        KNArticle::Ptr article = model()->data(index, HeadersModel::ArticleRole).value<KNArticle::Ptr>();
+        if(article) {
+            emit contextMenuRequest(article, mapToGlobal(point));
+        }
+    }
+}
+
+
 
 void HeadersView::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {

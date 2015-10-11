@@ -63,9 +63,11 @@ class HeadersView : public QTreeView
 
     private Q_SLOTS:
         void expandChildren(const QModelIndex& index);
+        void contextMenu(const QPoint& point);
 
     Q_SIGNALS:
         void articlesSelected(const KNArticle::List articles);
+        void contextMenuRequest(KNArticle::Ptr article, const QPoint& point);
 
     private:
         QModelIndex find(const QModelIndex& from, int role, const QVariant& value);

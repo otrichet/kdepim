@@ -20,6 +20,7 @@
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QSplitter>
+#include <KDE/KLineEdit>
 #include <kicon.h>
 #include <kactioncollection.h>
 #include <kinputdialog.h>
@@ -32,7 +33,6 @@
 #include <kstatusbar.h>
 #include <klocale.h>
 #include <kcmdlineargs.h>
-#include <k3listviewsearchline.h>
 #include <khbox.h>
 #include <kselectaction.h>
 #include <kstandardshortcut.h>
@@ -132,8 +132,8 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   connect(mHeadersView, SIGNAL(articlesSelected(const KNArticle::List)),
           SLOT(slotArticlesSelected(const KNArticle::List)));
-  connect(mHeadersView, SIGNAL(contextMenu(K3ListView*,Q3ListViewItem*,QPoint)),
-          SLOT(slotArticleRMB(K3ListView*,Q3ListViewItem*,QPoint)));
+  connect(mHeadersView, SIGNAL(contextMenuRequest(KNArticle::Ptr,QPoint)),
+          SLOT(slotArticleRMB(KNArticle::Ptr,QPoint)));
   connect(mHeadersView, SIGNAL(doubleClicked(KNArticle::Ptr)),
           this, SLOT(slotOpenArticle(KNArticle::Ptr)));
   connect(mHeadersView, SIGNAL(sortingChanged(int)),
@@ -1142,16 +1142,14 @@ void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
 }
 
 
-void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p)
+void KNMainWidget::slotArticleRMB(KNArticle::Ptr article, const QPoint& p)
 {
-kDebug() << "Port";
-#if 0
   if(b_lockui)
     return;
 
-  if(i) {
-    QMenu *popup;
-    if( (static_cast<KNHdrViewItem*>(i))->art->type()==KNArticle::ATremote) {
+  if(article) {
+    QMenu *popup = 0;
+    if(article->type() == KNArticle::ATremote) {
      popup = popupMenu( "remote_popup" );
     } else {
      popup = popupMenu( "local_popup" );
@@ -1160,7 +1158,6 @@ kDebug() << "Port";
     if ( popup )
       popup->popup(p);
   }
-#endif
 }
 
 

@@ -24,11 +24,9 @@
 #include <QList>
 
 
-class Q3ListViewItem;
 class QSplitter;
 class QTreeWidget;
 class QTreeWidgetItem;
-class K3ListView;
 class KAction;
 class KToggleAction;
 class KSelectAction;
@@ -204,7 +202,7 @@ protected slots:
   void slotCollectionSelected();
   /** Called when a collection is renamed. */
   void slotCollectionRenamed( QTreeWidgetItem *i );
-  void slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p);
+  void slotArticleRMB(KNArticle::Ptr article, const QPoint &p);
   /** Display a menu on items of the collections view. */
   void slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos );
   /** Open selected article in own composer/reader window */

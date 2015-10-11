@@ -75,6 +75,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
             this, SLOT(sortingChanged(int,Qt::SortOrder)));
     connect(this, SIGNAL(showThreads(bool)),
             mModel, SLOT(showThreads(bool)));
+    connect(mView, SIGNAL(contextMenuRequest(KNArticle::Ptr,QPoint)),
+            this, SIGNAL(contextMenuRequest(KNArticle::Ptr,QPoint)));
 
     mView->setExpandsOnDoubleClick(false);
     connect(mView, SIGNAL(doubleClicked(QModelIndex)),

@@ -27,6 +27,7 @@
 #define KNODE_HEADERS_WIDGET_H
 
 #include <QtCore/QModelIndex>
+#include <QtCore/QPoint>
 #include <QtGui/QWidget>
 
 #include "knarticle.h"
@@ -120,6 +121,7 @@ class HeadersWidget : public QWidget
         void articlesSelected(const KNArticle::List article);
         void showThreads(bool b);
         void doubleClicked(KNArticle::Ptr article);
+        void contextMenuRequest(KNArticle::Ptr article, const QPoint& point);
 
     private:
       KFilterProxySearchLine* mSearch;
