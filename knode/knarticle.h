@@ -72,6 +72,8 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
     void setListItem( KNHdrViewItem *i, KNArticle::Ptr a );
     virtual void updateListItem() {}
 
+    virtual bool filterResult() = 0;
+
     //network lock (reimplemented from KNJobItem)
     bool isLocked()                      { return f_lags.get(0); }
     void setLocked(bool b=true);
@@ -315,6 +317,7 @@ class KNAttachment {
           f_b64;
 };
 
+Q_DECLARE_METATYPE(KNArticle::Ptr);
 Q_DECLARE_METATYPE(KNRemoteArticle::Ptr);
 
 #endif //KNARTICLE_H

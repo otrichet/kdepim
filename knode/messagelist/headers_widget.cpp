@@ -65,8 +65,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
 
     mView->setSortingEnabled(true);
 
-    connect(KNGlobals::self()->articleManager(), SIGNAL(groupChanged(const KNGroup::Ptr)),
-            this, SLOT(showGroup(const KNGroup::Ptr)));
+    connect(KNGlobals::self()->articleManager(), SIGNAL(collectionChanged(KNArticleCollection::Ptr)),
+            this, SLOT(showCollection(KNArticleCollection::Ptr)));
     connect(KNGlobals::self()->articleManager(), SIGNAL(filterChanged(KNArticleFilter*)),
             this, SLOT(setFilter(KNArticleFilter*)));
     connect(mView, SIGNAL(articlesSelected(const KNArticle::List)),
@@ -122,10 +122,9 @@ void HeadersWidget::sortingChanged(int logicalIndex, Qt::SortOrder order)
 }
 
 
-
-void HeadersWidget::showGroup(const KNGroup::Ptr group)
+void HeadersWidget::showCollection(const KNArticleCollection::Ptr collection)
 {
-    mModel->setGroup(group);
+    mModel->setCollection(collection);
     if(KNGlobals::self()->settings()->defaultToExpandedThreads()) {
         expandAllThreads();
     }
@@ -157,23 +156,32 @@ void HeadersWidget::selectNextMessage()
 }
 
 
+static void addRemoteArticle(KNRemoteArticle::List& res, const QModelIndex& index)
+{
+    const KNRemoteArticle::Ptr art = boost::dynamic_pointer_cast<KNRemoteArticle>(
+                                                index.data(HeadersModel::ArticleRole).value<KNArticle::Ptr>()
+                                        );
+    if(art) {
+        res << art;
+    }
+}
+
 KNRemoteArticle::List HeadersWidget::getSelectedMessages()
 {
     const QModelIndexList selection = mView->selectionModel()->selectedRows();
     KNRemoteArticle::List res;
     Q_FOREACH(const QModelIndex& index, selection) {
-        res << index.data(HeadersModel::ArticleRole).value<KNRemoteArticle::Ptr>();
+        addRemoteArticle(res, index);
     }
     return res;
 }
-
-
 
 /* Helper method for #getSelectedThreads().
    Recursively add children of parent into res. */
 static void childrenArticles(KNRemoteArticle::List& res, const QModelIndex& parent)
 {
-    res << parent.data(HeadersModel::ArticleRole).value<KNRemoteArticle::Ptr>();
+    addRemoteArticle(res, parent);
+
     int row = 0;
     QModelIndex child;
     while(true) {
@@ -260,7 +268,7 @@ void HeadersWidget::viewDoubleClicked(const QModelIndex& index)
     if(index.isValid()) {
         QVariant v = mView->model()->data(index, HeadersModel::ArticleRole);
         if(v.isValid()) {
-            emit doubleClicked(v.value<KNRemoteArticle::Ptr>());
+            emit doubleClicked(v.value<KNArticle::Ptr>());
         }
     }
 }

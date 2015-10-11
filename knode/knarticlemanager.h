@@ -105,7 +105,7 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     /**
      * Emitted to indicates that the content of a group has changed.
      */
-    void groupChanged(const KNGroup::Ptr group);
+    void collectionChanged(const KNArticleCollection::Ptr group);
 
   protected:
     void processJob(KNJobData *j);

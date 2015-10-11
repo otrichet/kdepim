@@ -31,7 +31,7 @@
 #include <QtGui/QWidget>
 
 #include "knarticle.h"
-#include "kngroup.h"
+#include "knarticlecollection.h"
 
 class KFilterProxySearchLine;
 class KNArticleFilter;
@@ -88,7 +88,7 @@ class HeadersWidget : public QWidget
         KNRemoteArticle::List getSelectedThreads();
 
     public Q_SLOTS:
-        void showGroup(const KNGroup::Ptr group);
+        void showCollection(const KNArticleCollection::Ptr collection);
         void setFilter(KNArticleFilter* filter);
 
         /**

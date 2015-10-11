@@ -32,7 +32,7 @@
 #include <kmime/kmime_dateformatter.h>
 
 #include "knarticle.h"
-#include "kngroup.h"
+#include "knarticlecollection.h"
 
 class QRegExp;
 class KNArticleFilter;
@@ -80,7 +80,7 @@ class HeadersModel : public QAbstractItemModel
          * Change the group.
          * @param group The new group.
          */
-        void setGroup(const KNGroup::Ptr group);
+        void setCollection(const KNArticleCollection::Ptr collection);
         /**
          * Change the filter.
          */
@@ -106,10 +106,10 @@ class HeadersModel : public QAbstractItemModel
         /**
          * Reload the internal data structure.
          */
-        void reload(KNGroup::Ptr group);
+        void reload(KNArticleCollection::Ptr collection);
 
         Header* mRoot;
-        KNGroup::Ptr mGroup;
+        KNArticleCollection::Ptr mCollection;
         KNArticleFilter* mFilter;
         KMime::DateFormatter mDateFormatter;
         QRegExp* mNormlizeSubject;

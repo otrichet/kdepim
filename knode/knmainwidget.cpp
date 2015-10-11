@@ -1015,10 +1015,7 @@ void KNMainWidget::slotCollectionSelected()
   KNGroup::Ptr selectedGroup;
   KNFolder::Ptr selectedFolder;
 
-kDebug() << "Port";
-#if 0
-  h_drView->clear();
-#endif
+  mHeadersView->showCollection(KNArticleCollection::Ptr());
   slotArticlesSelected(KNArticle::List());
 
   // mark all articles in current group as not new/read

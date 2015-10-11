@@ -42,7 +42,7 @@ static const int INVALID_ID = -1;
 
 struct Header
 {
-    Header(KNRemoteArticle::Ptr a)
+    Header(KNArticle::Ptr a)
         : article(a), parent(0), children(),
           subThreadDate( !a ? 0 : a->date()->dateTime().dateTime().toMSecsSinceEpoch() )
     {
@@ -53,9 +53,21 @@ struct Header
         parent = 0;
         qDeleteAll(children);
         children.clear();
-    }
+    };
+    void addChild(Header* hdr)
+    {
+        hdr->parent = this;
+        children.append(hdr);
 
-    KNRemoteArticle::Ptr article;
+        // Update subThreadDate
+        Header* h = hdr;
+        while(h->parent && h->parent->subThreadDate < h->subThreadDate) {
+            h->parent->subThreadDate = h->subThreadDate;
+            h = h->parent;
+        }
+    };
+
+    KNArticle::Ptr article;
     Header* parent;
     QList<Header*> children;
     qint64 subThreadDate; // The most recent date below this header (included)
@@ -78,8 +90,8 @@ static QVariant extractFrom(const KNArticle::Ptr& art)
 
 HeadersModel::HeadersModel(QObject* parent)
     : QAbstractItemModel(parent),
-      mRoot(new Header(KNRemoteArticle::Ptr())),
-      mGroup(),
+      mRoot(new Header(KNArticle::Ptr())),
+      mCollection(),
       mSortByThreadChangeDate(false)
 {
     mDateFormatter.setCustomFormat(KNGlobals::self()->settings()->customDateFormat());
@@ -93,66 +105,77 @@ HeadersModel::HeadersModel(QObject* parent)
 HeadersModel::~HeadersModel()
 {
     delete mRoot;
-    mGroup.reset();
+    mCollection.reset();
 }
 
 void HeadersModel::setFilter(KNArticleFilter* filter)
 {
     mFilter = filter;
-    reload(mGroup);
+    reload(mCollection);
 }
 
-void HeadersModel::setGroup(const KNGroup::Ptr group)
+void HeadersModel::setCollection(const KNArticleCollection::Ptr collection)
 {
-    if(group != mGroup) {
-        reload(group);
+    if(collection != mCollection) {
+        reload(collection);
     }
 }
 
 void HeadersModel::showThreads(bool b)
 {
     KNGlobals::self()->settings()->setShowThreads(b);
-    reload(mGroup);
+    reload(mCollection);
 }
 
 
 
-void HeadersModel::reload(const KNGroup::Ptr group)
+void HeadersModel::reload(const KNArticleCollection::Ptr collection)
 {
-    Header* root = new Header(KNRemoteArticle::Ptr());
+    Header* root = new Header(KNArticle::Ptr());
     QHash<QByteArray, Header*> msgIdIndex;
 
-    if(group) {
+    if(collection) {
         if(mFilter) {
-            mFilter->doFilter(group);
-        }
-
-
-        for(int i = 0 ; i < group->length() ; ++i) {
-            const KNRemoteArticle::Ptr art = group->at(i);
-            if(art->filterResult()) {
-                msgIdIndex.insert(art->messageID()->as7BitString(false),
-                                  new Header(art));
+            switch(collection->type()) {
+                case KNCollection::CTgroup:
+                    mFilter->doFilter(boost::dynamic_pointer_cast<KNGroup>(collection));
+                    break;
+                case KNCollection::CTfolder:
+                    mFilter->doFilter(boost::dynamic_pointer_cast<KNFolder>(collection));
+                    break;
+                default:
+                    kError() << "Invalid collection type:" << collection->type();
+                    break;
             }
         }
 
-        Q_FOREACH(Header* hdr, msgIdIndex) {
-            Header* parent = root;
-            if(KNGlobals::self()->settings()->showThreads()) {
+        bool showThreads = KNGlobals::self()->settings()->showThreads()
+                            && (collection->type() == KNCollection::CTgroup);
+
+        if(showThreads) {
+            for(int i = 0 ; i < collection->length() ; ++i) {
+                const KNArticle::Ptr art = collection->at(i);
+                if(art->filterResult()) {
+                    msgIdIndex.insert(art->messageID()->as7BitString(false), new Header(art));
+                }
+            }
+
+            Q_FOREACH(Header* hdr, msgIdIndex) {
+                Header* parent = root;
                 KMime::Headers::References* refs = hdr->article->references();
                 if(refs && !refs->identifiers().isEmpty()) {
                     const QByteArray parentMsgId = '<' + refs->identifiers().last() + '>';
                     parent = msgIdIndex.value(parentMsgId, root);
                 }
+                parent->addChild(hdr);
             }
-            hdr->parent = parent;
-            parent->children.append(hdr);
-
-            // Update subThreadDate
-            Header* h = hdr;
-            while(h->parent && h->parent->subThreadDate < h->subThreadDate) {
-                h->parent->subThreadDate = h->subThreadDate;
-                h = h->parent;
+        } else {
+            for(int i = 0 ; i < collection->length() ; ++i) {
+                const KNArticle::Ptr art = collection->at(i);
+                if(art->filterResult()) {
+                    Header* hdr = new Header(art);
+                    root->addChild(hdr);
+                }
             }
         }
     }
@@ -160,7 +183,7 @@ void HeadersModel::reload(const KNGroup::Ptr group)
     Header* oldRoot = mRoot;
     beginResetModel();
     mRoot = root;
-    mGroup = group;
+    mCollection = collection;
     endResetModel();
     delete oldRoot;
 }
@@ -185,7 +208,8 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
     }
 
     const Header* hdr = static_cast<Header*>(index.internalPointer());
-    const KNRemoteArticle::Ptr art = hdr->article;
+    const KNArticle::Ptr art = hdr->article;
+    const KNRemoteArticle::Ptr remoteArt = boost::dynamic_pointer_cast<KNRemoteArticle>(art);
 
     switch(role) {
     case Qt::DisplayRole:
@@ -206,7 +230,7 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
         }
         break;
     case Qt::FontRole:
-        if(!art->isRead()) {
+        if(remoteArt && !remoteArt->isRead()) {
             QFont font;
             font.setBold(true);
             return font;
@@ -216,7 +240,7 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
         return QVariant::fromValue(art);
         break;
     case ReadRole:
-        return QVariant::fromValue(art->isRead());
+        return QVariant::fromValue(remoteArt ? remoteArt->isRead() : true);
         break;
     case SortRole:
         switch(index.column()) {

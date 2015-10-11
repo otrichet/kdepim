@@ -29,6 +29,7 @@
 #include <KDE/KConfigGroup>
 
 #include "headers_model.h"
+#include "knglobals.h"
 #include "settings.h"
 
 static void extendedNext(QModelIndex& index);
@@ -89,7 +90,7 @@ void HeadersView::selectionChanged(const QItemSelection& selected, const QItemSe
 {
     KNArticle::List articles;
     Q_FOREACH(const QModelIndex& idx, selected.indexes()) {
-        const KNArticle::Ptr& art = model()->data(idx, HeadersModel::ArticleRole).value<KNRemoteArticle::Ptr>();
+        const KNArticle::Ptr& art = model()->data(idx, HeadersModel::ArticleRole).value<KNArticle::Ptr>();
         if(art) {
             articles.append(art);
         }

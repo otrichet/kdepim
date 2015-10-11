@@ -180,61 +180,16 @@ void KNArticleManager::showHdrs(bool clear)
 {
   if(!g_roup && !f_older) return;
 
-  bool showThreads=knGlobals.settings()->showThreads();
-  bool expandThreads=knGlobals.settings()->defaultToExpandedThreads();
-
-kDebug() << "Port";
-#if 0
-  if(clear)
-    v_iew->clear();
-#endif
-
   ScopedCursorOverride cursor( Qt::WaitCursor );
   knGlobals.setStatusMsg(i18n(" Creating list..."));
 
+  KNArticleCollection::Ptr col;
   if(g_roup) {
-    emit groupChanged(g_roup);
-
-    KNArticle::Ptr current = knGlobals.top->articleViewer()->article();
-
-    if(current && (current->collection() != g_roup)) {
-      current.reset();
-      knGlobals.top->articleViewer()->setArticle( KNArticle::Ptr() );
-    }
+    col = g_roup;
+  } else if (f_older) {
+    col = f_older;
   }
-  else if (f_older) {
-kDebug() << "Port";
-#if 0
-
-    KNLocalArticle::Ptr art;
-    if(f_ilter) {
-      f_ilter->doFilter(f_older);
-    } else {
-      for(int i=0; i<f_older->length(); ++i) {
-        art=f_older->at(i);
-        art->setFilterResult(true);
-      }
-    }
-
-    for(int idx=0; idx<f_older->length(); idx++) {
-      art=f_older->at(idx);
-
-      if(!art->listItem() &&  art->filterResult()) {
-        art->setListItem( new KNHdrViewItem( v_iew ), art );
-        art->updateListItem();
-      } else if(art->listItem())
-        art->updateListItem();
-    }
-#endif
-  }
-
-kDebug() << "Port";
-#if 0
-  if(setFirstChild && v_iew->firstChild()) {
-    v_iew->setCurrentItem(v_iew->firstChild());
-    knGlobals.top->articleViewer()->setArticle( KNArticle::Ptr() );
-  }
-#endif
+  emit collectionChanged(col);
 
   knGlobals.setStatusMsg( QString() );
   updateStatusString();
