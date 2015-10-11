@@ -76,7 +76,7 @@ void KNArticle::setLocked(bool b)
 KNRemoteArticle::KNRemoteArticle( KNGroup::Ptr g )
  : KNArticle(g), a_rticleNumber(-1), i_dRef(-1), t_hrLevel(0),
    c_olor(knGlobals.settings()->unreadThreadColor()),
-   u_nreadFups(0), n_ewFups(0), s_ubThreadChangeDate(0)
+   u_nreadFups(0), n_ewFups(0)
 {
   setDefaultCharset( Locale::defaultCharset( g ) );
 
@@ -160,8 +160,6 @@ void KNRemoteArticle::updateListItem()
       i_tem->setPixmap(2, app->icon(KNode::Appearance::null));
   }
 
-  i_tem->setExpandable( (threadMode() && hasVisibleFollowUps()) );
-
   i_tem->repaint(); //force repaint
 }
 
@@ -208,24 +206,6 @@ void KNRemoteArticle::setForceDefaultCharset(bool b)
   initListItem();
 }
 
-
-void KNRemoteArticle::propagateThreadChangedDate()
-{
-  KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( c_ol );
-  KNRemoteArticle::Ptr ref = g->byId( id() );
-  int idRef=i_dRef;
-
-  while (idRef!=0) {
-    ref=g->byId(idRef);
-    if(!ref)
-      return; // sh#t !!
-    idRef=ref->idRef();
-  }
-
-  if (date()->dateTime() > ref->date()->dateTime()) {
-    ref->setSubThreadChangeDate(date()->dateTime().toTime_t());
-  }
-}
 
 
 //=========================================================================================

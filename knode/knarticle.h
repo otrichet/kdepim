@@ -148,8 +148,6 @@ class KNRemoteArticle : public KNArticle {
                                                         i_dRef=0; }
     KNRemoteArticle::Ptr displayedReference()           { return d_ref; }
     void setDisplayedReference( KNRemoteArticle::Ptr dr ) { d_ref=dr; }
-    bool threadMode()                             { return f_lags.get(9); }
-    void setThreadMode(bool b=true)               { f_lags.set(9, b); }
     unsigned char threadingLevel()                { return t_hrLevel; }
     void setThreadingLevel(unsigned char l)       { t_hrLevel=l; }
     unsigned short newFollowUps()                 { return n_ewFups; }
@@ -181,11 +179,6 @@ class KNRemoteArticle : public KNArticle {
     QColor color() const { return c_olor; }
     void setColor(const QColor& c) { c_olor = c; }
 
-    time_t subThreadChangeDate() { return s_ubThreadChangeDate; }
-    void setSubThreadChangeDate(time_t date) { s_ubThreadChangeDate = date; }
-    // propagate the change date to the root article
-    void propagateThreadChangedDate();
-
   protected:
     int a_rticleNumber;
     int i_dRef;                      // id of a reference-article (0 == none)
@@ -193,9 +186,7 @@ class KNRemoteArticle : public KNArticle {
     unsigned char t_hrLevel;         // quality of threading
     QColor c_olor;                   // color for the header list
     unsigned short u_nreadFups,      // number of the article's unread follow-ups
-                   n_ewFups;         // number of the article's new follow-ups
-    time_t s_ubThreadChangeDate;     // the last time the sub-thread of this article changed
-                                     // i.e. when the last article arrived...
+                   n_ewFups;         // number of the article's new follow-ups.
 
 }; // KNRemoteArticle
 

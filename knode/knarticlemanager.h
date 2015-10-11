@@ -53,8 +53,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     //listview handling
     void showHdrs(bool clear=true);
     void updateViewForCollection( KNArticleCollection::Ptr c );
-    void updateListViewItems();
-    void setAllThreadsOpen(bool b=true);
 
     void updateStatusString();
 
@@ -111,8 +109,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
 
   protected:
     void processJob(KNJobData *j);
-    void createThread( KNRemoteArticle::Ptr a );
-    void createCompleteThread( KNRemoteArticle::Ptr a );
 
     KNHeaderView *v_iew;
     KNGroup::Ptr g_roup;
@@ -121,7 +117,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     KNFilterManager *f_ilterMgr;
     KNode::SearchDialog *s_earchDlg;
     QList<KTemporaryFile*> mTempFiles;
-    bool d_isableExpander;
 
   Q_SIGNALS:
     void filterChanged(KNArticleFilter *f);
@@ -129,7 +124,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
   public slots:
     void slotFilterChanged(KNArticleFilter *f);
     void slotSearchDialogDone();
-    void slotItemExpanded(Q3ListViewItem *p);
 
 };
 
