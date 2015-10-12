@@ -81,7 +81,12 @@ class HeadersWidget : public QWidget
         /**
          * Returns the list of currently selected articles.
          */
-        KNRemoteArticle::List getSelectedMessages();
+        void getSelectedMessages(KNRemoteArticle::List& l);
+        /**
+         * Returns the list of currently selected articles.
+         */
+        void getSelectedMessages(KNLocalArticle::List& l);
+
         /**
          * Returns the list of threads containing selected articles.
          */

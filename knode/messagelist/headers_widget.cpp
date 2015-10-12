@@ -156,9 +156,10 @@ void HeadersWidget::selectNextMessage()
 }
 
 
-static void addRemoteArticle(KNRemoteArticle::List& res, const QModelIndex& index)
+template<class A>
+static void addRemoteArticle(QList<boost::shared_ptr<A> >& res, const QModelIndex& index)
 {
-    const KNRemoteArticle::Ptr art = boost::dynamic_pointer_cast<KNRemoteArticle>(
+    const boost::shared_ptr<A> art = boost::dynamic_pointer_cast<A>(
                                                 index.data(HeadersModel::ArticleRole).value<KNArticle::Ptr>()
                                         );
     if(art) {
@@ -166,21 +167,30 @@ static void addRemoteArticle(KNRemoteArticle::List& res, const QModelIndex& inde
     }
 }
 
-KNRemoteArticle::List HeadersWidget::getSelectedMessages()
+template<class A>
+static void selectedMessages(HeadersView* view, QList<boost::shared_ptr<A> >& res)
 {
-    const QModelIndexList selection = mView->selectionModel()->selectedRows();
-    KNRemoteArticle::List res;
+    const QModelIndexList selection = view->selectionModel()->selectedRows();
     Q_FOREACH(const QModelIndex& index, selection) {
-        addRemoteArticle(res, index);
+        addRemoteArticle<A>(res, index);
     }
-    return res;
 }
+
+void HeadersWidget::getSelectedMessages(KNRemoteArticle::List& l)
+{
+    selectedMessages<KNRemoteArticle>(mView, l);
+}
+void HeadersWidget::getSelectedMessages(KNLocalArticle::List& l)
+{
+    selectedMessages<KNLocalArticle>(mView, l);
+}
+
 
 /* Helper method for #getSelectedThreads().
    Recursively add children of parent into res. */
 static void childrenArticles(KNRemoteArticle::List& res, const QModelIndex& parent)
 {
-    addRemoteArticle(res, parent);
+    addRemoteArticle<KNRemoteArticle>(res, parent);
 
     int row = 0;
     QModelIndex child;

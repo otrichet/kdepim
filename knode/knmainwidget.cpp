@@ -944,33 +944,6 @@ bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
   return QWidget::eventFilter(o, e);
 }
 
-
-void KNMainWidget::getSelectedArticles(KNArticle::List &l)
-{
-  if(!g_rpManager->currentGroup() && !f_olManager->currentFolder())
-    return;
-
-kDebug() << "Port";
-#if 0
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNArticle>( static_cast<KNHdrViewItem*>( i )->art ) );
-#endif
-}
-
-void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
-{
-  if(!f_olManager->currentFolder()) return;
-
-kDebug() << "Port";
-#if 0
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNLocalArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
-#endif
-}
-
-
 void KNMainWidget::slotArticlesSelected(const KNArticle::List articles)
 {
   kDebug();
@@ -1558,7 +1531,8 @@ void KNMainWidget::slotArtSetArtRead()
   if(!g_rpManager->currentGroup())
     return;
 
-  KNRemoteArticle::List l = mHeadersView->getSelectedMessages();
+  KNRemoteArticle::List l;
+  mHeadersView->getSelectedMessages(l);
   a_rtManager->setRead(l, true);
 }
 
@@ -1569,7 +1543,8 @@ void KNMainWidget::slotArtSetArtUnread()
   if(!g_rpManager->currentGroup())
     return;
 
-  KNRemoteArticle::List l = mHeadersView->getSelectedMessages();
+  KNRemoteArticle::List l;
+  mHeadersView->getSelectedMessages(l);
   a_rtManager->setRead(l, false);
 }
 
@@ -1653,18 +1628,18 @@ void KNMainWidget::slotArtSendOutbox()
 
 void KNMainWidget::slotArtDelete()
 {
-kDebug() << "Port";
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtDelete()";
   if (!f_olManager->currentFolder())
     return;
 
   KNLocalArticle::List lst;
-  getSelectedArticles(lst);
+  mHeadersView->getSelectedMessages(lst);
 
   if(!lst.isEmpty())
     a_rtManager->deleteArticles(lst);
 
+kDebug() << "Port";
+#if 0
   if(h_drView->currentItem())
     h_drView->setActive( h_drView->currentItem() );
 #endif
@@ -1678,7 +1653,7 @@ void KNMainWidget::slotArtSendNow()
     return;
 
   KNLocalArticle::List lst;
-  getSelectedArticles(lst);
+  mHeadersView->getSelectedMessages(lst);
 
   if(!lst.isEmpty())
     a_rtFactory->sendArticles( lst, true );

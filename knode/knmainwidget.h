@@ -175,10 +175,6 @@ protected:
 
   bool eventFilter(QObject *, QEvent *);
 
-  // convenience methods...
-  void getSelectedArticles( KNArticle::List &l );
-  void getSelectedArticles( KNLocalArticle::List &l );
-
   //GUI
   //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
