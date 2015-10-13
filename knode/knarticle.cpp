@@ -164,38 +164,6 @@ void KNRemoteArticle::updateListItem()
 }
 
 
-void KNRemoteArticle::thread(KNRemoteArticle::List &l)
-{
-  KNRemoteArticle::Ptr tmp;
-  KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( c_ol );
-  int idRef=i_dRef, topID=-1;
-  KNRemoteArticle::Ptr ref = g->byId( id() ); // get self reference
-
-  while(idRef!=0) {
-    ref=g->byId(idRef);
-    if(!ref)
-      return; // sh#t !!
-    idRef=ref->idRef();
-  }
-
-  topID=ref->id();
-  l.append(ref);
-
-  for(int i=0; i<g->length(); ++i) {
-    tmp=g->at(i);
-    if(tmp->idRef()!=0) {
-      idRef=tmp->idRef();
-      while(idRef!=0) {
-        ref=g->byId(idRef);
-        idRef=ref->idRef();
-      }
-      if(ref->id()==topID)
-        l.append(tmp);
-    }
-  }
-}
-
-
 void KNRemoteArticle::setForceDefaultCharset(bool b)
 {
   if (!b) { // restore default
