@@ -30,6 +30,7 @@
 #include <KDE/KLocalizedString>
 
 #include "knarticlefilter.h"
+#include "knconfigmanager.h"
 #include "knfiltermanager.h"
 #include "settings.h"
 
@@ -44,7 +45,8 @@ struct Header
 {
     Header(KNArticle::Ptr a)
         : article(a), parent(0), children(),
-          subThreadDate( !a ? 0 : a->date()->dateTime().dateTime().toMSecsSinceEpoch() )
+          subThreadDate( !a ? 0 : a->date()->dateTime().dateTime().toMSecsSinceEpoch() ),
+          unreadFollowup(false)
     {
     };
     ~Header()
@@ -65,12 +67,26 @@ struct Header
             h->parent->subThreadDate = h->subThreadDate;
             h = h->parent;
         }
+        // Update unreadFollowup
+        KNRemoteArticle::Ptr r = boost::dynamic_pointer_cast<KNRemoteArticle>(hdr->article);
+        if(r && !r->isRead()) {
+            h = hdr;
+            while(h->parent) {
+                h = h->parent;
+                if(!h->unreadFollowup) {
+                    h->unreadFollowup = true;
+                } else {
+                    break;
+                }
+            }
+        }
     };
 
     KNArticle::Ptr article;
     Header* parent;
     QList<Header*> children;
     qint64 subThreadDate; // The most recent date below this header (included)
+    bool unreadFollowup;
 };
 
 static QVariant extractFrom(const KNArticle::Ptr& art)
@@ -234,6 +250,38 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
             QFont font;
             font.setBold(true);
             return font;
+        }
+        break;
+    case Qt::DecorationRole:
+        if(index.column() == COLUMN_SUBJECT) {
+            Appearance::IconIndex icon = Appearance::null;
+            switch(art->type()) {
+                case KNArticle::ATlocal: {
+                    const KNLocalArticle::Ptr localArt = boost::dynamic_pointer_cast<KNLocalArticle>(art);
+                    if(localArt->isSavedRemoteArticle()) {
+                        icon = Appearance::savedRemote;
+                    } else if(localArt->doPost()) {
+                        if(localArt->canceled()) {
+                            icon = Appearance::canceledPosting;
+                        } else {
+                            icon = Appearance::posting;
+                        }
+                    } else if(localArt->doMail()) {
+                        icon = Appearance::mail;
+                    }
+                    break;
+                }
+                case KNArticle::ATremote:
+                    if(remoteArt->isIgnored()) {
+                        icon = Appearance::ignore;
+                    } else if(remoteArt->isWatched()) {
+                        icon = Appearance::eyes;
+                    } else if(hdr->unreadFollowup > 0) {
+                        icon = Appearance::newFups;
+                    }
+                    break;
+            }
+            return KNGlobals::self()->configManager()->appearance()->icon(icon);
         }
         break;
     case ArticleRole:
