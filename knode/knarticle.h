@@ -27,7 +27,6 @@
 #include <kmime/boolflags.h>
 
 class KNLoadHelper;
-class KNHdrViewItem;
 class KNArticleCollection;
 
 /** This class encapsulates a generic article. It provides all the
@@ -62,16 +61,6 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
      */
     void setId( int i ) { i_d = i; }
 
-    //list item handling
-    KNHdrViewItem* listItem() const           { return i_tem; }
-    /**
-      Sets the headerview item associated to this article.
-      @param i The item associated to this item or 0 to break the link to the previous item.
-      @param a The shared pointer of <strong>this</strong> article.
-    */
-    void setListItem( KNHdrViewItem *i, KNArticle::Ptr a );
-    virtual void updateListItem() {}
-
     virtual bool filterResult() = 0;
 
     //network lock (reimplemented from KNJobItem)
@@ -90,7 +79,6 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
   protected:
     int i_d; //unique in the given collection
     boost::shared_ptr<KNArticleCollection> c_ol;
-    KNHdrViewItem *i_tem;
 
     KMime::BoolFlags f_lags;
 
@@ -171,10 +159,6 @@ class KNRemoteArticle : public KNArticle {
     bool hasVisibleFollowUps()              { return f_lags.get(12); }
     void setVisibleFollowUps(bool b=true)   { f_lags.set(12, b); }
 
-    // list item handling
-    void initListItem();
-    void updateListItem();
-
     virtual void setForceDefaultCharset( bool b );
 
   protected:
@@ -243,9 +227,6 @@ class KNLocalArticle : public KNArticle {
     //nntp-server id
     int serverId()                { if(!doPost()) return -1; else return s_erverId; }
     void setServerId(int i)       { s_erverId=i; }
-
-    //list item handling
-    void updateListItem();
 
     virtual void setForceDefaultCharset(bool b);
 

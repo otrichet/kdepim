@@ -21,7 +21,6 @@
 #include "kncollectionviewitem.h"
 #include "knfoldermanager.h"
 #include "knglobals.h"
-#include "knhdrviewitem.h"
 #include "knmainwidget.h"
 #include "utilities.h"
 #include "utils/scoped_cursor_override.h"
@@ -468,7 +467,10 @@ void KNFolder::removeArticles( KNLocalArticle::List &l, bool del )
     KNGlobals::self()->articleFactory()->deleteComposerForArticle(a);
     ArticleWindow::closeAllWindowsForArticle( a );
     ArticleWidget::articleRemoved( a );
+kDebug() << "Port";
+#if 0
     delete a->listItem();
+#endif
 
     //delete article
     remove( a );

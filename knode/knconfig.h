@@ -54,16 +54,13 @@ class ConfigBase {
  */
 class KNODE_EXPORT Appearance : public ConfigBase {
 
-#define ICON_CNT 14
-
   friend class AppearanceWidget;
 
   public:
-    enum IconIndex    { greyBall=0,        redBall=1,      greyBallChkd=2,
-                        redBallChkd=3,     newFups=4,      eyes=5,
-                        ignore=6,          mail=7,         posting=8,
-                        canceledPosting=9, savedRemote=10, group=11,
-                        null=12 };
+    enum IconIndex    { redBall=0,         newFups=1,      eyes=2,
+                        ignore=3,          mail=4,         posting=5,
+                        canceledPosting=6, savedRemote=7,  group=8,
+                        null=9 };
     Appearance();
 
     const QPixmap& icon(IconIndex i)     { return i_cons[i]; }
@@ -71,8 +68,7 @@ class KNODE_EXPORT Appearance : public ConfigBase {
   protected:
     void recreateLVIcons();
 
-    QPixmap i_cons[ICON_CNT];
-
+    QPixmap i_cons[null + 1];
 };
 
 

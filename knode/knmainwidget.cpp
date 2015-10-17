@@ -216,11 +216,6 @@ KNMainWidget::~KNMainWidget()
               this, SLOT(slotCollectionSelected()) );
 
   knGlobals.reset(); // cleanup
-
-kDebug() << "Port";
-#if 0
-  h_drView->clear(); //avoid some random crashes in KNHdrViewItem::~KNHdrViewItem()
-#endif
 }
 
 void KNMainWidget::initStatusBar()

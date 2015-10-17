@@ -380,7 +380,10 @@ void KNArticleFactory::createCancel( KNArticle::Ptr a )
     }
     KNLocalArticle::Ptr la = boost::static_pointer_cast<KNLocalArticle>( a );
     la->setCanceled(true);
+kDebug() << "Port";
+#if 0
     la->updateListItem();
+#endif
     nntp=knGlobals.accountManager()->account(la->serverId());
   }
 
@@ -448,7 +451,10 @@ void KNArticleFactory::createSupersede( KNArticle::Ptr a )
   else {
     KNLocalArticle::Ptr la = boost::static_pointer_cast<KNLocalArticle>( a );
     la->setCanceled(true);
+kDebug() << "Port";
+#if 0
     la->updateListItem();
+#endif
     nntp=knGlobals.accountManager()->account(la->serverId());
     if(!nntp)
       nntp=knGlobals.accountManager()->first();

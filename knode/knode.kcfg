@@ -300,10 +300,6 @@
       <label>Link</label>
       <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).foreground(KColorScheme::LinkText).color()</default>
     </entry>
-    <entry name="readArticleColor" key="readArtColor" type="Color">
-      <label>Read Article</label>
-      <default>#888888</default>
-    </entry>
     <entry name="unreadArticleColor" key="unreadArtColor" type="Color">
       <label>Unread Article</label>
       <default>#b7a90b</default>
@@ -346,9 +342,6 @@
     </entry>
     <entry name="groupListFont" type="Font">
       <label>Group List</label>
-    </entry>
-    <entry name="articleListFont" type="Font">
-      <label>Article List</label>
     </entry>
   </group>
 </kcfg>

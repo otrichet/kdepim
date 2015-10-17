@@ -24,7 +24,6 @@
 #include "knarticlemanager.h"
 #include "kngroupmanager.h"
 #include "knnntpaccount.h"
-#include "headerview.h"
 #include "settings.h"
 #include "utils/locale.h"
 #include "utils/scoped_cursor_override.h"

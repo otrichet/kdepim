@@ -22,9 +22,7 @@
 
 #include <QList>
 
-class Q3ListViewItem;
 class KTemporaryFile;
-class KNHeaderView;
 class KNArticleCollection;
 class KNArticleFilter;
 class KNFilterManager;
@@ -87,11 +85,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     bool toggleWatched(KNRemoteArticle::List &l);
     bool toggleIgnored(KNRemoteArticle::List &l);
 
-    /** Allow to delay the setup of UI elements, since the knode part may not
-     * be available when the config dialog is called.
-     */
-    void setView(KNHeaderView* v);
-
   signals:
     /** A newsgroup is about to be shown in the header view.
      * Connect to the header view to adapt to the upcoming content.
@@ -110,7 +103,6 @@ class KNArticleManager : public QObject, public KNJobConsumer {
   protected:
     void processJob(KNJobData *j);
 
-    KNHeaderView *v_iew;
     KNGroup::Ptr g_roup;
     KNFolder::Ptr f_older;
     KNArticleFilter *f_ilter;

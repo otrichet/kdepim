@@ -878,7 +878,10 @@ bool KNComposer::applyChanges()
   a_rticle->lines()->setNumberOfLines(a_rticle->lineCount());
 
   a_rticle->assemble();
+kDebug() << "Port";
+#if 0
   a_rticle->updateListItem();
+#endif
 
   return result;
 }

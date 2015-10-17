@@ -33,7 +33,6 @@ class KSelectAction;
 class KSqueezedTextLabel;
 class KLineEdit;
 class KXMLGUIClient;
-class KNHeaderView;
 class KNCollectionView;
 class KNConfigManager;
 class KNAccountManager;

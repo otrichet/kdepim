@@ -36,14 +36,12 @@
 #include "knfiltermanager.h"
 #include "knfolder.h"
 #include "knarticlefilter.h"
-#include "knhdrviewitem.h"
 #include "scheduler.h"
 #include "knnntpaccount.h"
 #include "knmemorymanager.h"
 #include "knarticlefactory.h"
 #include "knarticlewindow.h"
 #include "knfoldermanager.h"
-#include "headerview.h"
 #include "nntpjobs.h"
 #include "settings.h"
 
@@ -305,7 +303,10 @@ bool KNArticleManager::unloadArticle( KNArticle::Ptr a, bool force )
   ArticleWidget::articleRemoved( a );
   if ( a->type() != KNArticle::ATlocal )
     KNGlobals::self()->articleFactory()->deleteComposerForArticle( boost::static_pointer_cast<KNLocalArticle>( a ) );
+kDebug() << "Port";
+#if 0
   a->updateListItem();
+#endif
   knGlobals.memoryManager()->removeCacheEntry(a);
 
   return true;
@@ -501,7 +502,10 @@ void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPos
     else if ( (*it)->getReadFlag() != r ) {
       (*it)->setRead( r );
       (*it)->setChanged( true );
+kDebug() << "Port";
+#if 0
       (*it)->updateListItem();
+#endif
 
       if ( !(*it)->isIgnored() ) {
         changeCnt++;
@@ -520,10 +524,13 @@ void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPos
               ref->incNewFollowUps();
           }
 
+kDebug() << "Port";
+#if 0
           if(ref->listItem() &&
              ((ref->unreadFollowUps()==0 || ref->unreadFollowUps()==1) ||
               (ref->newFollowUps()==0 || ref->newFollowUps()==1)))
             ref->updateListItem();
+#endif
 
           idRef=ref->idRef();
         }
@@ -594,10 +601,13 @@ bool KNArticleManager::toggleWatched(KNRemoteArticle::List &l)
           if ( (*it)->isNew() )
             ref->incNewFollowUps();
 
+kDebug() << "Port";
+#if 0
           if(ref->listItem() &&
              ((ref->unreadFollowUps()==0 || ref->unreadFollowUps()==1) ||
               (ref->newFollowUps()==0 || ref->newFollowUps()==1)))
             ref->updateListItem();
+#endif
 
           idRef=ref->idRef();
         }
@@ -608,7 +618,10 @@ bool KNArticleManager::toggleWatched(KNRemoteArticle::List &l)
     }
 
     (*it)->setWatched( watch );
+kDebug() << "Port";
+#if 0
     (*it)->updateListItem();
+#endif
     (*it)->setChanged( true );
   }
 
@@ -654,10 +667,13 @@ bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
               ref->incNewFollowUps();
           }
 
+kDebug() << "Port";
+#if 0
           if(ref->listItem() &&
              ((ref->unreadFollowUps()==0 || ref->unreadFollowUps()==1) ||
               (ref->newFollowUps()==0 || ref->newFollowUps()==1)))
             ref->updateListItem();
+#endif
 
           idRef=ref->idRef();
         }
@@ -674,7 +690,10 @@ bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
 
       }
     }
+kDebug() << "Port";
+#if 0
     (*it)->updateListItem();
+#endif
     (*it)->setChanged(true);
   }
 
@@ -695,8 +714,11 @@ void KNArticleManager::processJob(KNJobData *j)
       ArticleWidget::articleChanged( a );
       if(!a->isOrphant()) //orphant articles are deleted by the displaying widget
         knGlobals.memoryManager()->updateCacheEntry( boost::static_pointer_cast<KNArticle>( a ) );
+kDebug() << "Port";
+#if 0
       if(a->listItem())
         a->updateListItem();
+#endif
     } else {
       if ( j->error() == KIO::ERR_DOES_NOT_EXIST ) {
         // article is not available at the server anymore
@@ -773,12 +795,5 @@ void KNArticleManager::slotSearchDialogDone()
   slotFilterChanged(f_ilterMgr->currentFilter());
 }
 
-
-void KNArticleManager::setView(KNHeaderView* v) {
-kDebug() << "Port";
-#if 0
-  v_iew = v;
-#endif
-}
 
 //-----------------------------

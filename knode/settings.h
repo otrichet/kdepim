@@ -49,8 +49,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     QColor linkColor() { return effectiveColor( linkColorItem() ); }
     /// Returns the effective color for unread articles.
     QColor unreadArticleColor() { return effectiveColor( unreadArticleColorItem() ); }
-    /// Returns the effective color for read articles.
-    QColor readArticleColor() { return effectiveColor( readArticleColorItem() ); }
     /// Returns the effective color for valid signatures with a trusted key.
     QColor signOkKeyOkColor() { return effectiveColor( signOkKeyOkColorItem() ); }
     /// Returns the effective color for valid signatures with a untrusted key.
@@ -70,8 +68,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     QFont composerFont() { return effectiveFont( composerFontItem() ); }
     /// Returns the effective folder tree font.
     QFont groupListFont() { return effectiveFont( groupListFontItem() ); }
-    /// Returns the effective article list font.
-    QFont articleListFont() { return effectiveFont( articleListFontItem() ); }
 
     /** Returns a list of additional headers added to created articles. */
     QList<XHeader> xHeaders() const { return mXHeaders; }

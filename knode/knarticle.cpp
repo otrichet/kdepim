@@ -14,7 +14,6 @@
 
 #include "knarticle.h"
 
-#include "knhdrviewitem.h"
 #include "kngroup.h"
 #include "knglobals.h"
 #include "knconfigmanager.h"
@@ -31,14 +30,13 @@ using namespace KMime;
 
 
 KNArticle::KNArticle( KNArticleCollection::Ptr c )
-  : i_d( -1 ), c_ol( c ), i_tem( 0 )
+  : i_d( -1 ), c_ol( c )
 {
 }
 
 
 KNArticle::~KNArticle()
 {
-  delete i_tem;
 }
 
 
@@ -46,17 +44,6 @@ void KNArticle::clear()
 {
   f_lags.clear();
 }
-
-
-void KNArticle::setListItem( KNHdrViewItem *it, KNArticle::Ptr a )
-{
-  Q_ASSERT_X( this == a.get(), "KNArticle::setListItem", "By contract, setListItem second parameter must be a reference to 'this' article" );
-  i_tem=it;
-  if( i_tem ) {
-    i_tem->art = a;
-  }
-}
-
 
 void KNArticle::setLocked(bool b)
 {
@@ -108,61 +95,6 @@ void KNRemoteArticle::parse()
   }
 }
 
-
-void KNRemoteArticle::initListItem()
-{
-  if(!i_tem) return;
-
-  KMime::Types::Mailbox mbox;
-  if ( !from()->isEmpty() ) {
-    mbox = from()->mailboxes().first();
-  }
-  if ( mbox.hasName() )
-    i_tem->setText( 1, mbox.name() );
-  else
-    i_tem->setText( 1, QString::fromLatin1( mbox.address() ) );
-
-  updateListItem();
-}
-
-
-void KNRemoteArticle::updateListItem()
-{
-  if(!i_tem) return;
-
-  KNode::Appearance *app=knGlobals.configManager()->appearance();
-
-  if(isRead()) {
-    if(hasContent())
-      i_tem->setPixmap(0, app->icon(KNode::Appearance::greyBallChkd));
-    else
-      i_tem->setPixmap(0, app->icon(KNode::Appearance::greyBall));
-  }
-  else {
-    if(hasContent())
-      i_tem->setPixmap(0,app->icon(KNode::Appearance::redBallChkd));
-    else
-      i_tem->setPixmap(0, app->icon(KNode::Appearance::redBall));
-  }
-
-  if(hasNewFollowUps())
-    i_tem->setPixmap(1, app->icon(KNode::Appearance::newFups));
-  else
-    i_tem->setPixmap(1, app->icon(KNode::Appearance::null));
-
-  if(isWatched())
-    i_tem->setPixmap(2, app->icon(KNode::Appearance::eyes));
-  else {
-    if(isIgnored())
-      i_tem->setPixmap(2, app->icon(KNode::Appearance::ignore));
-    else
-      i_tem->setPixmap(2, app->icon(KNode::Appearance::null));
-  }
-
-  i_tem->repaint(); //force repaint
-}
-
-
 void KNRemoteArticle::setForceDefaultCharset(bool b)
 {
   if (!b) { // restore default
@@ -170,7 +102,6 @@ void KNRemoteArticle::setForceDefaultCharset(bool b)
     setDefaultCharset( Locale::defaultCharset( g ) );
   }
   KNArticle::setForceDefaultCharset( b );
-  initListItem();
 }
 
 
@@ -189,53 +120,11 @@ KNLocalArticle::~KNLocalArticle()
 {}
 
 
-void KNLocalArticle::updateListItem()
-{
-  if(!i_tem)
-    return;
-
-  QString tmp;
-  int idx=0;
-  KNode::Appearance *app=knGlobals.configManager()->appearance();
-
-  if(isSavedRemoteArticle()) {
-    i_tem->setPixmap(0, app->icon(KNode::Appearance::savedRemote));
-    Headers::Newsgroups *hdrNewsgroup = newsgroups( false );
-    if ( hdrNewsgroup && !hdrNewsgroup->isEmpty() ) {
-      tmp = hdrNewsgroup->asUnicodeString();
-    } else {
-      Headers::To *hdrTo = to( false );
-      if ( hdrTo && !hdrTo->isEmpty() ) {
-        tmp = hdrTo->asUnicodeString();
-      }
-    }
-  } else {
-    if(doPost()) {
-      tmp += newsgroups()->asUnicodeString();
-      if(canceled())
-        i_tem->setPixmap(idx++, app->icon(KNode::Appearance::canceledPosting));
-      else
-        i_tem->setPixmap(idx++, app->icon(KNode::Appearance::posting));
-    }
-
-    if(doMail()) {
-      i_tem->setPixmap(idx++, app->icon(KNode::Appearance::mail));
-      if(doPost())
-        tmp+=" / ";
-      tmp += to()->asUnicodeString();
-    }
-  }
-
-  i_tem->setText(1, tmp);
-}
-
-
 void KNLocalArticle::setForceDefaultCharset( bool b )
 {
   if (!b)  // restore default
     setDefaultCharset( Locale::defaultCharset() );
   KNArticle::setForceDefaultCharset( b );
-  updateListItem();
 }
 
 
