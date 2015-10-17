@@ -284,23 +284,6 @@ void KNMainWidget::updateCaption()
   emit signalCaptionChangeRequest(newCaption);
 }
 
-void KNMainWidget::disableAccels(bool b)
-{
-#ifdef __GNUC__
-#warning Port me!
-#endif
-  /*a_ccel->setEnabled(!b);
-  KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
-  KAccel *naccel = mainWin ? mainWin->accel() : 0;
-  if ( naccel )
-    naccel->setEnabled(!b);*/
-  if (b)
-    installEventFilter(this);
-  else
-    removeEventFilter(this);
-}
-
-
 // processEvents with some blocking
 void KNMainWidget::secureProcessEvents()
 {
@@ -309,13 +292,7 @@ void KNMainWidget::secureProcessEvents()
   KMenuBar *mbar =  mainWin ? mainWin->menuBar() : 0;
   if ( mbar )
     mbar->setEnabled(false);
-#ifdef __GNUC__
-#warning Port me!
-#endif
-  /*a_ccel->setEnabled(false);
-  KAccel *naccel = mainWin ? mainWin->accel() : 0;
-  if ( naccel )
-    naccel->setEnabled(false);*/
+
   installEventFilter(this);
 
   qApp->processEvents();
@@ -323,12 +300,7 @@ void KNMainWidget::secureProcessEvents()
   b_lockui = false;
   if ( mbar )
     mbar->setEnabled(true);
-#ifdef __GNUC__
-#warning Port me!
-#endif
-//  a_ccel->setEnabled(true);
-//   if ( naccel )
-//     naccel->setEnabled(true);
+
   removeEventFilter(this);
 }
 
@@ -456,8 +428,6 @@ kDebug() << "Port";
 
 void KNMainWidget::initActions()
 {
-  //a_ccel=new KAccel(this);
-
   //navigation
   a_ctNavNextArt = actionCollection()->addAction("go_nextArticle" );
   a_ctNavNextArt->setText(i18n("&Next Article"));
@@ -1111,7 +1081,6 @@ void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
     if ( static_cast<KNCollectionViewItem*>( i )->collection()->type() == KNCollection::CTnntpAccount ) {
       a_ccManager->accountRenamed( boost::static_pointer_cast<KNNntpAccount>( static_cast<KNCollectionViewItem*>( i )->collection() ) );
     }
-    disableAccels(false);
   }
 }
 
@@ -1234,7 +1203,6 @@ void KNMainWidget::slotAccRename()
 {
   kDebug(5003) <<"KNMainWidget::slotAccRename()";
   if(a_ccManager->currentAccount()) {
-//     disableAccels(true);   // hack: global accels break the inplace renaming
     c_olView->editItem( a_ccManager->currentAccount()->listItem(), c_olView->labelColumnIndex() );
   }
 }
@@ -1305,7 +1273,6 @@ void KNMainWidget::slotGrpRename()
 {
   kDebug(5003) <<"slotGrpRename()";
   if(g_rpManager->currentGroup()) {
-//     disableAccels(true);   // hack: global accels break the inplace renaming
     c_olView->editItem( g_rpManager->currentGroup()->listItem(),  c_olView->labelColumnIndex() );
   }
 }
@@ -1433,7 +1400,6 @@ void KNMainWidget::slotFolRename()
     if(f_olManager->currentFolder()->isStandardFolder())
       KMessageBox::sorry(knGlobals.topWidget, i18n("You cannot rename a standard folder."));
     else {
-//       disableAccels(true);   // hack: global accels break the inplace renaming
       c_olView->editItem( f_olManager->currentFolder()->listItem(), c_olView->labelColumnIndex() );
     }
   }

@@ -67,7 +67,6 @@ public:
   void setStatusMsg(const QString& = QString(), int id=SB_MAIN);
   void setStatusHelpMsg(const QString& text);
   void updateCaption();
-  void disableAccels(bool b=true);
   /** processEvents with some blocking */
   void secureProcessEvents();
 
@@ -176,7 +175,6 @@ protected:
   bool eventFilter(QObject *, QEvent *);
 
   //GUI
-  //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
   KNCollectionView *c_olView;
   KNode::MessageList::HeadersWidget *mHeadersView;
