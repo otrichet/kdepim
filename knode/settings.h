@@ -47,10 +47,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     QColor quoteColor( int depth ) { return effectiveColor( quoteColorItem( depth ) ); }
     /// Returns the effective link color.
     QColor linkColor() { return effectiveColor( linkColorItem() ); }
-    /// Returns the effective color for unread threads.
-    QColor unreadThreadColor() { return effectiveColor( unreadThreadColorItem() ); }
-    /// Returns the effective color for read threads.
-    QColor readThreadColor() { return effectiveColor( readThreadColorItem() ); }
     /// Returns the effective color for unread articles.
     QColor unreadArticleColor() { return effectiveColor( unreadArticleColorItem() ); }
     /// Returns the effective color for read articles.

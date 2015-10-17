@@ -177,15 +177,11 @@ class KNRemoteArticle : public KNArticle {
 
     virtual void setForceDefaultCharset( bool b );
 
-    QColor color() const { return c_olor; }
-    void setColor(const QColor& c) { c_olor = c; }
-
   protected:
     int a_rticleNumber;
     int i_dRef;                      // id of a reference-article (0 == none)
     KNRemoteArticle::Ptr d_ref;      // displayed reference-article (may differ from i_dRef)
     unsigned char t_hrLevel;         // quality of threading
-    QColor c_olor;                   // color for the header list
     unsigned short u_nreadFups,      // number of the article's unread follow-ups
                    n_ewFups;         // number of the article's new follow-ups.
 

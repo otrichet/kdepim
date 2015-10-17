@@ -300,14 +300,6 @@
       <label>Link</label>
       <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).foreground(KColorScheme::LinkText).color()</default>
     </entry>
-    <entry name="readThreadColor" type="Color">
-      <label>Read Thread</label>
-      <default code="true">KColorScheme( QPalette::Disabled, KColorScheme::View ).foreground( KColorScheme::InactiveText ).color()</default>
-    </entry>
-    <entry name="unreadThreadColor" type="Color">
-      <label>Unread Thread</label>
-      <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).foreground().color()</default>
-    </entry>
     <entry name="readArticleColor" key="readArtColor" type="Color">
       <label>Read Article</label>
       <default>#888888</default>
