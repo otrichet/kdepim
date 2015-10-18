@@ -85,6 +85,8 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     bool toggleWatched(KNRemoteArticle::List &l);
     bool toggleIgnored(KNRemoteArticle::List &l);
 
+    void notifyArticleChanged(KNArticle::Ptr a, bool deleted = false);
+
   signals:
     /** A newsgroup is about to be shown in the header view.
      * Connect to the header view to adapt to the upcoming content.
@@ -99,6 +101,12 @@ class KNArticleManager : public QObject, public KNJobConsumer {
      * Emitted to indicates that the content of a group has changed.
      */
     void collectionChanged(const KNArticleCollection::Ptr group);
+
+    /**
+     * Emitted to indicates that the content of articles has changed.
+     */
+    void articlesChanged(const KNArticle::List articles, bool deleted = false);
+
 
   protected:
     void processJob(KNJobData *j);

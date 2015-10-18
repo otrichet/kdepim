@@ -303,10 +303,7 @@ bool KNArticleManager::unloadArticle( KNArticle::Ptr a, bool force )
   ArticleWidget::articleRemoved( a );
   if ( a->type() != KNArticle::ATlocal )
     KNGlobals::self()->articleFactory()->deleteComposerForArticle( boost::static_pointer_cast<KNLocalArticle>( a ) );
-kDebug() << "Port";
-#if 0
-  a->updateListItem();
-#endif
+
   knGlobals.memoryManager()->removeCacheEntry(a);
 
   return true;
@@ -471,9 +468,8 @@ void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPos
   if ( l.isEmpty() )
     return;
 
-  KNRemoteArticle::Ptr ref;
+  KNArticle::List changed;
   KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( l.first()->collection() );
-  int changeCnt=0, idRef=0;
 
   for ( KNRemoteArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
     if( r && knGlobals.settings()->markCrossposts() &&
@@ -498,43 +494,12 @@ void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPos
         }
       }
     }
-
     else if ( (*it)->getReadFlag() != r ) {
       (*it)->setRead( r );
       (*it)->setChanged( true );
-kDebug() << "Port";
-#if 0
-      (*it)->updateListItem();
-#endif
+      changed << (*it);
 
       if ( !(*it)->isIgnored() ) {
-        changeCnt++;
-        idRef = (*it)->idRef();
-
-        while ( idRef != 0 ) {
-          ref=g->byId(idRef);
-          if(r) {
-            ref->decUnreadFollowUps();
-            if ( (*it)->isNew() )
-              ref->decNewFollowUps();
-          }
-          else {
-            ref->incUnreadFollowUps();
-            if ( (*it)->isNew() )
-              ref->incNewFollowUps();
-          }
-
-kDebug() << "Port";
-#if 0
-          if(ref->listItem() &&
-             ((ref->unreadFollowUps()==0 || ref->unreadFollowUps()==1) ||
-              (ref->newFollowUps()==0 || ref->newFollowUps()==1)))
-            ref->updateListItem();
-#endif
-
-          idRef=ref->idRef();
-        }
-
         if(r) {
           g->incReadCount();
           if ( (*it)->isNew() )
@@ -549,10 +514,12 @@ kDebug() << "Port";
     }
   }
 
-  if(changeCnt>0) {
+  if(!changed.isEmpty()) {
     g->updateListItem();
     if(g==g_roup)
       updateStatusString();
+
+    emit articlesChanged(changed);
   }
 }
 
@@ -580,37 +547,16 @@ bool KNArticleManager::toggleWatched(KNRemoteArticle::List &l)
   if(l.isEmpty())
     return true;
 
+  KNArticle::List changed;
   KNRemoteArticle::Ptr a = l.first();
-  KNRemoteArticle::Ptr ref;
   bool watch = (!a->isWatched());
   KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( a->collection() );
-  int changeCnt=0, idRef=0;
 
   for ( KNRemoteArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
     if ( (*it)->isIgnored() ) {
       (*it)->setIgnored(false);
 
       if ( !(*it)->getReadFlag() ) {
-        changeCnt++;
-        idRef = (*it)->idRef();
-
-        while ( idRef != 0 ) {
-          ref=g->byId(idRef);
-
-          ref->incUnreadFollowUps();
-          if ( (*it)->isNew() )
-            ref->incNewFollowUps();
-
-kDebug() << "Port";
-#if 0
-          if(ref->listItem() &&
-             ((ref->unreadFollowUps()==0 || ref->unreadFollowUps()==1) ||
-              (ref->newFollowUps()==0 || ref->newFollowUps()==1)))
-            ref->updateListItem();
-#endif
-
-          idRef=ref->idRef();
-        }
         g->decReadCount();
         if ( (*it)->isNew() )
           g->incNewCount();
@@ -618,17 +564,16 @@ kDebug() << "Port";
     }
 
     (*it)->setWatched( watch );
-kDebug() << "Port";
-#if 0
-    (*it)->updateListItem();
-#endif
     (*it)->setChanged( true );
+    changed << (*it);
   }
 
-  if(changeCnt>0) {
+  if(!changed.isEmpty()) {
     g->updateListItem();
     if(g==g_roup)
       updateStatusString();
+
+    emit articlesChanged(changed);
   }
 
   return watch;
@@ -640,10 +585,9 @@ bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
   if(l.isEmpty())
     return true;
 
-  KNRemoteArticle::Ptr ref;
+  KNArticle::List changed;
   bool ignore = !l.first()->isIgnored();
   KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( l.first()->collection() );
-  int changeCnt = 0, idRef = 0;
 
   for ( KNRemoteArticle::List::Iterator it = l.begin(); it != l.end(); ++it ) {
     (*it)->setWatched(false);
@@ -651,33 +595,6 @@ bool KNArticleManager::toggleIgnored(KNRemoteArticle::List &l)
       (*it)->setIgnored( ignore );
 
       if ( !(*it)->getReadFlag() ) {
-        changeCnt++;
-        idRef = (*it)->idRef();
-
-        while ( idRef != 0 ) {
-          ref = g->byId( idRef );
-
-          if ( ignore ) {
-            ref->decUnreadFollowUps();
-            if ( (*it)->isNew() )
-              ref->decNewFollowUps();
-          } else {
-            ref->incUnreadFollowUps();
-            if ( (*it)->isNew() )
-              ref->incNewFollowUps();
-          }
-
-kDebug() << "Port";
-#if 0
-          if(ref->listItem() &&
-             ((ref->unreadFollowUps()==0 || ref->unreadFollowUps()==1) ||
-              (ref->newFollowUps()==0 || ref->newFollowUps()==1)))
-            ref->updateListItem();
-#endif
-
-          idRef=ref->idRef();
-        }
-
         if ( ignore ) {
           g->incReadCount();
           if ( (*it)->isNew() )
@@ -690,21 +607,30 @@ kDebug() << "Port";
 
       }
     }
-kDebug() << "Port";
-#if 0
-    (*it)->updateListItem();
-#endif
+
     (*it)->setChanged(true);
+    changed << (*it);
   }
 
-  if(changeCnt>0) {
+  if(!changed.isEmpty()) {
     g->updateListItem();
     if(g==g_roup)
       updateStatusString();
+
+    emit articlesChanged(changed);
   }
 
   return ignore;
 }
+
+
+void KNArticleManager::notifyArticleChanged(KNArticle::Ptr a, bool deleted)
+{
+    KNArticle::List l;
+    l << a;
+    emit articlesChanged(l, deleted);
+}
+
 
 void KNArticleManager::processJob(KNJobData *j)
 {
@@ -714,11 +640,8 @@ void KNArticleManager::processJob(KNJobData *j)
       ArticleWidget::articleChanged( a );
       if(!a->isOrphant()) //orphant articles are deleted by the displaying widget
         knGlobals.memoryManager()->updateCacheEntry( boost::static_pointer_cast<KNArticle>( a ) );
-kDebug() << "Port";
-#if 0
-      if(a->listItem())
-        a->updateListItem();
-#endif
+
+      notifyArticleChanged(a);
     } else {
       if ( j->error() == KIO::ERR_DOES_NOT_EXIST ) {
         // article is not available at the server anymore

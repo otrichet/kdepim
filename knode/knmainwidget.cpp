@@ -161,10 +161,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   //Article Manager
   a_rtManager = knGlobals.articleManager();
-kDebug() << "Port";
-#if 0
-  a_rtManager->setView(h_drView);
-#endif
 
   //Group Manager
   g_rpManager = knGlobals.groupManager();
@@ -1598,12 +1594,6 @@ void KNMainWidget::slotArtDelete()
 
   if(!lst.isEmpty())
     a_rtManager->deleteArticles(lst);
-
-kDebug() << "Port";
-#if 0
-  if(h_drView->currentItem())
-    h_drView->setActive( h_drView->currentItem() );
-#endif
 }
 
 

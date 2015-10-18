@@ -69,6 +69,8 @@ HeadersWidget::HeadersWidget(QWidget* parent)
             this, SLOT(showCollection(KNArticleCollection::Ptr)));
     connect(KNGlobals::self()->articleManager(), SIGNAL(filterChanged(KNArticleFilter*)),
             this, SLOT(setFilter(KNArticleFilter*)));
+    connect(KNGlobals::self()->articleManager(), SIGNAL(articlesChanged(KNArticle::List,bool)),
+            mModel, SLOT(changedArticles(KNArticle::List,bool)));
     connect(mView, SIGNAL(articlesSelected(const KNArticle::List)),
             this, SIGNAL(articlesSelected(const KNArticle::List)));
     connect(mView->header(), SIGNAL(sortIndicatorChanged(int,Qt::SortOrder)),

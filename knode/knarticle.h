@@ -140,16 +140,12 @@ class KNRemoteArticle : public KNArticle {
     void setDisplayedReference( KNRemoteArticle::Ptr dr ) { d_ref=dr; }
     unsigned char threadingLevel()                { return t_hrLevel; }
     void setThreadingLevel(unsigned char l)       { t_hrLevel=l; }
-    unsigned short newFollowUps()                 { return n_ewFups; }
     bool hasNewFollowUps()                        { return (n_ewFups>0); }
     void setNewFollowUps(unsigned short s)        { n_ewFups=s; }
     void incNewFollowUps(unsigned short s=1)      { n_ewFups+=s; }
-    void decNewFollowUps(unsigned short s=1)      { n_ewFups-=s; }
-    unsigned short unreadFollowUps()              { return u_nreadFups; }
     bool hasUnreadFollowUps()                     { return (u_nreadFups>0); }
     void setUnreadFollowUps(unsigned short s)     { u_nreadFups=s; }
     void incUnreadFollowUps(unsigned short s=1)   { u_nreadFups+=s; }
-    void decUnreadFollowUps(unsigned short s=1)   { u_nreadFups-=s; }
 
     //filtering
     bool filterResult()                     { return f_lags.get(10); }

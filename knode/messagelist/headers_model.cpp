@@ -145,6 +145,86 @@ void HeadersModel::showThreads(bool b)
 
 
 
+/**
+ * Recursively search articles from @p articles and
+ * - emit #dataChanged(QModelIndex).
+ * - or remove them from the internal model.
+ */
+void HeadersModel::modifyInternal(KNArticle::List& articles, Header* parent, bool deletion)
+{
+    if(articles.isEmpty()) {
+        return;
+    }
+
+    for(int r = 0 ; r < parent->children.length() ; ++r) {
+        Header* child = parent->children.at(r);
+        int idx = articles.indexOf(child->article);
+        if(idx != -1) {
+            if(deletion) {
+                const QModelIndex parentIdx = (parent->parent ? createIndex(parent->parent->children.indexOf(parent), 0, parent) : QModelIndex());
+                beginRemoveRows(parentIdx, r, r);
+                parent->children.removeAt(r);
+                delete child;
+                endRemoveRows();
+            } else {
+                refreshInternal(child, r);
+            }
+
+            articles.removeAt(idx);
+            if(articles.isEmpty()) {
+                return;
+            }
+        }
+        if(!child->children.isEmpty()) {
+            modifyInternal(articles, child, deletion);
+        }
+    }
+}
+
+/**
+ * Update the internal model when a KNArticle has changed.
+ */
+void HeadersModel::refreshInternal(Header* hdr, int row)
+{
+    Header *parent = hdr->parent;
+    if(!parent) {
+        // Reach the root
+        return;
+    }
+
+    if(row < 0) {
+        row = parent->children.indexOf(hdr);
+    }
+
+    emit dataChanged(createIndex(row, COLUMN_SUBJECT, hdr),
+                     createIndex(row, COLUMN_DATE, hdr));
+
+    if(!hdr->unreadFollowup) { // if current header still has unread children, its parent too.
+        if(hdr->article->type() == KNArticle::ATremote) {
+            Q_FOREACH(Header* child, parent->children) {
+                const KNRemoteArticle::Ptr remote = boost::dynamic_pointer_cast<KNRemoteArticle>(child->article);
+                if(parent->unreadFollowup != (remote && !remote->isRead())) {
+                    parent->unreadFollowup = !parent->unreadFollowup;
+                    refreshInternal(parent);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void HeadersModel::changedArticles(const KNArticle::List articles, bool deleted)
+{
+    if(articles.isEmpty() || articles.first()->collection() != mCollection) {
+        return;
+    }
+
+    KNArticle::List arts = articles;
+    modifyInternal(arts, mRoot, deleted);
+}
+
+
+
 void HeadersModel::reload(const KNArticleCollection::Ptr collection)
 {
     Header* root = new Header(KNArticle::Ptr());

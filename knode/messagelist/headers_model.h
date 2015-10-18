@@ -101,12 +101,18 @@ class HeadersModel : public QAbstractItemModel
          * Show/hide threading.
          */
         void showThreads(bool b);
+        /**
+         * Receive notification of article changes.
+         */
+        void changedArticles(const KNArticle::List articles, bool deleted);
 
     private:
         /**
          * Reload the internal data structure.
          */
         void reload(KNArticleCollection::Ptr collection);
+        void modifyInternal(KNArticle::List &articles, Header* parent, bool deletion);
+        void refreshInternal(Header *hdr, int row = -1);
 
         Header* mRoot;
         KNArticleCollection::Ptr mCollection;

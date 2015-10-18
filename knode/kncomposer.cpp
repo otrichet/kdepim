@@ -42,6 +42,8 @@ using KPIM::RecentAddresses;
 #include <klocale.h>
 #include <kselectaction.h>
 #include <ktoggleaction.h>
+
+#include "knarticlemanager.h"
 #include "kngroupselectdialog.h"
 #include "utilities.h"
 #include "knglobals.h"
@@ -878,10 +880,8 @@ bool KNComposer::applyChanges()
   a_rticle->lines()->setNumberOfLines(a_rticle->lineCount());
 
   a_rticle->assemble();
-kDebug() << "Port";
-#if 0
-  a_rticle->updateListItem();
-#endif
+
+  KNGlobals::self()->articleManager()->notifyArticleChanged(a_rticle);
 
   return result;
 }
