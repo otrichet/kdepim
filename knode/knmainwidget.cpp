@@ -14,9 +14,9 @@
 
 #include "knmainwidget.h"
 
-#include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
+#include <QShortcut>
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QSplitter>
@@ -97,7 +97,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   // this will enable keyboard-only actions like that don't appear in any menu
   //actionCollection()->setDefaultShortcutContext( Qt::WindowShortcut );
 
-  Q3Accel *accel = new Q3Accel( this );
   initStatusBar();
   setSpacing( 0 );
   setMargin( 0 );
@@ -122,10 +121,10 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   connect( c_olView, SIGNAL(renamed(QTreeWidgetItem*)),
            this, SLOT(slotCollectionRenamed(QTreeWidgetItem*)) );
 
-  accel->connectItem( accel->insertItem(Qt::Key_Up), mArticleViewer, SLOT(scrollUp()) );
-  accel->connectItem( accel->insertItem(Qt::Key_Down), mArticleViewer, SLOT(scrollDown()) );
-  accel->connectItem( accel->insertItem(Qt::Key_PageUp), mArticleViewer, SLOT(scrollPrior()) );
-  accel->connectItem( accel->insertItem(Qt::Key_PageDown), mArticleViewer, SLOT(scrollNext()) );
+  new QShortcut(Qt::Key_Up, mArticleViewer, SLOT(scrollUp()));
+  new QShortcut(Qt::Key_Down, mArticleViewer, SLOT(scrollDown()));
+  new QShortcut(Qt::Key_PageUp, mArticleViewer, SLOT(scrollPrior()));
+  new QShortcut(Qt::Key_PageDown, mArticleViewer, SLOT(scrollNext()));
 
   //header view
   mHeadersView = new MessageList::HeadersWidget( mSecondSplitter );
