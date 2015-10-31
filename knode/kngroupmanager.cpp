@@ -17,7 +17,6 @@
 #include "articlewidget.h"
 #include "knmainwidget.h"
 #include "knarticlemanager.h"
-#include "kngroupdialog.h"
 #include "knnntpaccount.h"
 #include "kncleanup.h"
 #include "scheduler.h"
@@ -40,6 +39,8 @@
 #include <kiconloader.h>
 #include <kdebug.h>
 #include <kcharsets.h>
+
+#include "groupselection/group_subscription_dialog.h"
 #include "knaccountmanager.h"
 
 
@@ -81,6 +82,10 @@ bool KNGroupInfo::operator< (const KNGroupInfo &gi2) const
   return (name < gi2.name);
 }
 
+uint qHash(const KNGroupInfo& gi)
+{
+    return qHash(gi.name);
+}
 
 //===============================================================================
 
@@ -400,8 +405,9 @@ void KNGroupManager::expireAll( KNNntpAccount::Ptr a )
 
 void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
 {
-  KNGroupDialog* gDialog=new KNGroupDialog((parent!=0)? parent:knGlobals.topWidget, a);
+  GroupSelection::SubscriptionDialog* gDialog = new GroupSelection::SubscriptionDialog(parent, a);
 
+kDebug() << "Port" << "Connection from loadList(...) and fetchList(...)";
   connect( gDialog, SIGNAL(loadList(KNNntpAccount::Ptr)), this, SLOT(slotLoadGroupList(KNNntpAccount::Ptr)) );
   connect( gDialog, SIGNAL(fetchList(KNNntpAccount::Ptr)), this, SLOT(slotFetchGroupList(KNNntpAccount::Ptr)) );
   connect( gDialog, SIGNAL(checkNew(KNNntpAccount::Ptr,QDate)), this, SLOT(slotCheckForNewGroups(KNNntpAccount::Ptr,QDate)) );
@@ -417,9 +423,9 @@ void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
     KNGroup::Ptr g;
 
     QStringList lst;
-    gDialog->toUnsubscribe(&lst);
+    gDialog->toUnsubscribe(lst);
     if (lst.count()>0) {
-      if (KMessageBox::Yes == KMessageBox::questionYesNoList((parent!=0)? parent:knGlobals.topWidget,i18n("Do you really want to unsubscribe\nfrom these groups?"),
+      if (KMessageBox::Yes == KMessageBox::questionYesNoList(parent, i18n("Do you really want to unsubscribe\nfrom these groups?"),
                                                               lst, QString(), KGuiItem(i18n("Unsubscribe")), KStandardGuiItem::cancel())) {
         for ( QStringList::Iterator it = lst.begin(); it != lst.end(); ++it ) {
           if((g=group(*it, a)))
@@ -429,7 +435,7 @@ void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
     }
 
     QList<KNGroupInfo> lst2;
-    gDialog->toSubscribe(&lst2);
+    gDialog->toSubscribe(lst2);
     Q_FOREACH( const KNGroupInfo& var, lst2) {
       subscribeGroup(&var, a);
     }

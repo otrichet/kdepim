@@ -1202,7 +1202,7 @@ void KNMainWidget::slotAccSubscribe()
 {
   kDebug(5003) <<"KNMainWidget::slotAccSubscribe()";
   if(a_ccManager->currentAccount())
-    g_rpManager->showGroupDialog(a_ccManager->currentAccount());
+    g_rpManager->showGroupDialog(a_ccManager->currentAccount(), this);
 }
 
 

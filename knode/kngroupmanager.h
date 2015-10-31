@@ -48,6 +48,9 @@ class KNGroupInfo {
     bool operator< (const KNGroupInfo &gi2) const;
 };
 
+Q_DECLARE_METATYPE(KNGroupInfo)
+uint qHash(const KNGroupInfo& gi);
+
 
 /** Data of group list jobs. */
 class KNGroupListData : public KNJobItem {
@@ -113,7 +116,7 @@ class KNGroupManager : public QObject , public KNJobConsumer {
     void setCurrentGroup( KNGroup::Ptr g );
 
     // group handling
-    void showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent = 0 );
+    void showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent );
     void subscribeGroup( const KNGroupInfo *gi, KNNntpAccount::Ptr a );
     bool unsubscribeGroup( KNGroup::Ptr g = KNGroup::Ptr() );
     /**
