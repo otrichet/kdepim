@@ -81,6 +81,7 @@ set(knodecommon_LIB_SRCS
    groupselection/subscription_state_proxy_model.cpp
    groupselection/subscription_state_grouping_proxy_model.cpp
    groupselection/group_model.cpp
+   groupselection/group_list_date_picker.cpp
    utils/locale.cpp
    utils/startup.cpp
    messagelist/headers_widget.cpp
@@ -106,6 +107,7 @@ kde4_add_ui_files(knodecommon_LIB_SRCS
    configuration/identity_widget.ui
    configuration/identity_edition_dialog.ui
    groupselection/group_subscription_dialog.ui
+   groupselection/group_list_date_picker.ui
 )
 
 kde4_add_kcfg_files(knodecommon_LIB_SRCS settings_base.kcfgc )

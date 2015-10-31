@@ -407,7 +407,6 @@ void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
 {
   GroupSelection::SubscriptionDialog* gDialog = new GroupSelection::SubscriptionDialog(parent, a);
 
-kDebug() << "Port" << "Connection from loadList(...) and fetchList(...)";
   connect( gDialog, SIGNAL(loadList(KNNntpAccount::Ptr)), this, SLOT(slotLoadGroupList(KNNntpAccount::Ptr)) );
   connect( gDialog, SIGNAL(fetchList(KNNntpAccount::Ptr)), this, SLOT(slotFetchGroupList(KNNntpAccount::Ptr)) );
   connect( gDialog, SIGNAL(checkNew(KNNntpAccount::Ptr,QDate)), this, SLOT(slotCheckForNewGroups(KNNntpAccount::Ptr,QDate)) );

@@ -30,10 +30,12 @@
 
 #include "groupselection/checked_state_proxy_model.h"
 #include "groupselection/enums.h"
+#include "groupselection/group_list_date_picker.h"
 #include "groupselection/group_model.h"
 #include "groupselection/subscription_state_proxy_model.h"
 #include "groupselection/subscription_state_grouping_proxy_model.h"
 
+#include "scheduler.h"
 
 namespace KNode {
 namespace GroupSelection {
@@ -55,12 +57,24 @@ SubscriptionDialog::SubscriptionDialog(QWidget* parent, KNNntpAccount::Ptr accou
         mRevertChangeButton->setIcon(KIcon("arrow-right"));
     }
 
+    setButtons(Ok | Cancel | Help | User1 | User2);
+    setHelp("anc-fetch-group-list");
+    setButtonText(User1, i18nc("@action:button Fetch the list of groups from the server", "New &List"));
+    connect(this, SIGNAL(user1Clicked()), this, SLOT(slotRequestNewList()));
+    setButtonText(User2, i18nc("@action:button Fetch the list of groups from the server", "New &Groups..."));
+    connect(this, SIGNAL(user2Clicked()), this, SLOT(slotRequestGroupSince()));
+
+
     QTimer::singleShot(5, this, SLOT(init()));
 }
 
 
+
 SubscriptionDialog::~SubscriptionDialog()
 {
+    KNode::Scheduler* s = KNGlobals::self()->scheduler();
+    s->cancelJobs(KNJobData::JTLoadGroups);
+    s->cancelJobs(KNJobData::JTFetchGroups);
 }
 
 void SubscriptionDialog::toSubscribe(QList<KNGroupInfo>& list)
@@ -91,6 +105,9 @@ void SubscriptionDialog::slotReceiveList(KNGroupListData::Ptr data)
     }
     mSubscriptionModel->setOriginalSubscriptions(subscribed);
     mGroupModel->newList(groups);
+
+    enableButton(User1, true);
+    enableButton(User2, true);
 }
 
 
@@ -186,6 +203,25 @@ void SubscriptionDialog::slotSelectionChange()
 {
     mAddChangeButton->setEnabled(mGroupsView->selectionModel()->hasSelection());
     mRevertChangeButton->setEnabled(mChangeView->selectionModel()->hasSelection());
+}
+
+
+void SubscriptionDialog::slotRequestNewList()
+{
+    enableButton(User1, false);
+    enableButton(User2, false);
+    emit fetchList(mAccount);
+}
+
+void SubscriptionDialog::slotRequestGroupSince()
+{
+    QPointer<GroupListDatePicker> diag = new GroupListDatePicker(this, mAccount);
+    if(diag->exec() == QDialog::Accepted) {
+        enableButton(User1, false);
+        enableButton(User2, false);
+        emit checkNew(mAccount, diag->selectedDate());
+    }
+    delete diag;
 }
 
 

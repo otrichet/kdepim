@@ -63,6 +63,8 @@ class SubscriptionDialog : public KDialog, private Ui_GroupSelectionDialog
 
     Q_SIGNALS:
         void loadList(KNNntpAccount::Ptr account);
+        void fetchList(KNNntpAccount::Ptr account);
+        void checkNew(KNNntpAccount::Ptr account, QDate since);
 
     private Q_SLOTS:
         void init();
@@ -77,6 +79,9 @@ class SubscriptionDialog : public KDialog, private Ui_GroupSelectionDialog
          * Called when the items selection in any of the view is modified.
          */
         void slotSelectionChange();
+
+        void slotRequestNewList();
+        void slotRequestGroupSince();
 
     private:
         KNNntpAccount::Ptr mAccount;
