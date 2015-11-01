@@ -27,6 +27,7 @@
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
+#include <QtGui/QFont>
 #include <KDE/KLocalizedString>
 
 #include "groupselection/enums.h"
@@ -96,6 +97,18 @@ QVariant GroupModel::data(const QModelIndex& index, int role) const
             }
         }
             break;
+
+        case Qt::FontRole:
+            if(index.column() == GroupModelColumn_Name) {
+                const KNGroupInfo& gi = mGroups->at(index.internalId());
+                if(gi.newGroup) {
+                    QFont f;
+                    f.setBold(true);
+                    return QVariant::fromValue(f);
+                }
+            }
+            break;
+
         case GroupInfoRole:
             return QVariant::fromValue(mGroups->at(index.internalId()));
             break;

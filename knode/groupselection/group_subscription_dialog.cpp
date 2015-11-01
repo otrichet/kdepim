@@ -32,6 +32,7 @@
 #include "groupselection/enums.h"
 #include "groupselection/group_list_date_picker.h"
 #include "groupselection/group_model.h"
+#include "groupselection/recent_group_proxy_model.h"
 #include "groupselection/subscription_state_proxy_model.h"
 #include "groupselection/subscription_state_grouping_proxy_model.h"
 
@@ -122,8 +123,10 @@ void SubscriptionDialog::init()
     // View of all groups and its dedicated proxy models
     QSortFilterProxyModel* searchProxy = new QSortFilterProxyModel(this);
     searchProxy->setSourceModel(mSubscriptionModel);
+    RecentGroupProxyModel* filterRecentGroup = new RecentGroupProxyModel(this);
+    filterRecentGroup->setSourceModel(searchProxy);
     CheckedStateConvertionProxyModel* checkableConvertionProxyModel = new CheckedStateConvertionProxyModel(this);
-    checkableConvertionProxyModel->setSourceModel(searchProxy);
+    checkableConvertionProxyModel->setSourceModel(filterRecentGroup);
     mGroupsView->setModel(checkableConvertionProxyModel);
 
     // View of subscription changes and its models
@@ -139,6 +142,11 @@ void SubscriptionDialog::init()
     searchProxy->setSortLocaleAware(true);
     searchProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
     searchProxy->sort(GroupModelColumn_Name, Qt::DescendingOrder);
+    mNewOnlyCheckbox->setChecked(filterRecentGroup->isNewOnlyEnabled());
+    connect(mNewOnlyCheckbox, SIGNAL(toggled(bool)),
+            filterRecentGroup, SLOT(setEnable(bool)));
+
+
 
     // Operation on selection
     connect(mAddChangeButton, SIGNAL(clicked(bool)),

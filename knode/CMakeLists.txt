@@ -78,6 +78,7 @@ set(knodecommon_LIB_SRCS
    configuration/identity_edition_dialog.cpp
    groupselection/group_subscription_dialog.cpp
    groupselection/checked_state_proxy_model.cpp
+   groupselection/recent_group_proxy_model.cpp
    groupselection/subscription_state_proxy_model.cpp
    groupselection/subscription_state_grouping_proxy_model.cpp
    groupselection/group_model.cpp

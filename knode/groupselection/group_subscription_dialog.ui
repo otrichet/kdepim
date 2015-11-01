@@ -39,6 +39,13 @@
        <item>
         <widget class="KFilterProxySearchLine" name="mSearchLine"/>
        </item>
+       <item>
+        <widget class="QCheckBox" name="mNewOnlyCheckbox">
+         <property name="text">
+          <string comment="@option:check Filter newly received group in the subscription dialog">New only</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
