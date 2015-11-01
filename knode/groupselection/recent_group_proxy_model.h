@@ -26,7 +26,7 @@
 #ifndef KNODE_GROUPSELECTION_RECENTGROUPPROXYMODEL_H
 #define KNODE_GROUPSELECTION_RECENTGROUPPROXYMODEL_H
 
-#include <QtGui/QSortFilterProxyModel>
+#include <KDE/KRecursiveFilterProxyModel>
 
 namespace KNode {
 namespace GroupSelection {
@@ -34,7 +34,7 @@ namespace GroupSelection {
 /**
  * Filter group having the 'new' flag set.
  */
-class RecentGroupProxyModel : public QSortFilterProxyModel
+class RecentGroupProxyModel : public KRecursiveFilterProxyModel
 {
     Q_OBJECT
 
@@ -51,7 +51,7 @@ class RecentGroupProxyModel : public QSortFilterProxyModel
         void setEnable(bool enable);
 
     protected:
-        virtual bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
+        virtual bool acceptRow(int sourceRow, const QModelIndex& sourceParent) const;
 
     private:
         bool mEnable;

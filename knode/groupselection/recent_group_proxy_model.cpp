@@ -33,7 +33,7 @@ namespace GroupSelection {
 
 
 RecentGroupProxyModel::RecentGroupProxyModel(QObject* parent)
-    : QSortFilterProxyModel(parent),
+    : KRecursiveFilterProxyModel(parent),
       mEnable(false)
 {
 }
@@ -49,8 +49,7 @@ void RecentGroupProxyModel::setEnable(bool enable)
     endResetModel();
 }
 
-
-bool RecentGroupProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
+bool RecentGroupProxyModel::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     if(mEnable) {
         const QVariant v = sourceModel()->index(sourceRow, 0, sourceParent).data(GroupInfoRole);

@@ -26,6 +26,7 @@
 #include "groupselection/group_subscription_dialog.h"
 
 #include <QtCore/QTimer>
+#include <KDE/KRecursiveFilterProxyModel>
 #include <KDE/KDebug>
 
 #include "groupselection/checked_state_proxy_model.h"
@@ -121,7 +122,7 @@ void SubscriptionDialog::init()
     mSubscriptionModel->setSourceModel(mGroupModel);
 
     // View of all groups and its dedicated proxy models
-    QSortFilterProxyModel* searchProxy = new QSortFilterProxyModel(this);
+    KRecursiveFilterProxyModel* searchProxy = new KRecursiveFilterProxyModel(this);
     searchProxy->setSourceModel(mSubscriptionModel);
     RecentGroupProxyModel* filterRecentGroup = new RecentGroupProxyModel(this);
     filterRecentGroup->setSourceModel(searchProxy);
@@ -141,10 +142,14 @@ void SubscriptionDialog::init()
     searchProxy->setFilterCaseSensitivity(Qt::CaseInsensitive);
     searchProxy->setSortLocaleAware(true);
     searchProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
-    searchProxy->sort(GroupModelColumn_Name, Qt::DescendingOrder);
+    searchProxy->sort(GroupModelColumn_Name, Qt::AscendingOrder);
     mNewOnlyCheckbox->setChecked(filterRecentGroup->isNewOnlyEnabled());
     connect(mNewOnlyCheckbox, SIGNAL(toggled(bool)),
             filterRecentGroup, SLOT(setEnable(bool)));
+    mTreeviewCheckbox->setChecked(mGroupModel->modelAsTree());
+    connect(mTreeviewCheckbox, SIGNAL(toggled(bool)),
+            mGroupModel, SLOT(modelAsTree(bool)));
+
 
 
 

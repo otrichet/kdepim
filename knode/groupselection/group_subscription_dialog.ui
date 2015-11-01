@@ -29,15 +29,22 @@
     </property>
     <item>
      <widget class="QWidget" name="mFilterContainer" native="true">
-      <layout class="QHBoxLayout" name="_3">
+      <layout class="QHBoxLayout" name="_3" stretch="1,0,0">
        <property name="spacing">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="margin">
         <number>0</number>
        </property>
        <item>
         <widget class="KFilterProxySearchLine" name="mSearchLine"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="mTreeviewCheckbox">
+         <property name="text">
+          <string comment="@option:check Display the list of newsgroups as a tree when enabled">Tree view</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="mNewOnlyCheckbox">

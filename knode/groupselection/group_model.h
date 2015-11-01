@@ -37,11 +37,15 @@ class KNGroupInfo;
 namespace KNode {
 namespace GroupSelection {
 
+class Node;
+
 /**
  * Base mode representing the list of all groups.
  */
 class GroupModel : public QAbstractItemModel
 {
+    Q_OBJECT
+
     public:
         GroupModel(QObject* parent);
         ~GroupModel();
@@ -55,8 +59,18 @@ class GroupModel : public QAbstractItemModel
 
         void newList(QList<KNGroupInfo>* groups);
 
+        bool modelAsTree() const
+        {
+            return mBuildTree;
+        }
+
+    public Q_SLOTS:
+        void modelAsTree(bool enable);
+
     private:
         QList<KNGroupInfo>* mGroups;
+        Node* mRoot;
+        bool mBuildTree;
 };
 
 }
