@@ -78,10 +78,13 @@ set(knodecommon_LIB_SRCS
    configuration/identity_edition_dialog.cpp
    groupselection/dialog_base.cpp
    groupselection/group_subscription_dialog.cpp
+   groupselection/group_selection_dialog.cpp
    groupselection/model/checked_state_proxy_model.cpp
    groupselection/model/recent_group_proxy_model.cpp
    groupselection/model/subscription_state_proxy_model.cpp
-   groupselection/model/subscription_state_grouping_proxy_model.cpp
+   groupselection/model/base_grouping_proxy_model.cpp
+   groupselection/model/subscription_grouping_proxy_model.cpp
+   groupselection/model/selection_grouping_proxy_model.cpp
    groupselection/model/group_model.cpp
    groupselection/helper/group_list_date_picker.cpp
    utils/locale.cpp

@@ -23,46 +23,52 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
-#define KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
+#include "selection_grouping_proxy_model.h"
 
-#include "dialog_base.h"
+#include <KDE/KLocalizedString>
+
+#include "../enums.h"
 
 namespace KNode {
 namespace GroupSelection {
 
-class SubscriptionDialog : public BaseDialog
+SelectionGroupingProxyModel::SelectionGroupingProxyModel(QObject* parent)
+    : BaseGroupingProxyModel(parent),
+      mSelection()
 {
-    Q_OBJECT
+    QList<QVector<QPersistentModelIndex>*> groupings;
+    groupings << &mSelection;
+    setGroupings(groupings);
+}
 
-    public:
-        SubscriptionDialog(QWidget* parent, KNNntpAccount::Ptr account);
-        ~SubscriptionDialog();
+SelectionGroupingProxyModel::~SelectionGroupingProxyModel()
+{
+}
 
-        /**
-         * Returns the list of groups that were subscribed.
-         */
-        void toSubscribe(QList<KNGroupInfo>& list);
-        /**
-         * Returns the list of groups that were unsubscribed.
-         */
-        void toUnsubscribe(QStringList& list);
+const QString SelectionGroupingProxyModel::title(QVector< QPersistentModelIndex >* grouping) const
+{
+    if(grouping == &mSelection) {
+        return i18nc("@title", "Groups for this article");
+    }
+    return QString();
+}
 
-    protected:
-        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView);
-        virtual QList<KNGroupInfo>* receiveList(KNGroupListData::Ptr data);
-        virtual QAbstractProxyModel* changesGroupingModel();
 
-    Q_SIGNALS:
-        void fetchList(KNNntpAccount::Ptr account);
-        void checkNew(KNNntpAccount::Ptr account, QDate since);
+QVector<QPersistentModelIndex>* SelectionGroupingProxyModel::selectInternalGrouping(SubscriptionState state)
+{
+    switch(state) {
+    case ExistingSubscription:
+    case NewSubscription:
+        return &mSelection;
+        break;
+    case NewUnsubscription:
+    case NoStateChange:
+    case Invalid:
+        break;
+    }
+    return 0;
+}
 
-    private Q_SLOTS:
-        void slotRequestNewList();
-        void slotRequestGroupSince();
-};
 
 }
 }
-
-#endif

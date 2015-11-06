@@ -23,43 +23,29 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
-#define KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
+#ifndef KNODE_GROUPSELECTION_SELECTIONGROUPINGPROXYMODEL_H
+#define KNODE_GROUPSELECTION_SELECTIONGROUPINGPROXYMODEL_H
 
-#include "dialog_base.h"
+#include "base_grouping_proxy_model.h"
 
 namespace KNode {
 namespace GroupSelection {
 
-class SubscriptionDialog : public BaseDialog
+/**
+ * This proxy model filters out group that are not selected.
+ */
+class SelectionGroupingProxyModel : public BaseGroupingProxyModel
 {
-    Q_OBJECT
-
     public:
-        SubscriptionDialog(QWidget* parent, KNNntpAccount::Ptr account);
-        ~SubscriptionDialog();
-
-        /**
-         * Returns the list of groups that were subscribed.
-         */
-        void toSubscribe(QList<KNGroupInfo>& list);
-        /**
-         * Returns the list of groups that were unsubscribed.
-         */
-        void toUnsubscribe(QStringList& list);
+        SelectionGroupingProxyModel(QObject* parent);
+        virtual ~SelectionGroupingProxyModel();
 
     protected:
-        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView);
-        virtual QList<KNGroupInfo>* receiveList(KNGroupListData::Ptr data);
-        virtual QAbstractProxyModel* changesGroupingModel();
+        virtual const QString title(QVector< QPersistentModelIndex >* grouping) const;
+        virtual QVector<QPersistentModelIndex>* selectInternalGrouping(SubscriptionState state);
 
-    Q_SIGNALS:
-        void fetchList(KNNntpAccount::Ptr account);
-        void checkNew(KNNntpAccount::Ptr account, QDate since);
-
-    private Q_SLOTS:
-        void slotRequestNewList();
-        void slotRequestGroupSince();
+    private:
+        QVector<QPersistentModelIndex> mSelection;
 };
 
 }

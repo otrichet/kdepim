@@ -23,30 +23,36 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef KNODE_GROUPSELECTION_SUBSCRIPTIONSTATEGROUPINGPROXYMODEL_H
-#define KNODE_GROUPSELECTION_SUBSCRIPTIONSTATEGROUPINGPROXYMODEL_H
+#ifndef KNODE_GROUPSELECTION_BASEGROUPINGPROXYMODEL_H
+#define KNODE_GROUPSELECTION_BASEGROUPINGPROXYMODEL_H
 
 #include <QtCore/QVector>
 #include <QtGui/QSortFilterProxyModel>
+
+#include "../enums.h"
 
 namespace KNode {
 namespace GroupSelection {
 
 /**
- * This model places the subscribed (respectively unsubscribed) groups
- * together under a common ancestor.
- *
- * It is assumed that a SubscriptionChangeFilterProxyModel is a source model.
+ * Base model to group newsgroups in the view of selection/subscription.
+ * It assumes a SubscriptionChangeFilterProxyModel is a source model.
  */
-class SubscriptionStateGroupingProxyModel : public QAbstractProxyModel
+class BaseGroupingProxyModel : public QAbstractProxyModel
 {
     Q_OBJECT
 
-    public:
-        SubscriptionStateGroupingProxyModel(QObject* parent);
-        virtual ~SubscriptionStateGroupingProxyModel();
+    protected:
+        // Use the internalId of QModelIndex to store the type of item.
+        // Type >= 0, are grouping (and index in mGroupings).
+        static const int INDEX_TYPE_TITLE = -1;
+
+        static const int COLUMN = 0;
 
     public:
+        BaseGroupingProxyModel(QObject* parent);
+        virtual ~BaseGroupingProxyModel();
+
         /**
          * Reimplemented to provide data for titles.
          */
@@ -64,21 +70,40 @@ class SubscriptionStateGroupingProxyModel : public QAbstractProxyModel
 
     Q_SIGNALS:
         /**
-         * Emitted to inform the view that.
+         * Emitted to inform the view that a change occurs.
          */
         void changed();
 
+    protected:
+        /**
+         * Needs to be call by subclasse to initialize the ordered list of groupings.
+         */
+        void setGroupings(const QList<QVector<QPersistentModelIndex>* > groupings)
+        {
+            mGroupings = groupings;
+        }
+
+        /**
+         * Returns the displayed title of a group.
+         */
+        virtual const QString title(QVector<QPersistentModelIndex>* grouping) const = 0;
+
+        /**
+         * Called by #refreshInternal() to get the target group of a newsgroup.
+         */
+        virtual QVector<QPersistentModelIndex>* selectInternalGrouping(SubscriptionState state) = 0;
+
     private Q_SLOTS:
         /**
-         * Connected to the source model to update mSubscribed and mUnsubscribed.
+         * Connected to the source model to update groupings.
          */
-        void sourceModelRowsInserted(const QModelIndex& parent, int start, int end);
+        virtual void sourceModelRowsInserted(const QModelIndex& parent, int start, int end);
         /**
-         * Connected to the source model to update mSubscribed and mUnsubscribed.
+         * Connected to the source model to update groupings.
          */
-        void sourceModelRowsAboutToBeRemoved(const QModelIndex& parent, int start, int end);
+        virtual void sourceModelRowsAboutToBeRemoved(const QModelIndex& parent, int start, int end);
         /**
-         * Connected to the source model to update mSubscribed and mUnsubscribed.
+         * Connected to the source model to update groupings.
          */
         void sourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
@@ -88,16 +113,21 @@ class SubscriptionStateGroupingProxyModel : public QAbstractProxyModel
         void refreshInternal();
 
     private:
-        QVector<QPersistentModelIndex> mSubscribed;
-        QVector<QPersistentModelIndex> mUnsubscribed;
-        QVector<QPersistentModelIndex> mExisting;
-
-
         /**
          * Returns the index of @p list to insert @p idx such as the QModelIndex in the list
          * are sorted by their display role.
          */
         int findInsertionPlace(QVector<QPersistentModelIndex>& list, const QModelIndex& idx) const;
+        /**
+         * Inserts an index at the right place into a grouping.
+         */
+        void insertIntoGrouping(const QModelIndex& index, QVector<QPersistentModelIndex>& grouping, int groupingRow);
+        /**
+         * Attempts to remove an index at the right place into a grouping.
+         */
+        bool removeFromGrouping(const QPersistentModelIndex& index, QVector<QPersistentModelIndex>& grouping, int groupingRow);
+
+        QList<QVector<QPersistentModelIndex>*> mGroupings;
 };
 
 }

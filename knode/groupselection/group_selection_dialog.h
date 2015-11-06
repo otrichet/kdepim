@@ -23,43 +23,41 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
-#define KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
+#ifndef KNODE_GROUPSELECTION_SELECTIONDIALOG_H
+#define KNODE_GROUPSELECTION_SELECTIONDIALOG_H
 
 #include "dialog_base.h"
 
 namespace KNode {
 namespace GroupSelection {
 
-class SubscriptionDialog : public BaseDialog
+/**
+ * Dialog to select groups. Used by the composer.
+ */
+class SelectionDialog : public BaseDialog
 {
     Q_OBJECT
 
     public:
-        SubscriptionDialog(QWidget* parent, KNNntpAccount::Ptr account);
-        ~SubscriptionDialog();
+        SelectionDialog(QWidget* parent, KNNntpAccount::Ptr account);
+        ~SelectionDialog();
 
         /**
-         * Returns the list of groups that were subscribed.
+         * Set the list of name of initially selected groups.
          */
-        void toSubscribe(QList<KNGroupInfo>& list);
+        void setPreselectedGroups(const QStringList& groups);
         /**
-         * Returns the list of groups that were unsubscribed.
+         * Returns the current group selections.
          */
-        void toUnsubscribe(QStringList& list);
+        QStringList selectedGroups() const;
 
     protected:
         virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView);
         virtual QList<KNGroupInfo>* receiveList(KNGroupListData::Ptr data);
         virtual QAbstractProxyModel* changesGroupingModel();
 
-    Q_SIGNALS:
-        void fetchList(KNNntpAccount::Ptr account);
-        void checkNew(KNNntpAccount::Ptr account, QDate since);
-
-    private Q_SLOTS:
-        void slotRequestNewList();
-        void slotRequestGroupSince();
+    private:
+        QStringList mPreselected;
 };
 
 }

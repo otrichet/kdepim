@@ -43,6 +43,7 @@ using KPIM::RecentAddresses;
 #include <kselectaction.h>
 #include <ktoggleaction.h>
 
+#include "groupselection/group_selection_dialog.h"
 #include "knarticlemanager.h"
 #include "kngroupselectdialog.h"
 #include "utilities.h"
@@ -1454,7 +1455,8 @@ void KNComposer::slotGroupsBtnClicked()
   if(id==-1)
     a_rticle->setServerId(nntp->id());
 
-  KNGroupSelectDialog *dlg = new KNGroupSelectDialog( this, nntp, v_iew->groups() );
+  KNode::GroupSelection::SelectionDialog* dlg = new KNode::GroupSelection::SelectionDialog(this, nntp);
+  dlg->setPreselectedGroups(v_iew->groups());
 
   connect( dlg, SIGNAL(loadList(KNNntpAccount::Ptr)),
            knGlobals.groupManager(), SLOT(slotLoadGroupList(KNNntpAccount::Ptr)) );
@@ -1462,7 +1464,7 @@ void KNComposer::slotGroupsBtnClicked()
            dlg, SLOT(slotReceiveList(KNGroupListData::Ptr)) );
 
   if(dlg->exec())
-    v_iew->setGroups( dlg->selectedGroups() );
+    v_iew->setGroups( dlg->selectedGroups().join(QLatin1String(", ")) );
 
   delete dlg;
 }

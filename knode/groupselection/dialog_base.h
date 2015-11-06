@@ -33,6 +33,7 @@
 #include "kngroupmanager.h"
 #include "knnntpaccount.h"
 
+class QAbstractProxyModel;
 
 namespace KNode {
 namespace GroupSelection {
@@ -48,23 +49,27 @@ class BaseDialog : public KDialog, private Ui::BaseDialog
         BaseDialog(QWidget* parent, KNNntpAccount::Ptr account);
         virtual ~BaseDialog();
 
-
-        /**
-         * Returns the list of groups that were subscribed.
-         */
-        void toSubscribe(QList<KNGroupInfo>& list);
-        /**
-         * Returns the list of groups that were unsubscribed.
-         */
-        void toUnsubscribe(QStringList& list);
-
     public Q_SLOTS:
         void slotReceiveList(KNGroupListData::Ptr data);
 
     Q_SIGNALS:
         void loadList(KNNntpAccount::Ptr account);
-        void fetchList(KNNntpAccount::Ptr account);
-        void checkNew(KNNntpAccount::Ptr account, QDate since);
+
+    protected:
+        /**
+         * Call at the end of the setup (models/proxies, connection, etc. are in place).
+         */
+        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView) = 0;
+        virtual QList<KNGroupInfo>* receiveList(KNGroupListData::Ptr data) = 0;
+        KNNntpAccount::Ptr account() const;
+        /**
+         * Returns the proxy responsible for grouping item in the changes view.
+         */
+        virtual QAbstractProxyModel* changesGroupingModel() = 0;
+        /**
+         * For the subclass to get the subscription / selection.
+         */
+        SubscriptionStateProxyModel* subscriptionModel() const;
 
     private Q_SLOTS:
         void init();
@@ -79,9 +84,6 @@ class BaseDialog : public KDialog, private Ui::BaseDialog
          * Called when the items selection in any of the view is modified.
          */
         void slotSelectionChange();
-
-        void slotRequestNewList();
-        void slotRequestGroupSince();
 
     private:
         KNNntpAccount::Ptr mAccount;

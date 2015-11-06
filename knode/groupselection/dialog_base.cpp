@@ -30,12 +30,10 @@
 #include <KDE/KDebug>
 
 #include "enums.h"
-#include "helper/group_list_date_picker.h"
 #include "model/checked_state_proxy_model.h"
 #include "model/group_model.h"
 #include "model/recent_group_proxy_model.h"
 #include "model/subscription_state_proxy_model.h"
-#include "model/subscription_state_grouping_proxy_model.h"
 
 #include "scheduler.h"
 
@@ -49,7 +47,6 @@ BaseDialog::BaseDialog(QWidget* parent, KNNntpAccount::Ptr account)
       mSubscriptionModel(0)
 {
     setupUi(this);
-    setCaption(i18nc("@title:window", "Subscribe to Newsgroups"));
     setMainWidget(page);
     if(QApplication::isLeftToRight()) {
         mAddChangeButton->setIcon(KIcon("arrow-right"));
@@ -58,14 +55,6 @@ BaseDialog::BaseDialog(QWidget* parent, KNNntpAccount::Ptr account)
         mAddChangeButton->setIcon(KIcon("arrow-left"));
         mRevertChangeButton->setIcon(KIcon("arrow-right"));
     }
-
-    setButtons(Ok | Cancel | Help | User1 | User2);
-    setHelp("anc-fetch-group-list");
-    setButtonText(User1, i18nc("@action:button Fetch the list of groups from the server", "New &List"));
-    connect(this, SIGNAL(user1Clicked()), this, SLOT(slotRequestNewList()));
-    setButtonText(User2, i18nc("@action:button Fetch the list of groups from the server", "New &Groups..."));
-    connect(this, SIGNAL(user2Clicked()), this, SLOT(slotRequestGroupSince()));
-
 
     QTimer::singleShot(5, this, SLOT(init()));
 }
@@ -79,37 +68,22 @@ BaseDialog::~BaseDialog()
     s->cancelJobs(KNJobData::JTFetchGroups);
 }
 
-void BaseDialog::toSubscribe(QList<KNGroupInfo>& list)
+
+KNNntpAccount::Ptr BaseDialog::account() const
 {
-    list << mSubscriptionModel->subscribed();
+    return mAccount;
 }
 
-void BaseDialog::toUnsubscribe(QStringList& list)
+SubscriptionStateProxyModel* BaseDialog::subscriptionModel() const
 {
-    Q_FOREACH(const KNGroupInfo& gi, mSubscriptionModel->unsubscribed()) {
-        list << gi.name;
-    }
+    return mSubscriptionModel;
 }
+
 
 void BaseDialog::slotReceiveList(KNGroupListData::Ptr data)
 {
-    QStringList subscribed;
-    QList<KNGroupInfo>* groups = 0;
-
-    if(data) {
-        groups = data->extractList();
-
-        Q_FOREACH(const KNGroupInfo& gi, *groups) {
-            if(gi.subscribed) {
-                subscribed << gi.name;
-            }
-        }
-    }
-    mSubscriptionModel->setOriginalSubscriptions(subscribed);
+    QList<KNGroupInfo>* groups = receiveList(data);
     mGroupModel->newList(groups);
-
-    enableButton(User1, true);
-    enableButton(User2, true);
 }
 
 
@@ -131,7 +105,7 @@ void BaseDialog::init()
     mGroupsView->setModel(checkableConvertionProxyModel);
 
     // View of subscription changes and its models
-    SubscriptionStateGroupingProxyModel* groupByStateProxy = new SubscriptionStateGroupingProxyModel(this);
+    QAbstractProxyModel* groupByStateProxy = changesGroupingModel();
     groupByStateProxy->setSourceModel(mSubscriptionModel);
     mChangeView->setModel(groupByStateProxy);
     connect(groupByStateProxy, SIGNAL(changed()),
@@ -150,9 +124,6 @@ void BaseDialog::init()
     connect(mTreeviewCheckbox, SIGNAL(toggled(bool)),
             mGroupModel, SLOT(modelAsTree(bool)));
 
-
-
-
     // Operation on selection
     connect(mAddChangeButton, SIGNAL(clicked(bool)),
             this, SLOT(revertSelectionStateChange()));
@@ -163,8 +134,11 @@ void BaseDialog::init()
     connect(mGroupsView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(slotSelectionChange()));
 
+    // Inialize the state
+    setupDialog(mNewOnlyCheckbox, mTreeviewCheckbox);
+
     // Request the list of groups
-    emit loadList(mAccount);
+    emit loadList(account());
 }
 
 
@@ -217,26 +191,6 @@ void BaseDialog::slotSelectionChange()
     mAddChangeButton->setEnabled(mGroupsView->selectionModel()->hasSelection());
     mRevertChangeButton->setEnabled(mChangeView->selectionModel()->hasSelection());
 }
-
-
-void BaseDialog::slotRequestNewList()
-{
-    enableButton(User1, false);
-    enableButton(User2, false);
-    emit fetchList(mAccount);
-}
-
-void BaseDialog::slotRequestGroupSince()
-{
-    QPointer<GroupListDatePicker> diag = new GroupListDatePicker(this, mAccount);
-    if(diag->exec() == QDialog::Accepted) {
-        enableButton(User1, false);
-        enableButton(User2, false);
-        emit checkNew(mAccount, diag->selectedDate());
-    }
-    delete diag;
-}
-
 
 }
 }
