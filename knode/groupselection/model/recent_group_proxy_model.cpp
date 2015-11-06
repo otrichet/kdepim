@@ -25,7 +25,7 @@
 
 #include "recent_group_proxy_model.h"
 
-#include "groupselection/enums.h"
+#include "../enums.h"
 #include "kngroupmanager.h"
 
 namespace KNode {

@@ -23,11 +23,11 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "groupselection/subscription_state_proxy_model.h"
+#include "subscription_state_proxy_model.h"
 
 #include <KDE/KIcon>
 
-#include "groupselection/enums.h"
+#include "../enums.h"
 
 namespace KNode {
 namespace GroupSelection {

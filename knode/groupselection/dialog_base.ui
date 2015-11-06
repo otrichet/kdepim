@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <author>Olivier Trichet &lt;olivier@trichet.fr&gt;</author>
- <class>GroupSelectionDialog</class>
- <widget class="KDialog" name="GroupSelectionDialog">
+ <class>KNode::GroupSelection::BaseDialog</class>
+ <widget class="KDialog" name="KNode::GroupSelection::BaseDialog">
   <property name="geometry">
    <rect>
     <x>0</x>

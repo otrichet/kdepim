@@ -30,7 +30,7 @@
 #include <QtGui/QFont>
 #include <KDE/KLocalizedString>
 
-#include "groupselection/enums.h"
+#include "../enums.h"
 #include "kngroupmanager.h"
 
 namespace KNode {

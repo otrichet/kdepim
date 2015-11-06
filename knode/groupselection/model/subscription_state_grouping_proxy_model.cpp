@@ -23,9 +23,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "groupselection/subscription_state_grouping_proxy_model.h"
+#include "subscription_state_grouping_proxy_model.h"
 
-#include "groupselection/enums.h"
+#include "../enums.h"
 
 #include <QtGui/QFont>
 #include <KDE/KLocalizedString>

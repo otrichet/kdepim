@@ -26,67 +26,18 @@
 #ifndef KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
 #define KNODE_GROUPSELECTION_SUBSCRIPTIONDIALOG_H
 
-#include "ui_group_subscription_dialog.h"
-
-#include <KDE/KDialog>
-
-#include "kngroupmanager.h"
-#include "knnntpaccount.h"
-
+#include "dialog_base.h"
 
 namespace KNode {
 namespace GroupSelection {
 
-class GroupModel;
-class SubscriptionStateProxyModel;
-
-class SubscriptionDialog : public KDialog, private Ui_GroupSelectionDialog
+class SubscriptionDialog : public BaseDialog
 {
     Q_OBJECT
 
     public:
         SubscriptionDialog(QWidget* parent, KNNntpAccount::Ptr account);
-        virtual ~SubscriptionDialog();
-
-
-        /**
-         * Returns the list of groups that were subscribed.
-         */
-        void toSubscribe(QList<KNGroupInfo>& list);
-        /**
-         * Returns the list of groups that were unsubscribed.
-         */
-        void toUnsubscribe(QStringList& list);
-
-    public Q_SLOTS:
-        void slotReceiveList(KNGroupListData::Ptr data);
-
-    Q_SIGNALS:
-        void loadList(KNNntpAccount::Ptr account);
-        void fetchList(KNNntpAccount::Ptr account);
-        void checkNew(KNNntpAccount::Ptr account, QDate since);
-
-    private Q_SLOTS:
-        void init();
-
-        /**
-         * Revert change to the subscription state of the current selection
-         * in the view associated with the click button.
-         */
-        void revertSelectionStateChange();
-
-        /**
-         * Called when the items selection in any of the view is modified.
-         */
-        void slotSelectionChange();
-
-        void slotRequestNewList();
-        void slotRequestGroupSince();
-
-    private:
-        KNNntpAccount::Ptr mAccount;
-        GroupModel* mGroupModel;
-        SubscriptionStateProxyModel* mSubscriptionModel;
+        ~SubscriptionDialog();
 };
 
 }

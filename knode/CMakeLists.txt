@@ -76,13 +76,14 @@ set(knodecommon_LIB_SRCS
    composer/followupto_combobox.cpp
    configuration/identity_widget.cpp
    configuration/identity_edition_dialog.cpp
+   groupselection/dialog_base.cpp
    groupselection/group_subscription_dialog.cpp
-   groupselection/checked_state_proxy_model.cpp
-   groupselection/recent_group_proxy_model.cpp
-   groupselection/subscription_state_proxy_model.cpp
-   groupselection/subscription_state_grouping_proxy_model.cpp
-   groupselection/group_model.cpp
-   groupselection/group_list_date_picker.cpp
+   groupselection/model/checked_state_proxy_model.cpp
+   groupselection/model/recent_group_proxy_model.cpp
+   groupselection/model/subscription_state_proxy_model.cpp
+   groupselection/model/subscription_state_grouping_proxy_model.cpp
+   groupselection/model/group_model.cpp
+   groupselection/helper/group_list_date_picker.cpp
    utils/locale.cpp
    utils/startup.cpp
    messagelist/headers_widget.cpp
@@ -107,8 +108,8 @@ kde4_add_ui_files(knodecommon_LIB_SRCS
    composer/composer_view.ui
    configuration/identity_widget.ui
    configuration/identity_edition_dialog.ui
-   groupselection/group_subscription_dialog.ui
-   groupselection/group_list_date_picker.ui
+   groupselection/dialog_base.ui
+   groupselection/helper/group_list_date_picker.ui
 )
 
 kde4_add_kcfg_files(knodecommon_LIB_SRCS settings_base.kcfgc )
