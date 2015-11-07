@@ -80,7 +80,7 @@ set(knodecommon_LIB_SRCS
    groupselection/group_subscription_dialog.cpp
    groupselection/group_selection_dialog.cpp
    groupselection/model/checked_state_proxy_model.cpp
-   groupselection/model/recent_group_proxy_model.cpp
+   groupselection/model/filter_group_proxy_model.cpp
    groupselection/model/subscription_state_proxy_model.cpp
    groupselection/model/base_grouping_proxy_model.cpp
    groupselection/model/subscription_grouping_proxy_model.cpp

@@ -23,8 +23,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef KNODE_GROUPSELECTION_RECENTGROUPPROXYMODEL_H
-#define KNODE_GROUPSELECTION_RECENTGROUPPROXYMODEL_H
+#ifndef KNODE_GROUPSELECTION_GROUPFILTERPROXYMODEL_H
+#define KNODE_GROUPSELECTION_GROUPFILTERPROXYMODEL_H
 
 #include <KDE/KRecursiveFilterProxyModel>
 
@@ -32,29 +32,35 @@ namespace KNode {
 namespace GroupSelection {
 
 /**
- * Filter group having the 'new' flag set.
+ * Filter group having the 'new' and/or 'subscribed' flag set.
  */
-class RecentGroupProxyModel : public KRecursiveFilterProxyModel
+class GroupFilterProxyModel : public KRecursiveFilterProxyModel
 {
     Q_OBJECT
 
     public:
-        RecentGroupProxyModel(QObject* parent = 0);
-        virtual ~RecentGroupProxyModel();
+        GroupFilterProxyModel(QObject* parent = 0);
+        virtual ~GroupFilterProxyModel();
 
         bool isNewOnlyEnabled() const
         {
-            return mEnable;
+            return mFilterNew;
+        }
+        bool isSubscribedOnlyEnabled() const
+        {
+            return mFilterSubscribed;
         }
 
     public Q_SLOTS:
-        void setEnable(bool enable);
+        void filterNew(bool enable);
+        void filterSubscribed(bool enable);
 
     protected:
         virtual bool acceptRow(int sourceRow, const QModelIndex& sourceParent) const;
 
     private:
-        bool mEnable;
+        bool mFilterNew;
+        bool mFilterSubscribed;
 };
 
 }

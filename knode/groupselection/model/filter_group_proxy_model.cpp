@@ -23,7 +23,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "recent_group_proxy_model.h"
+#include "filter_group_proxy_model.h"
 
 #include "../enums.h"
 #include "kngroupmanager.h"
@@ -32,30 +32,45 @@ namespace KNode {
 namespace GroupSelection {
 
 
-RecentGroupProxyModel::RecentGroupProxyModel(QObject* parent)
+GroupFilterProxyModel::GroupFilterProxyModel(QObject* parent)
     : KRecursiveFilterProxyModel(parent),
-      mEnable(false)
+      mFilterNew(false), mFilterSubscribed(false)
 {
 }
 
-RecentGroupProxyModel::~RecentGroupProxyModel()
+GroupFilterProxyModel::~GroupFilterProxyModel()
 {
 }
 
-void RecentGroupProxyModel::setEnable(bool enable)
+void GroupFilterProxyModel::filterNew(bool enable)
 {
     beginResetModel();
-    mEnable = enable;
+    mFilterNew = enable;
     endResetModel();
 }
 
-bool RecentGroupProxyModel::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
+void GroupFilterProxyModel::filterSubscribed(bool enable)
 {
-    if(mEnable) {
+    beginResetModel();
+    mFilterSubscribed = enable;
+    endResetModel();
+}
+
+
+bool GroupFilterProxyModel::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
+{
+    bool accept = true;
+    if(mFilterNew || mFilterSubscribed) {
         const QVariant v = sourceModel()->index(sourceRow, 0, sourceParent).data(GroupInfoRole);
-        return v.isValid() && v.value<KNGroupInfo>().newGroup;
+        accept &= v.isValid();
+        if(accept && mFilterNew) {
+            accept &= v.value<KNGroupInfo>().newGroup;
+        }
+        if(accept && mFilterSubscribed) {
+            accept &= v.value<KNGroupInfo>().subscribed;
+        }
     }
-    return true;
+    return accept;
 }
 
 

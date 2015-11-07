@@ -59,7 +59,7 @@ class BaseDialog : public KDialog, private Ui::BaseDialog
         /**
          * Call at the end of the setup (models/proxies, connection, etc. are in place).
          */
-        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView) = 0;
+        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView, QCheckBox* subscribedOnly) = 0;
         virtual QList<KNGroupInfo>* receiveList(KNGroupListData::Ptr data) = 0;
         KNNntpAccount::Ptr account() const;
         /**

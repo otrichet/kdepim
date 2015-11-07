@@ -54,7 +54,7 @@ void SubscriptionDialog::toUnsubscribe(QStringList& list)
 }
 
 
-void SubscriptionDialog::setupDialog(QCheckBox* newOnly, QCheckBox* treeView)
+void SubscriptionDialog::setupDialog(QCheckBox* newOnly, QCheckBox* treeView, QCheckBox* subscribedOnly)
 {
     setCaption(i18nc("@title:window", "Subscribe to Newsgroups"));
 
@@ -67,6 +67,8 @@ void SubscriptionDialog::setupDialog(QCheckBox* newOnly, QCheckBox* treeView)
 
     newOnly->setVisible(true);
     newOnly->setChecked(false);
+    subscribedOnly->setVisible(false);
+    subscribedOnly->setVisible(false);
     treeView->setVisible(true);
     treeView->setChecked(true);
 }

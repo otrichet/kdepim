@@ -32,7 +32,7 @@
 #include "enums.h"
 #include "model/checked_state_proxy_model.h"
 #include "model/group_model.h"
-#include "model/recent_group_proxy_model.h"
+#include "model/filter_group_proxy_model.h"
 #include "model/subscription_state_proxy_model.h"
 
 #include "scheduler.h"
@@ -98,10 +98,10 @@ void BaseDialog::init()
     // View of all groups and its dedicated proxy models
     KRecursiveFilterProxyModel* searchProxy = new KRecursiveFilterProxyModel(this);
     searchProxy->setSourceModel(mSubscriptionModel);
-    RecentGroupProxyModel* filterRecentGroup = new RecentGroupProxyModel(this);
-    filterRecentGroup->setSourceModel(searchProxy);
+    GroupFilterProxyModel* filterGroupProxy = new GroupFilterProxyModel(this);
+    filterGroupProxy->setSourceModel(searchProxy);
     CheckedStateConvertionProxyModel* checkableConvertionProxyModel = new CheckedStateConvertionProxyModel(this);
-    checkableConvertionProxyModel->setSourceModel(filterRecentGroup);
+    checkableConvertionProxyModel->setSourceModel(filterGroupProxy);
     mGroupsView->setModel(checkableConvertionProxyModel);
 
     // View of subscription changes and its models
@@ -117,9 +117,12 @@ void BaseDialog::init()
     searchProxy->setSortLocaleAware(true);
     searchProxy->setSortCaseSensitivity(Qt::CaseInsensitive);
     searchProxy->sort(GroupModelColumn_Name, Qt::AscendingOrder);
-    mNewOnlyCheckbox->setChecked(filterRecentGroup->isNewOnlyEnabled());
+    mNewOnlyCheckbox->setChecked(filterGroupProxy->isNewOnlyEnabled());
     connect(mNewOnlyCheckbox, SIGNAL(toggled(bool)),
-            filterRecentGroup, SLOT(setEnable(bool)));
+            filterGroupProxy, SLOT(filterNew(bool)));
+    mSubscribedOnlyCheckbox->setChecked(filterGroupProxy->isSubscribedOnlyEnabled());
+    connect(mSubscribedOnlyCheckbox, SIGNAL(toggled(bool)),
+            filterGroupProxy, SLOT(filterSubscribed(bool)));
     mTreeviewCheckbox->setChecked(mGroupModel->modelAsTree());
     connect(mTreeviewCheckbox, SIGNAL(toggled(bool)),
             mGroupModel, SLOT(modelAsTree(bool)));
@@ -135,7 +138,7 @@ void BaseDialog::init()
             this, SLOT(slotSelectionChange()));
 
     // Inialize the state
-    setupDialog(mNewOnlyCheckbox, mTreeviewCheckbox);
+    setupDialog(mNewOnlyCheckbox, mTreeviewCheckbox, mSubscribedOnlyCheckbox);
 
     // Request the list of groups
     emit loadList(account());

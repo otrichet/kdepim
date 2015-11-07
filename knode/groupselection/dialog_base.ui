@@ -29,7 +29,7 @@
     </property>
     <item>
      <widget class="QWidget" name="mFilterContainer" native="true">
-      <layout class="QHBoxLayout" name="_3" stretch="1,0,0">
+      <layout class="QHBoxLayout" name="_3" stretch="1,0,0,0">
        <property name="spacing">
         <number>2</number>
        </property>
@@ -50,6 +50,13 @@
         <widget class="QCheckBox" name="mNewOnlyCheckbox">
          <property name="text">
           <string comment="@option:check Filter newly received group in the subscription dialog">New only</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="mSubscribedOnlyCheckbox">
+         <property name="text">
+          <string comment="@option:check Filter to only display subscribed groups">Subscribed</string>
          </property>
         </widget>
        </item>

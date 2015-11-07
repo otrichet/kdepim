@@ -49,7 +49,7 @@ class SubscriptionDialog : public BaseDialog
         void toUnsubscribe(QStringList& list);
 
     protected:
-        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView);
+        virtual void setupDialog(QCheckBox* newOnly, QCheckBox* treeView, QCheckBox* subscribedOnly);
         virtual QList<KNGroupInfo>* receiveList(KNGroupListData::Ptr data);
         virtual QAbstractProxyModel* changesGroupingModel();
 

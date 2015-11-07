@@ -44,13 +44,15 @@ SelectionDialog::~SelectionDialog()
 }
 
 
-void SelectionDialog::setupDialog(QCheckBox* newOnly, QCheckBox* treeView)
+void SelectionDialog::setupDialog(QCheckBox* newOnly, QCheckBox* treeView, QCheckBox* subscribedOnly)
 {
     setCaption(i18nc("@title:window", "Select Destinations"));
     setButtons(Ok | Cancel);
 
     newOnly->setVisible(false);
     newOnly->setChecked(false);
+    subscribedOnly->setVisible(true);
+    subscribedOnly->setChecked(true);
     treeView->setVisible(true);
     treeView->setChecked(false);
 }
