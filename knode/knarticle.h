@@ -42,7 +42,6 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
     typedef QList<KNArticle::Ptr> List;
 
     enum articleType {
-      ATmimeContent,
       ATremote,
       ATlocal
     };
@@ -52,7 +51,7 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
 
     virtual void clear();
 
-    virtual articleType type() const { return ATmimeContent; }
+    virtual articleType type() const = 0;
 
     /** Returns the article id. */
     int id() const            { return i_d; }
@@ -104,7 +103,7 @@ class KNRemoteArticle : public KNArticle {
     ~KNRemoteArticle();
 
     // type
-    articleType type() const { return ATremote; }
+    virtual articleType type() const { return ATremote; }
 
     // content handling
     virtual void parse();
@@ -186,7 +185,7 @@ class KNLocalArticle : public KNArticle {
     ~KNLocalArticle();
 
     //type
-    articleType type() const { return ATlocal; }
+    virtual articleType type() const { return ATlocal; }
 
     //send article as mail
     bool doMail()                 { return f_lags.get(2); }
