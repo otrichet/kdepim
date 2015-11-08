@@ -20,6 +20,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QtDBus/QtDBus>
+#include <QtGui/QContextMenuEvent>
 #include <qgroupbox.h>
 #include "libkdepim/addressline/recentaddress/recentaddresses.h"
 #include "libkdepim/addressline/recentaddress/recentaddressdialog.h"
@@ -28,7 +29,6 @@ using KPIM::RecentAddresses;
 #include <kcharsets.h>
 #include <kmessagebox.h>
 #include <kactioncollection.h>
-#include <kstandardaction.h>
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kmenu.h>
@@ -46,10 +46,8 @@ using KPIM::RecentAddresses;
 #include "groupselection/group_selection_dialog.h"
 #include "knarticlemanager.h"
 #include "utilities.h"
-#include "knglobals.h"
 #include "knmainwidget.h"
 #include "knaccountmanager.h"
-#include "knnntpaccount.h"
 #include "settings.h"
 #include "kncomposerview.h"
 #include "utils/locale.h"
