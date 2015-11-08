@@ -30,6 +30,8 @@
 #include "model/selection_grouping_proxy_model.h"
 #include "model/subscription_state_proxy_model.h"
 
+#include "utilities.h"
+
 namespace KNode {
 namespace GroupSelection {
 
@@ -41,6 +43,7 @@ SelectionDialog::SelectionDialog(QWidget* parent, KNNntpAccount::Ptr account)
 
 SelectionDialog::~SelectionDialog()
 {
+    KNHelper::saveWindowSize("groupSelDlg", this->size());
 }
 
 
@@ -55,6 +58,8 @@ void SelectionDialog::setupDialog(QCheckBox* newOnly, QCheckBox* treeView, QChec
     subscribedOnly->setChecked(true);
     treeView->setVisible(true);
     treeView->setChecked(false);
+
+    KNHelper::restoreWindowSize("groupSelDlg", this, QSize(659,364));
 }
 
 

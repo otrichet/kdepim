@@ -140,6 +140,15 @@ void BaseDialog::init()
     // Inialize the state
     setupDialog(mNewOnlyCheckbox, mTreeviewCheckbox, mSubscribedOnlyCheckbox);
 
+    int width = mViewSplitter->size().width();
+    mViewSplitter->setSizes(QList<int>() << (width * 2 / 3) << (width * 1 / 3));
+
+    QHeaderView* groupsViewHdr = mGroupsView->header();
+    width = groupsViewHdr->size().width();
+    groupsViewHdr->setSortIndicator(GroupModelColumn_Name, Qt::AscendingOrder);
+    groupsViewHdr->resizeSection(GroupModelColumn_Name, width * 4 / 7);
+    groupsViewHdr->resizeSection(GroupModelColumn_Description, width * 2 / 7);
+
     // Request the list of groups
     emit loadList(account());
 }
