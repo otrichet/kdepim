@@ -57,7 +57,7 @@ class KNODE_EXPORT Appearance : public ConfigBase {
   friend class AppearanceWidget;
 
   public:
-    enum IconIndex    { redBall=0,         newFups=1,      eyes=2,
+    enum IconIndex    {                    newFups=1,      eyes=2,
                         ignore=3,          mail=4,         posting=5,
                         canceledPosting=6, savedRemote=7,  group=8,
                         null=9 };
@@ -66,8 +66,6 @@ class KNODE_EXPORT Appearance : public ConfigBase {
     const QPixmap& icon(IconIndex i)     { return i_cons[i]; }
 
   protected:
-    void recreateLVIcons();
-
     QPixmap i_cons[null + 1];
 };
 

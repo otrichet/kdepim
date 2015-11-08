@@ -40,9 +40,6 @@ set(knodecommon_LIB_SRCS
    kngroupmanager.cpp
    knarticlecollection.cpp
    kngroup.cpp
-   kngroupbrowser.cpp
-   kngroupselectdialog.cpp
-   kngroupdialog.cpp
    kngrouppropdlg.cpp
    knfoldermanager.cpp
    knfolder.cpp

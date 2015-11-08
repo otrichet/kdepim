@@ -45,7 +45,6 @@ using KPIM::RecentAddresses;
 
 #include "groupselection/group_selection_dialog.h"
 #include "knarticlemanager.h"
-#include "kngroupselectdialog.h"
 #include "utilities.h"
 #include "knglobals.h"
 #include "knmainwidget.h"

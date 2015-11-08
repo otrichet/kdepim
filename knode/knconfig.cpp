@@ -28,7 +28,6 @@
 
 KNode::Appearance::Appearance()
 {
-  recreateLVIcons();
   i_cons[newFups]         = UserIcon("newsubs");
   i_cons[eyes]            = UserIcon("eyes");
   i_cons[ignore]          = UserIcon("ignore");
@@ -37,15 +36,6 @@ KNode::Appearance::Appearance()
   i_cons[canceledPosting] = SmallIcon("edit-delete");
   i_cons[savedRemote]     = SmallIcon("edit-copy");
   i_cons[group]           = UserIcon("group");
-}
-
-
-void KNode::Appearance::recreateLVIcons()
-{
-  QPixmap tempPix = UserIcon("greyball");
-  QImage tempImg = tempPix.toImage();
-  KIconEffect::colorize(tempImg, knGlobals.settings()->unreadArticleColor(), 1.0);
-  i_cons[redBall] = QPixmap::fromImage(tempImg);
 }
 
 

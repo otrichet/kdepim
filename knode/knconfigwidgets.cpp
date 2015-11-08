@@ -477,8 +477,6 @@ void KNode::AppearanceWidget::save()
   }
 
   KCModule::save();
-
-  knGlobals.configManager()->appearance()->recreateLVIcons();
 }
 
 

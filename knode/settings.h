@@ -47,8 +47,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     QColor quoteColor( int depth ) { return effectiveColor( quoteColorItem( depth ) ); }
     /// Returns the effective link color.
     QColor linkColor() { return effectiveColor( linkColorItem() ); }
-    /// Returns the effective color for unread articles.
-    QColor unreadArticleColor() { return effectiveColor( unreadArticleColorItem() ); }
     /// Returns the effective color for valid signatures with a trusted key.
     QColor signOkKeyOkColor() { return effectiveColor( signOkKeyOkColorItem() ); }
     /// Returns the effective color for valid signatures with a untrusted key.

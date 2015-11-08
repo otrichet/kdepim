@@ -300,10 +300,6 @@
       <label>Link</label>
       <default code="true">KColorScheme(QPalette::Active, KColorScheme::View).foreground(KColorScheme::LinkText).color()</default>
     </entry>
-    <entry name="unreadArticleColor" key="unreadArtColor" type="Color">
-      <label>Unread Article</label>
-      <default>#b7a90b</default>
-    </entry>
     <entry name="signOkKeyOkColor" key="signOkKeyOk" type="Color">
       <label>Valid Signature with Trusted Key</label>
       <default>#40ff00</default>
