@@ -15,7 +15,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/messagecomposer
 )
 
-add_definitions (-DQT3_SUPPORT -DQT3_SUPPORT_WARNINGS)
 add_definitions( -DKDE_DEFAULT_DEBUG_AREA=5003 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
@@ -118,7 +117,7 @@ kde4_add_library(knodecommon ${LIBRARY_TYPE} ${knodecommon_LIB_SRCS})
 
 target_link_libraries(knodecommon
   ${KDEPIMLIBS_KMIME_LIBS} ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS}
-  ${KDE4_KDE3SUPPORT_LIBS} ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
+  ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
   ${KDEPIMLIBS_KPIMUTILS_LIBS} ${KDEPIMLIBS_MAILTRANSPORT_LIBS}
   ${KDEPIMLIBS_KONTACTINTERFACE_LIBS}
   kleo
@@ -127,7 +126,7 @@ target_link_libraries(knodecommon
   messageviewer
 )
 
-target_link_libraries(knodecommon LINK_INTERFACE_LIBRARIES ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KDE3SUPPORT_LIBS})
+target_link_libraries(knodecommon LINK_INTERFACE_LIBRARIES ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS})
 
 set_target_properties(knodecommon
    PROPERTIES VERSION ${GENERIC_LIB_VERSION}

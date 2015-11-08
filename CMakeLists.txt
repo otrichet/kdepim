@@ -304,9 +304,7 @@ else()
     macro_optional_add_subdirectory(kjots)
 
     if(KDEPIMLIBS_KRESOURCES_LIBRARY)
-      if(QT_QT3SUPPORT_FOUND)
-        macro_optional_add_subdirectory(knode)
-      endif()
+      macro_optional_add_subdirectory(knode)
 
       if(Q_WS_X11)
         macro_optional_add_subdirectory(ktimetracker)
