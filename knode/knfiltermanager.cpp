@@ -12,6 +12,7 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 
+#include <KDE/KActionCollection>
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kmenu.h>
@@ -30,11 +31,10 @@
 
 KNFilterSelectAction::KNFilterSelectAction( const QString& text, const QString& pix,
                                             KActionCollection* parent, const char *name )
-  : KActionMenu(text, parent), currentItem(-42)
+  : KActionMenu(text, parent)
 {
   setIcon(KIcon(pix));
-  menu()->setCheckable(true);
-  connect(menu(),SIGNAL(activated(int)),this,SLOT(slotMenuActivated(int)));
+  connect(menu(), SIGNAL(triggered(QAction*)), this, SLOT(slotMenuActivated(QAction*)));
   setDelayed(false);
   parent->addAction(name, this);
 }
@@ -45,18 +45,34 @@ KNFilterSelectAction::~KNFilterSelectAction()
 {
 }
 
-void KNFilterSelectAction::setCurrentItem(int id)
+void KNFilterSelectAction::insertFilterAction(KNArticleFilter* filter)
 {
-  menu()->setItemChecked(currentItem, false);
-  menu()->setItemChecked(id, true);
-  currentItem = id;
+    QAction* a = menu()->addAction(filter->translatedName());
+    a->setCheckable(true);
+    mIdActions.insert(filter->id(), a);
+}
+
+void KNFilterSelectAction::setCurrentFilter(int id)
+{
+    QAction* a = mIdActions.value(id);
+    Q_FOREACH(QAction* action, mIdActions) {
+        action->setChecked(a == action);
+    }
 }
 
 
-void KNFilterSelectAction::slotMenuActivated(int id)
+void KNFilterSelectAction::slotMenuActivated(QAction *action)
 {
-  setCurrentItem(id);
-  emit(activated(id));
+    int id = mIdActions.key(action, -1);
+    if(id != -1) {
+        emit(activated(id));
+    }
+}
+
+void KNFilterSelectAction::clear()
+{
+    mIdActions.clear();
+    menu()->clear();
 }
 
 
@@ -293,7 +309,7 @@ KNArticleFilter* KNFilterManager::setFilter(const int id)
 
   if(currFilter) {
     if(a_ctFilter)
-      a_ctFilter->setCurrentItem(currFilter->id());
+      a_ctFilter->setCurrentFilter(currFilter->id());
     emit(filterChanged(currFilter));
   } else
     currFilter=bak;
@@ -319,19 +335,19 @@ void KNFilterManager::updateMenu()
   if(!a_ctFilter)
     return;
 
-  a_ctFilter->menu()->clear();
-  KNArticleFilter *f=0;
+  a_ctFilter->clear();
 
+  KNArticleFilter *f=0;
   foreach ( int id, menuOrder ) {
     if ( id != -1 ) {
       if ( ( f = byID( id ) ) )
-        a_ctFilter->menu()->insertItem( f->translatedName(), f->id() );
+        a_ctFilter->insertFilterAction(f);
     } else
-      a_ctFilter->menu()->addSeparator();
+      a_ctFilter->addSeparator();
   }
 
   if(currFilter)
-    a_ctFilter->setCurrentItem(currFilter->id());
+    a_ctFilter->setCurrentFilter(currFilter->id());
 }
 
 
@@ -378,7 +394,7 @@ void KNFilterManager::setMenuAction(KNFilterSelectAction *a, QAction *keybA)
     connect(a_ctFilter, SIGNAL(activated(int)), this,  SLOT(slotMenuActivated(int)));
   }
   if(keybA)
-    connect(keybA, SIGNAL(activated()), this,  SLOT(slotShowFilterChooser()));
+    connect(keybA, SIGNAL(triggered(bool)), this, SLOT(slotShowFilterChooser()));
 
   updateMenu();
 }
