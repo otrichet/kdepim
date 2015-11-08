@@ -334,34 +334,32 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
         break;
     case Qt::DecorationRole:
         if(index.column() == COLUMN_SUBJECT) {
-            Appearance::IconIndex icon = Appearance::null;
             switch(art->type()) {
                 case KNArticle::ATlocal: {
                     const KNLocalArticle::Ptr localArt = boost::dynamic_pointer_cast<KNLocalArticle>(art);
                     if(localArt->isSavedRemoteArticle()) {
-                        icon = Appearance::savedRemote;
+                        return SmallIcon("edit-copy");
                     } else if(localArt->doPost()) {
                         if(localArt->canceled()) {
-                            icon = Appearance::canceledPosting;
+                            return SmallIcon("edit-delete");
                         } else {
-                            icon = Appearance::posting;
+                            return UserIcon("article");
                         }
                     } else if(localArt->doMail()) {
-                        icon = Appearance::mail;
+                        return SmallIcon("mail-message");
                     }
                     break;
                 }
                 case KNArticle::ATremote:
                     if(remoteArt->isIgnored()) {
-                        icon = Appearance::ignore;
+                        return UserIcon("ignore");
                     } else if(remoteArt->isWatched()) {
-                        icon = Appearance::eyes;
+                        return UserIcon("eyes");
                     } else if(hdr->unreadFollowup > 0) {
-                        icon = Appearance::newFups;
+                        return UserIcon("newsubs");
                     }
                     break;
             }
-            return KNGlobals::self()->configManager()->appearance()->icon(icon);
         }
         break;
     case ArticleRole:

@@ -33,7 +33,6 @@ class KNConfigManager : QObject {
     explicit KNConfigManager( QObject *parent = 0 );
     ~KNConfigManager();
 
-    KNode::Appearance*           appearance()const          { return a_ppearance; }
     KNode::DisplayedHeaders*     displayedHeaders()const    { return d_isplayedHeaders; }
     KNode::Cleanup*              cleanup()const             { return c_leanup; }
 
@@ -41,7 +40,6 @@ class KNConfigManager : QObject {
     void syncConfig();
 
   protected:
-    KNode::Appearance           *a_ppearance;
     KNode::DisplayedHeaders     *d_isplayedHeaders;
     KNode::Cleanup              *c_leanup;
 

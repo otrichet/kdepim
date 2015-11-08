@@ -48,28 +48,6 @@ class ConfigBase {
 };
 
 
-/** Ex-Appearance settings.
- * @deprecated Move the remaining parts either to their only users or to the
- *  KConfigXT generated Settings class.
- */
-class KNODE_EXPORT Appearance : public ConfigBase {
-
-  friend class AppearanceWidget;
-
-  public:
-    enum IconIndex    {                    newFups=1,      eyes=2,
-                        ignore=3,          mail=4,         posting=5,
-                        canceledPosting=6, savedRemote=7,  group=8,
-                        null=9 };
-    Appearance();
-
-    const QPixmap& icon(IconIndex i)     { return i_cons[i]; }
-
-  protected:
-    QPixmap i_cons[null + 1];
-};
-
-
 /** Headers displayed in the article viewer. */
 class KNODE_EXPORT DisplayedHeaders : public ConfigBase
 {

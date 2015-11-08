@@ -28,7 +28,6 @@
 KNConfigManager::KNConfigManager( QObject *parent )
     : QObject( parent ), d_ialog(0)
 {
-  a_ppearance         = new KNode::Appearance();
   d_isplayedHeaders   = new KNode::DisplayedHeaders();
   c_leanup            = new KNode::Cleanup();
 }
@@ -36,7 +35,6 @@ KNConfigManager::KNConfigManager( QObject *parent )
 
 KNConfigManager::~KNConfigManager()
 {
-  delete a_ppearance;
   delete d_isplayedHeaders;
   delete c_leanup;
 }
@@ -59,7 +57,6 @@ void KNConfigManager::configure()
 
 void KNConfigManager::syncConfig()
 {
-  a_ppearance->save();
   d_isplayedHeaders->save();
   c_leanup->save();
   knGlobals.settings()->writeConfig();
