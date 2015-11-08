@@ -25,6 +25,8 @@
 
 #include "group_subscription_dialog.h"
 
+#include <KDE/KMessageBox>
+
 #include "helper/group_list_date_picker.h"
 #include "model/subscription_grouping_proxy_model.h"
 #include "model/subscription_state_proxy_model.h"
@@ -41,9 +43,20 @@ SubscriptionDialog::~SubscriptionDialog()
 {
 }
 
-void SubscriptionDialog::toSubscribe(QList< KNGroupInfo >& list)
+void SubscriptionDialog::toSubscribe(QList<KNGroupInfo>& list)
 {
     list << subscriptionModel()->subscribed();
+
+    Q_FOREACH(const KNGroupInfo& gi, list) {
+        if(gi.status == KNGroup::moderated) {
+            KMessageBox::information(parentWidget(),
+                                     i18nc("@info", "You have subscribed to a moderated newsgroup.\n"
+                                                    "Your articles will not appear in the group immediately.\n"
+                                                    "They have to go through a moderation process."),
+                                     QString(), "subscribeModeratedWarning");
+            break;
+        }
+    }
 }
 
 void SubscriptionDialog::toUnsubscribe(QStringList& list)
