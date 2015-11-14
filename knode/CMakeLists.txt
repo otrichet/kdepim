@@ -119,7 +119,6 @@ target_link_libraries(knodecommon
   ${KDEPIMLIBS_KMIME_LIBS} ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS}
   ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
   ${KDEPIMLIBS_KPIMUTILS_LIBS} ${KDEPIMLIBS_MAILTRANSPORT_LIBS}
-  ${KDEPIMLIBS_KONTACTINTERFACE_LIBS}
   kleo
   kdepim kpgp
   messagecomposer
@@ -148,21 +147,6 @@ target_link_libraries(kcm_knode  ${KDE4_KDECORE_LIBS} knodecommon )
 
 install(TARGETS kcm_knode  DESTINATION ${PLUGIN_INSTALL_DIR})
 
-
-########### next target ###############
-
-set(knodepart_PART_SRCS knode_part.cpp )
-
-
-kde4_add_plugin(knodepart ${knodepart_PART_SRCS})
-
-
-
-target_link_libraries(knodepart  ${KDE4_KPARTS_LIBS} knodecommon )
-
-install(TARGETS knodepart  DESTINATION ${PLUGIN_INSTALL_DIR})
-
-
 ########### next target ###############
 
 set(knode_SRCS knode.cpp knapplication.cpp main.cpp )
@@ -171,7 +155,7 @@ kde4_add_app_icon(knode_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/icons/hi*-apps-knode.p
 
 kde4_add_executable(knode ${knode_SRCS})
 
-target_link_libraries(knode ${KDE4_KDECORE_LIBS} ${KDEPIMLIBS_KONTACTINTERFACE_LIBS} kdepim knodecommon)
+target_link_libraries(knode ${KDE4_KDECORE_LIBS} kdepim knodecommon)
 
 install(TARGETS knode  ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

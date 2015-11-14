@@ -15,17 +15,18 @@
 #ifndef KNAPPLICATION_H
 #define KNAPPLICATION_H
 
-#include <kontactinterface/pimuniqueapplication.h>
+#include <KDE/KUniqueApplication>
 
 class KNMainWindow;
 
 /** Conversion of old settings and session restoration. */
-class KNApplication : public KontactInterface::PimUniqueApplication
+class KNApplication : public KUniqueApplication
 {
     Q_OBJECT
   public:
-    KNApplication() : KontactInterface::PimUniqueApplication() { }
-
+    KNApplication() : KUniqueApplication()
+    {
+    }
 
     /** Create new instance of KNode. Make the existing
         main window active if KNode is already running */
