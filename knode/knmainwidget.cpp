@@ -475,24 +475,6 @@ void KNMainWidget::initActions()
   connect(action, SIGNAL(triggered(bool)), c_olView, SLOT(selectCurrentFolder()));
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
 
-kDebug() << "Port";
-#if 0
-  action = actionCollection()->addAction("inc_current_article");
-  action->setText(i18n("Focus on Next Article"));
-  connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(incCurrentArticle()));
-  action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Right));
-
-  action = actionCollection()->addAction("dec_current_article");
-  action->setText(i18n("Focus on Previous Article"));
-  connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(decCurrentArticle()));
-  action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Left));
-
-  action = actionCollection()->addAction("select_current_article");
-  action->setText(i18n("Select Article with Focus"));
-  connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(selectCurrentArticle()));
-  action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Space));
-#endif
-
   //collection-view - accounts
   a_ctAccProperties = actionCollection()->addAction("account_properties");
   a_ctAccProperties->setIcon(KIcon("document-properties"));
