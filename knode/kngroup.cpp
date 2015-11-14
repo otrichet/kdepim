@@ -16,6 +16,7 @@
 #include "kngroup.h"
 
 #include "knglobals.h"
+#include "messagelist/headers_widget.h"
 #include "kncollectionview.h"
 #include "kncollectionviewitem.h"
 #include "kngrouppropdlg.h"
@@ -922,10 +923,10 @@ void KNGroup::reorganize()
   buildThreads(length());
   saveStaticData(length(), true);
   saveDynamicData(length(), true);
-kDebug() << "Port";
-#if 0
-  knGlobals.top->headerView()->repaint();
-#endif
+
+  knGlobals.top->headerView()->showCollection(KNGroup::Ptr());
+  knGlobals.top->headerView()->showCollection(thisGroupPtr());
+
   knGlobals.setStatusMsg( QString() );
 }
 
