@@ -59,6 +59,16 @@ class HeadersWidget : public QWidget
         bool isSearchShown() const;
 
         /**
+         * Change the sorting column.
+         * @param i Index of the column section.
+         */
+        void setSorting(int section);
+        /**
+         * Returns the section that is currently sorted.
+         */
+        int sortColumn() const;
+
+        /**
          * Select the next unread article.
          * @return @code false if no unread article is found.
          */
@@ -127,6 +137,7 @@ class HeadersWidget : public QWidget
         void showThreads(bool b);
         void doubleClicked(KNArticle::Ptr article);
         void contextMenuRequest(KNArticle::Ptr article, const QPoint& point);
+        void sortingChanged(int section);
 
     private:
       KFilterProxySearchLine* mSearch;

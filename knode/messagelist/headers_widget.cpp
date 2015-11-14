@@ -116,12 +116,24 @@ bool HeadersWidget::isSearchShown() const
     return mSearch->isVisible();
 }
 
+
 void HeadersWidget::sortingChanged(int logicalIndex, Qt::SortOrder order)
 {
     if(logicalIndex == HeadersModel::COLUMN_DATE && order == Qt::AscendingOrder) {
         mModel->setSortedByThreadChangeDate(!mModel->sortedByThreadChangeDate());
     }
+    emit sortingChanged(logicalIndex);
 }
+
+int HeadersWidget::sortColumn() const
+{
+    return mView->header()->sortIndicatorSection();
+}
+void HeadersWidget::setSorting(int section)
+{
+    mView->header()->setSortIndicator(section, mView->header()->sortIndicatorOrder());
+}
+
 
 
 void HeadersWidget::showCollection(const KNArticleCollection::Ptr collection)

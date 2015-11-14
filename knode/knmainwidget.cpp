@@ -605,12 +605,10 @@ void KNMainWidget::initActions()
   QStringList items;
   items += i18n("By &Subject");
   items += i18n("By S&ender");
-  items += i18n("By S&core");
-  items += i18n("By &Lines");
   items += i18n("By &Date");
   a_ctArtSortHeaders->setItems(items);
   a_ctArtSortHeaders->setShortcutConfigurable(false);
-  connect(a_ctArtSortHeaders, SIGNAL(activated(int)), this, SLOT(slotArtSortHeaders(int)));
+  connect(a_ctArtSortHeaders, SIGNAL(triggered(int)), this, SLOT(slotArtSortHeaders(int)));
 
   a_ctArtSortHeadersKeyb = actionCollection()->addAction("view_Sort_Keyb");
   a_ctArtSortHeadersKeyb->setText(i18n("Sort"));
@@ -764,10 +762,7 @@ void KNMainWidget::readOptions()
 
   a_ctToggleQuickSearch->setChecked(mHeadersView->isSearchShown());
 
-kDebug() << "Port";
-#if 0
-  a_ctArtSortHeaders->setCurrentItem( h_drView->sortColumn() );
-#endif
+  a_ctArtSortHeaders->setCurrentItem( mHeadersView->sortColumn() );
 
   resize(787,478);  // default optimized for 800x600
   //applyMainWindowSettings(KGlobal::config(),"mainWindow_options");
@@ -1426,24 +1421,18 @@ void KNMainWidget::slotFolMBoxExport()
 
 void KNMainWidget::slotArtSortHeaders(int i)
 {
-kDebug() << "Port";
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeaders(int i)";
-  h_drView->setSorting( i );
-#endif
+  mHeadersView->setSorting( i );
 }
 
 
 void KNMainWidget::slotArtSortHeadersKeyb()
 {
-kDebug() << "Port";
-#if 0
   kDebug(5003) <<"KNMainWidget::slotArtSortHeadersKeyb()";
 
   int newCol = KNHelper::selectDialog(this, i18n("Select Sort Column"), a_ctArtSortHeaders->items(), a_ctArtSortHeaders->currentItem());
   if (newCol != -1)
-    h_drView->setSorting( newCol );
-#endif
+    mHeadersView->setSorting( newCol );
 }
 
 
