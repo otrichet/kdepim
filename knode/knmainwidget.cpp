@@ -837,6 +837,8 @@ void KNMainWidget::prepareShutdown()
   //cleanup article-views
   ArticleWidget::cleanup();
 
+  ArticleWindow::closeAllWindows();
+
   // expire groups (if necessary)
   KNCleanUp *cup = new KNCleanUp();
   g_rpManager->expireAll(cup);

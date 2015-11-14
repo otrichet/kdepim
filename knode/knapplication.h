@@ -17,6 +17,8 @@
 
 #include <kontactinterface/pimuniqueapplication.h>
 
+class KNMainWindow;
+
 /** Conversion of old settings and session restoration. */
 class KNApplication : public KontactInterface::PimUniqueApplication
 {
@@ -28,6 +30,9 @@ class KNApplication : public KontactInterface::PimUniqueApplication
     /** Create new instance of KNode. Make the existing
         main window active if KNode is already running */
     int newInstance();
+
+  private:
+    KNMainWindow* findPrimaryWindow();
 
 };
 #endif
