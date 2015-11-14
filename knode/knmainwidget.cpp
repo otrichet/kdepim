@@ -408,11 +408,6 @@ void KNMainWidget::configChanged()
 {
   mHeadersView->readConfig();
   c_olView->readConfig();
-kDebug() << "Port";
-#if 0
-  // Still necessary to refresh the view?
-  a_rtManager->updateListViewItems();
-#endif
 }
 
 
