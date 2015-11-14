@@ -221,7 +221,7 @@ KNArticle::Ptr KNArticleCollection::byMessageId( const QByteArray &mid )
 {
   if(m_idIndex.isEmpty()) {
     m_idIndex.syncWithMaster();
-    kDebug(5003) <<"KNArticleCollection::byMessageId() : created index";
+    kDebug() << "created index";
   }
   return m_idIndex.bsearch(mid);
 }

@@ -171,7 +171,7 @@ bool KNGroupListData::readIn(KNJobData *job)
     f.close();
     return true;
   } else {
-    kWarning(5003) <<"unable to open" << f.fileName() <<" reason" << f.error();
+    kWarning() <<"unable to open" << f.fileName() <<" reason" << f.error();
     return false;
   }
 }
@@ -202,7 +202,7 @@ bool KNGroupListData::writeOut()
     f.close();
     return true;
   } else {
-    kWarning(5003) <<"unable to open" << f.fileName() <<" reason" << f.error();
+    kWarning() <<"unable to open" << f.fileName() <<" reason" << f.error();
     return false;
   }
 }
@@ -275,7 +275,7 @@ void KNGroupManager::loadGroups( KNNntpAccount::Ptr a )
       mGroupList.append( group );
       emit groupAdded(group);
     } else {
-      kError(5003) <<"Unable to load" << (*it) <<"!";
+      kError() <<"Unable to load" << (*it) <<"!";
     }
   }
 }
@@ -487,7 +487,7 @@ bool KNGroupManager::unsubscribeGroup( KNGroup::Ptr g )
              it.fileName() == g->groupname()+".grpinfo" )
           dir.remove( it.fileName() );
       }
-      kDebug(5003) <<"Files deleted!";
+      kDebug() <<"Files deleted!";
 
       emit groupRemoved(g);
       mGroupList.removeAll( g );
@@ -513,7 +513,7 @@ void KNGroupManager::checkGroupForNewHeaders( KNGroup::Ptr g )
   if(!g) g=c_urrentGroup;
   if(!g) return;
   if(g->isLocked()) {
-    kDebug(5003) <<"KNGroupManager::checkGroupForNewHeaders() : group locked - returning";
+    kDebug() << "group locked - returning";
     return;
   }
 
@@ -561,7 +561,7 @@ void KNGroupManager::setCurrentGroup( KNGroup::Ptr g )
 {
   c_urrentGroup=g;
   a_rticleMgr->setGroup(g);
-  kDebug(5003) <<"KNGroupManager::setCurrentGroup() : group changed";
+  kDebug() << "group changed";
 
   if(g) {
     if( !loadHeaders(g) ) {

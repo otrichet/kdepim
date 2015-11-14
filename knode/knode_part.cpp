@@ -48,13 +48,11 @@ KNodePart::KNodePart( QWidget *parentWidget, QObject *parent, const QVariantList
   : KParts::ReadOnlyPart( parent ),
   mParentWidget( parentWidget )
 {
-  kDebug(5003) <<"KNodePart()";
-  kDebug(5003) <<"  InstanceName:" << KGlobal::mainComponent().componentName();
+  kDebug() << "KNodePart(): InstanceName:" << KGlobal::mainComponent().componentName();
 
   setComponentData( KNodeFactory::componentData() );
 
-  kDebug(5003) <<"KNodePart()...";
-  kDebug(5003) <<"  InstanceName:" << KGlobal::mainComponent().componentName();
+  kDebug() << "KNodePart(): InstanceName:" << KGlobal::mainComponent().componentName();
 
 
   KNode::Utilities::Startup s;
@@ -103,7 +101,7 @@ KAboutData *KNodePart::createAboutData()
 
 bool KNodePart::openFile()
 {
-  kDebug(5003) <<"KNodePart:openFile()";
+  kDebug();
 
   mainWidget->show();
   return true;
@@ -111,7 +109,7 @@ bool KNodePart::openFile()
 
 void KNodePart::guiActivateEvent(KParts::GUIActivateEvent *e)
 {
-  kDebug(5003) <<"KNodePart::guiActivateEvent";
+  kDebug();
   KParts::ReadOnlyPart::guiActivateEvent(e);
 }
 

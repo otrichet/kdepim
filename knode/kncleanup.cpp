@@ -180,7 +180,7 @@ void KNCleanUp::expireGroup( KNGroup::Ptr g, bool showResult )
   g->writeConfig();
   leftCnt=g->count();
 
-  kDebug(5003) <<"KNCleanUp::expireGroup() :" << g->groupname() <<":"
+  kDebug() << g->groupname() << ":"
     << delCnt << "deleted ," << leftCnt << "left";
 
   if(showResult)

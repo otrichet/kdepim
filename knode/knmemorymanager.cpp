@@ -45,11 +45,11 @@ void KNMemoryManager::updateCacheEntry( KNArticleCollection::Ptr c )
   if( (ci=findCacheEntry(c, true)) ) { // item is taken from the list
     oldSize=ci->storageSize;
     ci->sync();
-    kDebug(5003) <<"KNMemoryManager::updateCacheEntry() : collection (" << c->name() <<") updated";
+    kDebug() << "collection (" << c->name() <<") updated";
   }
   else {
     ci=new CollectionItem(c);
-    kDebug(5003) <<"KNMemoryManager::updateCacheEntry() : collection (" << c->name() <<") added";
+    kDebug() << "collection (" << c->name() <<") added";
   }
 
   mColList.append(ci);
@@ -67,7 +67,7 @@ void KNMemoryManager::removeCacheEntry( KNArticleCollection::Ptr c )
     c_ollCacheSize -= ci->storageSize;
     delete ci;
 
-    kDebug(5003) <<"KNMemoryManager::removeCacheEntry() : collection removed (" << c->name() <<"),"
+    kDebug() << "collection removed (" << c->name() <<"),"
                   << mColList.count() << "collections left in cache";
   }
 }
@@ -91,11 +91,11 @@ void KNMemoryManager::updateCacheEntry( KNArticle::Ptr a )
   if( (ai=findCacheEntry(a, true)) ) {
     oldSize=ai->storageSize;
     ai->sync();
-    kDebug(5003) <<"KNMemoryManager::updateCacheEntry() : article updated";
+    kDebug() << "article updated";
   }
   else {
     ai=new ArticleItem(a);
-    kDebug(5003) <<"KNMemoryManager::updateCacheEntry() : article added";
+    kDebug() << "article added";
   }
 
   mArtList.append(ai);
@@ -112,7 +112,7 @@ void KNMemoryManager::removeCacheEntry( KNArticle::Ptr a )
     a_rtCacheSize -= ai->storageSize;
     delete ai;
 
-    kDebug(5003) <<"KNMemoryManager::removeCacheEntry() : article removed,"
+    kDebug() << "article removed,"
                   << mArtList.count() << "articles left in cache";
 
   }
@@ -173,8 +173,7 @@ void KNMemoryManager::checkMemoryUsageCollections()
     }
   }
 
-  kDebug(5003) <<"KNMemoryManager::checkMemoryUsageCollections() :"
-                << mColList.count() << "collections in cache => Usage :"
+  kDebug() << mColList.count() << "collections in cache => Usage :"
                 << ( c_ollCacheSize*100.0 / maxSize ) << "%";
 }
 
@@ -197,8 +196,7 @@ void KNMemoryManager::checkMemoryUsageArticles()
     }
   }
 
-  kDebug(5003) <<"KNMemoryManager::checkMemoryUsageArticles() :"
-                << mArtList.count() << "articles in cache => Usage :"
+  kDebug() << mArtList.count() << "articles in cache => Usage :"
                 << ( a_rtCacheSize*100.0 / maxSize ) << "%";
 }
 

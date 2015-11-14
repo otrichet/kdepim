@@ -441,7 +441,7 @@ void KNComposer::slotCut()
     ((KTextEdit*)fw)->cut();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->cut();
-  else kDebug(5003) <<"wrong focus widget";
+  else kDebug() <<"wrong focus widget";
 }
 
 void KNComposer::slotCopy()
@@ -453,7 +453,7 @@ void KNComposer::slotCopy()
     ((KTextEdit*)fw)->copy();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->copy();
-  else kDebug(5003) <<"wrong focus widget";
+  else kDebug() <<"wrong focus widget";
 
 }
 
@@ -467,7 +467,7 @@ void KNComposer::slotPaste()
     ((KTextEdit*)fw)->paste();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->paste();
-  else kDebug(5003) <<"wrong focus widget";
+  else kDebug() <<"wrong focus widget";
 }
 
 void KNComposer::slotSelectAll()
@@ -862,7 +862,7 @@ bool KNComposer::applyChanges()
               codec=KGlobal::locale()->codecForEncoding();
 
           block.setText( codec->fromUnicode(tmpText) );
-          kDebug(5003) <<"signing article from" << article()->from()->addresses();
+          kDebug() <<"signing article from" << article()->from()->addresses();
           if( block.clearsign( signingKey, codec->name() ) == Kpgp::Ok ) {
               QByteArray result = block.text();
               tmp = codec->toUnicode(result.data(), result.length() );

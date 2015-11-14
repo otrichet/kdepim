@@ -461,7 +461,7 @@ void ArticleWidget::displayArticle()
   if ( text && !canDecodeText( text->contentType()->charset() ) ) {
     html += QString("<table width=\"100%\" border=\"0\"><tr><td bgcolor=\"#FF0000\">%1</td></tr></table>")
       .arg( i18n("Unknown charset. Default charset is used instead.") );
-    kDebug(5003) <<"unknown charset =" << text->contentType()->charset();
+    kDebug() <<"unknown charset =" << text->contentType()->charset();
   }
 
   // if the article is pgp signed and the user asked for verifying the
@@ -986,7 +986,7 @@ bool ArticleWidget::inlinePossible( KMime::Content *c )
 
 bool ArticleWidget::canDecodeText( const QByteArray &charset ) const
 {
-  kDebug( 5003 ) << charset;
+  kDebug() << charset;
   if ( charset.isEmpty() )
     return false;
   bool ok = true;
@@ -1189,7 +1189,7 @@ void ArticleWidget::slotURLClicked( const KUrl &url, bool forceOpen)
   }
   // handle news URL's
   if ( url.protocol() == "news" ) {
-    kDebug( 5003 ) << url;
+    kDebug() << url;
     knGlobals.top->openURL( url );
     return;
   }

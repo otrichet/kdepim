@@ -79,7 +79,7 @@ void KNFolderManager::setCurrentFolder( KNFolder::Ptr f )
   c_urrentFolder=f;
   a_rtManager->setFolder(f);
 
-  kDebug(5003) <<"KNFolderManager::setCurrentFolder() : folder changed";
+  kDebug() << "folder changed";
 
   if(f && !f->isRootFolder()) {
     if( loadHeaders(f) )
