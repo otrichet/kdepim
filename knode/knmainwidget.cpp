@@ -1457,7 +1457,7 @@ void KNMainWidget::slotArtSearch()
 void KNMainWidget::slotArtRefreshList()
 {
   kDebug(5003) <<"KNMainWidget::slotArtRefreshList()";
-  a_rtManager->showHdrs(true);
+  a_rtManager->showHdrs();
 }
 
 void KNMainWidget::slotArtSetArtRead()

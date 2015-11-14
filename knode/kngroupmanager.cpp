@@ -655,7 +655,7 @@ void KNGroupManager::processJob(KNJobData *j)
       }
     }
     if( group == c_urrentGroup ) {
-      a_rticleMgr->showHdrs(false);
+      a_rticleMgr->showHdrs();
     }
 
     delete j;

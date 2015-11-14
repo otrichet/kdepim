@@ -49,7 +49,7 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     void openContent(KMime::Content *c);
 
     //listview handling
-    void showHdrs(bool clear=true);
+    void showHdrs();
     void updateViewForCollection( KNArticleCollection::Ptr c );
 
     void updateStatusString();

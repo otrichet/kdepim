@@ -174,7 +174,7 @@ void KNArticleManager::openContent(KMime::Content *c)
 }
 
 
-void KNArticleManager::showHdrs(bool clear)
+void KNArticleManager::showHdrs()
 {
   if(!g_roup && !f_older) return;
 
@@ -197,7 +197,7 @@ void KNArticleManager::showHdrs(bool clear)
 void KNArticleManager::updateViewForCollection( KNArticleCollection::Ptr c )
 {
   if(g_roup==c || f_older==c)
-    showHdrs(false);
+    showHdrs();
 }
 
 
@@ -459,7 +459,7 @@ void KNArticleManager::setAllRead( bool read, int lastcount )
   }
 
   g_roup->updateListItem();
-  showHdrs( true );
+  showHdrs();
 }
 
 
