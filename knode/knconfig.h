@@ -48,34 +48,6 @@ class ConfigBase {
 };
 
 
-/** Ex-Appearance settings.
- * @deprecated Move the remaining parts either to their only users or to the
- *  KConfigXT generated Settings class.
- */
-class KNODE_EXPORT Appearance : public ConfigBase {
-
-#define ICON_CNT 14
-
-  friend class AppearanceWidget;
-
-  public:
-    enum IconIndex    { greyBall=0,        redBall=1,      greyBallChkd=2,
-                        redBallChkd=3,     newFups=4,      eyes=5,
-                        ignore=6,          mail=7,         posting=8,
-                        canceledPosting=9, savedRemote=10, group=11,
-                        null=12 };
-    Appearance();
-
-    const QPixmap& icon(IconIndex i)     { return i_cons[i]; }
-
-  protected:
-    void recreateLVIcons();
-
-    QPixmap i_cons[ICON_CNT];
-
-};
-
-
 /** Headers displayed in the article viewer. */
 class KNODE_EXPORT DisplayedHeaders : public ConfigBase
 {

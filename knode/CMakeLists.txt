@@ -15,7 +15,6 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/messagecomposer
 )
 
-add_definitions (-DQT3_SUPPORT -DQT3_SUPPORT_WARNINGS)
 add_definitions( -DKDE_DEFAULT_DEBUG_AREA=5003 )
 
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
@@ -40,9 +39,6 @@ set(knodecommon_LIB_SRCS
    kngroupmanager.cpp
    knarticlecollection.cpp
    kngroup.cpp
-   kngroupbrowser.cpp
-   kngroupselectdialog.cpp
-   kngroupdialog.cpp
    kngrouppropdlg.cpp
    knfoldermanager.cpp
    knfolder.cpp
@@ -53,7 +49,6 @@ set(knodecommon_LIB_SRCS
    kndisplayedheader.cpp
    knsourceviewwindow.cpp
    knarticlewindow.cpp
-   knhdrviewitem.cpp
    kncomposer.cpp
    kncomposerview.cpp
    kncomposereditor.cpp
@@ -67,8 +62,6 @@ set(knodecommon_LIB_SRCS
    knfilterdialog.cpp
    knsearchdialog.cpp
    utilities.cpp
-   knscoring.cpp
-   headerview.cpp
    knmainwidget.cpp
    aboutdata.cpp
    knglobals.cpp
@@ -79,10 +72,22 @@ set(knodecommon_LIB_SRCS
    composer/followupto_combobox.cpp
    configuration/identity_widget.cpp
    configuration/identity_edition_dialog.cpp
+   groupselection/dialog_base.cpp
+   groupselection/group_subscription_dialog.cpp
+   groupselection/group_selection_dialog.cpp
+   groupselection/model/checked_state_proxy_model.cpp
+   groupselection/model/filter_group_proxy_model.cpp
+   groupselection/model/subscription_state_proxy_model.cpp
+   groupselection/model/base_grouping_proxy_model.cpp
+   groupselection/model/subscription_grouping_proxy_model.cpp
+   groupselection/model/selection_grouping_proxy_model.cpp
+   groupselection/model/group_model.cpp
+   groupselection/helper/group_list_date_picker.cpp
    utils/locale.cpp
    utils/startup.cpp
-   kscoring.cpp
-   kscoringeditor.cpp
+   messagelist/headers_widget.cpp
+   messagelist/headers_model.cpp
+   messagelist/headers_view.cpp
    treewidget.cpp
    foldertreewidget.cpp
 )
@@ -102,6 +107,8 @@ kde4_add_ui_files(knodecommon_LIB_SRCS
    composer/composer_view.ui
    configuration/identity_widget.ui
    configuration/identity_edition_dialog.ui
+   groupselection/dialog_base.ui
+   groupselection/helper/group_list_date_picker.ui
 )
 
 kde4_add_kcfg_files(knodecommon_LIB_SRCS settings_base.kcfgc )
@@ -110,16 +117,15 @@ kde4_add_library(knodecommon ${LIBRARY_TYPE} ${knodecommon_LIB_SRCS})
 
 target_link_libraries(knodecommon
   ${KDEPIMLIBS_KMIME_LIBS} ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS}
-  ${KDE4_KDE3SUPPORT_LIBS} ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
+  ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
   ${KDEPIMLIBS_KPIMUTILS_LIBS} ${KDEPIMLIBS_MAILTRANSPORT_LIBS}
-  ${KDEPIMLIBS_KONTACTINTERFACE_LIBS}
   kleo
   kdepim kpgp
   messagecomposer
   messageviewer
 )
 
-target_link_libraries(knodecommon LINK_INTERFACE_LIBRARIES ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KDE3SUPPORT_LIBS})
+target_link_libraries(knodecommon LINK_INTERFACE_LIBRARIES ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS})
 
 set_target_properties(knodecommon
    PROPERTIES VERSION ${GENERIC_LIB_VERSION}
@@ -141,21 +147,6 @@ target_link_libraries(kcm_knode  ${KDE4_KDECORE_LIBS} knodecommon )
 
 install(TARGETS kcm_knode  DESTINATION ${PLUGIN_INSTALL_DIR})
 
-
-########### next target ###############
-
-set(knodepart_PART_SRCS knode_part.cpp )
-
-
-kde4_add_plugin(knodepart ${knodepart_PART_SRCS})
-
-
-
-target_link_libraries(knodepart  ${KDE4_KPARTS_LIBS} knodecommon )
-
-install(TARGETS knodepart  DESTINATION ${PLUGIN_INSTALL_DIR})
-
-
 ########### next target ###############
 
 set(knode_SRCS knode.cpp knapplication.cpp main.cpp )
@@ -164,7 +155,7 @@ kde4_add_app_icon(knode_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/icons/hi*-apps-knode.p
 
 kde4_add_executable(knode ${knode_SRCS})
 
-target_link_libraries(knode ${KDE4_KDECORE_LIBS} ${KDEPIMLIBS_KONTACTINTERFACE_LIBS} kdepim knodecommon)
+target_link_libraries(knode ${KDE4_KDECORE_LIBS} kdepim knodecommon)
 
 install(TARGETS knode  ${INSTALL_TARGETS_DEFAULT_ARGS} )
 

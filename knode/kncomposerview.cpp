@@ -235,7 +235,7 @@ void View::setFrom( const QString& from )
 const QStringList View::groups() const
 {
   const QRegExp r = QRegExp( "\\s*,\\s*", Qt::CaseInsensitive, QRegExp::RegExp2 );
-  return mGroupsEdit->text().split( r, QString::SkipEmptyParts );
+  return mGroupsEdit->text().trimmed().split( r, QString::SkipEmptyParts );
 }
 
 void View::setGroups( const QString &groups )

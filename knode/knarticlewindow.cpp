@@ -30,6 +30,14 @@ using namespace KNode;
 
 QList<KNode::ArticleWindow*> ArticleWindow::mInstances;
 
+void ArticleWindow::closeAllWindows()
+{
+  ArticleWindow::List list = mInstances;
+  Q_FOREACH(ArticleWindow* win, list) {
+    win->close();
+  }
+}
+
 
 bool ArticleWindow::closeAllWindowsForCollection( KNArticleCollection::Ptr col, bool force )
 {

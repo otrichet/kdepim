@@ -49,7 +49,6 @@ class KNFilterConfigWidget : public QTabWidget
     KNode::StringFilterWidget *references;
     KNode::RangeFilterWidget *age;
     KNode::RangeFilterWidget *lines;
-    KNode::RangeFilterWidget *score;
 };
 
 #endif

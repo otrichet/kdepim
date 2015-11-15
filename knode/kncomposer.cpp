@@ -20,14 +20,15 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QtDBus/QtDBus>
+#include <QtGui/QContextMenuEvent>
 #include <qgroupbox.h>
-#include "libkdepim/addressline/recentaddresses.h"
+#include "libkdepim/addressline/recentaddress/recentaddresses.h"
+#include "libkdepim/addressline/recentaddress/recentaddressdialog.h"
 using KPIM::RecentAddresses;
 #include <akonadi/contact/emailaddressselectiondialog.h>
 #include <kcharsets.h>
 #include <kmessagebox.h>
 #include <kactioncollection.h>
-#include <kstandardaction.h>
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kmenu.h>
@@ -41,12 +42,12 @@ using KPIM::RecentAddresses;
 #include <klocale.h>
 #include <kselectaction.h>
 #include <ktoggleaction.h>
-#include "kngroupselectdialog.h"
+
+#include "groupselection/group_selection_dialog.h"
+#include "knarticlemanager.h"
 #include "utilities.h"
-#include "knglobals.h"
 #include "knmainwidget.h"
 #include "knaccountmanager.h"
-#include "knnntpaccount.h"
 #include "settings.h"
 #include "kncomposerview.h"
 #include "utils/locale.h"
@@ -83,11 +84,7 @@ void KNLineEdit::editRecentAddresses()
   dlg.setAddresses( RecentAddresses::self( knGlobals.config() )->addresses() );
   if ( dlg.exec() ) {
     RecentAddresses::self( knGlobals.config() )->clear();
-    QStringList addrList = dlg.addresses();
-    QStringList::Iterator it;
-    for ( it = addrList.begin(); it != addrList.end(); ++it )
-      RecentAddresses::self( knGlobals.config() )->add( *it );
-
+    dlg.storeAddresses(knGlobals.config());
     loadAddresses();
   }
 }
@@ -444,7 +441,7 @@ void KNComposer::slotCut()
     ((KTextEdit*)fw)->cut();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->cut();
-  else kDebug(5003) <<"wrong focus widget";
+  else kDebug() <<"wrong focus widget";
 }
 
 void KNComposer::slotCopy()
@@ -456,7 +453,7 @@ void KNComposer::slotCopy()
     ((KTextEdit*)fw)->copy();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->copy();
-  else kDebug(5003) <<"wrong focus widget";
+  else kDebug() <<"wrong focus widget";
 
 }
 
@@ -470,7 +467,7 @@ void KNComposer::slotPaste()
     ((KTextEdit*)fw)->paste();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->paste();
-  else kDebug(5003) <<"wrong focus widget";
+  else kDebug() <<"wrong focus widget";
 }
 
 void KNComposer::slotSelectAll()
@@ -865,7 +862,7 @@ bool KNComposer::applyChanges()
               codec=KGlobal::locale()->codecForEncoding();
 
           block.setText( codec->fromUnicode(tmpText) );
-          kDebug(5003) <<"signing article from" << article()->from()->addresses();
+          kDebug() <<"signing article from" << article()->from()->addresses();
           if( block.clearsign( signingKey, codec->name() ) == Kpgp::Ok ) {
               QByteArray result = block.text();
               tmp = codec->toUnicode(result.data(), result.length() );
@@ -881,7 +878,8 @@ bool KNComposer::applyChanges()
   a_rticle->lines()->setNumberOfLines(a_rticle->lineCount());
 
   a_rticle->assemble();
-  a_rticle->updateListItem();
+
+  KNGlobals::self()->articleManager()->notifyArticleChanged(a_rticle);
 
   return result;
 }
@@ -1454,7 +1452,8 @@ void KNComposer::slotGroupsBtnClicked()
   if(id==-1)
     a_rticle->setServerId(nntp->id());
 
-  KNGroupSelectDialog *dlg = new KNGroupSelectDialog( this, nntp, v_iew->groups() );
+  KNode::GroupSelection::SelectionDialog* dlg = new KNode::GroupSelection::SelectionDialog(this, nntp);
+  dlg->setPreselectedGroups(v_iew->groups());
 
   connect( dlg, SIGNAL(loadList(KNNntpAccount::Ptr)),
            knGlobals.groupManager(), SLOT(slotLoadGroupList(KNNntpAccount::Ptr)) );
@@ -1462,7 +1461,7 @@ void KNComposer::slotGroupsBtnClicked()
            dlg, SLOT(slotReceiveList(KNGroupListData::Ptr)) );
 
   if(dlg->exec())
-    v_iew->setGroups( dlg->selectedGroups() );
+    v_iew->setGroups( dlg->selectedGroups().join(QLatin1String(", ")) );
 
   delete dlg;
 }

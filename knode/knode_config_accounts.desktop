@@ -8,7 +8,7 @@ X-KDE-Library=kcm_knode
 X-KDE-FactoryName=knode_config_accounts
 X-KDE-HasReadOnlyMode=false
 X-KDE-ParentApp=knode
-X-KDE-ParentComponents=knode,kontact_knodeplugin
+X-KDE-ParentComponents=knode
 X-KDE-CfgDlgHierarchy=KNode
 X-KDE-Weight=200
 

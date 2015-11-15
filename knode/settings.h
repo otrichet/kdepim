@@ -39,8 +39,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
 
     /// Returns the effective background color.
     QColor backgroundColor() { return effectiveColor( backgroundColorItem() ); }
-    /// Returns the effective alternate background color.
-    QColor alternateBackgroundColor() { return effectiveColor( alternateBackgroundColorItem() ); }
     /// Returns the effective text color.
     QColor textColor() { return effectiveColor( textColorItem() ); }
     /** Returns the effective quoting color.
@@ -49,14 +47,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     QColor quoteColor( int depth ) { return effectiveColor( quoteColorItem( depth ) ); }
     /// Returns the effective link color.
     QColor linkColor() { return effectiveColor( linkColorItem() ); }
-    /// Returns the effective color for unread threads.
-    QColor unreadThreadColor() { return effectiveColor( unreadThreadColorItem() ); }
-    /// Returns the effective color for read threads.
-    QColor readThreadColor() { return effectiveColor( readThreadColorItem() ); }
-    /// Returns the effective color for unread articles.
-    QColor unreadArticleColor() { return effectiveColor( unreadArticleColorItem() ); }
-    /// Returns the effective color for read articles.
-    QColor readArticleColor() { return effectiveColor( readArticleColorItem() ); }
     /// Returns the effective color for valid signatures with a trusted key.
     QColor signOkKeyOkColor() { return effectiveColor( signOkKeyOkColorItem() ); }
     /// Returns the effective color for valid signatures with a untrusted key.
@@ -76,8 +66,6 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     QFont composerFont() { return effectiveFont( composerFontItem() ); }
     /// Returns the effective folder tree font.
     QFont groupListFont() { return effectiveFont( groupListFontItem() ); }
-    /// Returns the effective article list font.
-    QFont articleListFont() { return effectiveFont( articleListFontItem() ); }
 
     /** Returns a list of additional headers added to created articles. */
     QList<XHeader> xHeaders() const { return mXHeaders; }

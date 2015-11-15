@@ -22,9 +22,7 @@
 
 #include <QList>
 
-class Q3ListViewItem;
 class KTemporaryFile;
-class KNHeaderView;
 class KNArticleCollection;
 class KNArticleFilter;
 class KNFilterManager;
@@ -51,10 +49,8 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     void openContent(KMime::Content *c);
 
     //listview handling
-    void showHdrs(bool clear=true);
+    void showHdrs();
     void updateViewForCollection( KNArticleCollection::Ptr c );
-    void updateListViewItems();
-    void setAllThreadsOpen(bool b=true);
 
     void updateStatusString();
 
@@ -89,12 +85,7 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     bool toggleWatched(KNRemoteArticle::List &l);
     bool toggleIgnored(KNRemoteArticle::List &l);
 
-    void rescoreArticles(KNRemoteArticle::List &l);
-
-    /** Allow to delay the setup of UI elements, since the knode part may not
-     * be available when the config dialog is called.
-     */
-    void setView(KNHeaderView* v);
+    void notifyArticleChanged(KNArticle::Ptr a, bool deleted = false);
 
   signals:
     /** A newsgroup is about to be shown in the header view.
@@ -106,24 +97,33 @@ class KNArticleManager : public QObject, public KNJobConsumer {
      */
     void aboutToShowFolder();
 
+    /**
+     * Emitted to indicates that the content of a group has changed.
+     */
+    void collectionChanged(const KNArticleCollection::Ptr group);
+
+    /**
+     * Emitted to indicates that the content of articles has changed.
+     */
+    void articlesChanged(const KNArticle::List articles, bool deleted = false);
+
+
   protected:
     void processJob(KNJobData *j);
-    void createThread( KNRemoteArticle::Ptr a );
-    void createCompleteThread( KNRemoteArticle::Ptr a );
 
-    KNHeaderView *v_iew;
     KNGroup::Ptr g_roup;
     KNFolder::Ptr f_older;
     KNArticleFilter *f_ilter;
     KNFilterManager *f_ilterMgr;
     KNode::SearchDialog *s_earchDlg;
     QList<KTemporaryFile*> mTempFiles;
-    bool d_isableExpander;
+
+  Q_SIGNALS:
+    void filterChanged(KNArticleFilter *f);
 
   public slots:
     void slotFilterChanged(KNArticleFilter *f);
     void slotSearchDialogDone();
-    void slotItemExpanded(Q3ListViewItem *p);
 
 };
 

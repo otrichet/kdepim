@@ -16,7 +16,6 @@
 #define KNODE_SCHEDULER_H
 
 #include <QObject>
-#include <QMutex>
 #include <QList>
 
 namespace KPIM {
@@ -55,8 +54,6 @@ class Scheduler : public QObject  {
      */
     void addJob(KNJobData *job);
 
-    QMutex& nntpMutex() { return nntp_Mutex; }
-
     /** Cancel the selected jobs.
      *  @param type Cancel all jobs of the given type, 0 means all.
      *  @param item Cancel the job associated with this progress item.
@@ -69,7 +66,6 @@ class Scheduler : public QObject  {
     KNJobData *currentNntpJob;
     /// the currently active SMTP job
     KNJobData *currentSmtpJob;
-    QMutex nntp_Mutex;
 
   signals:
     /** Indicates whether there are currently active jobs, useful to e.g. enable

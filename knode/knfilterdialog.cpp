@@ -82,7 +82,6 @@ KNFilterDialog::KNFilterDialog( KNArticleFilter *f, QWidget *parent )
   fw->status->setFilter(f->status);
   fw->lines->setFilter(f->lines);
   fw->age->setFilter(f->age);
-  fw->score->setFilter(f->score);
   fw->subject->setFilter(f->subject);
   fw->from->setFilter(f->from);
   fw->messageId->setFilter(f->messageId);
@@ -120,7 +119,6 @@ void KNFilterDialog::slotOk()
       fltr->setTranslatedName(fname->text());
       fltr->setEnabled(enabled->isChecked());
       fltr->status=fw->status->filter();
-      fltr->score=fw->score->filter();
       fltr->age=fw->age->filter();
       fltr->lines=fw->lines->filter();
       fltr->subject=fw->subject->filter();
@@ -132,8 +130,3 @@ void KNFilterDialog::slotOk()
       accept();
     }
 }
-
-
-
-//--------------------------------
-

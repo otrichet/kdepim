@@ -17,7 +17,6 @@
 #include "articlewidget.h"
 #include "knmainwidget.h"
 #include "knarticlemanager.h"
-#include "kngroupdialog.h"
 #include "knnntpaccount.h"
 #include "kncleanup.h"
 #include "scheduler.h"
@@ -40,6 +39,8 @@
 #include <kiconloader.h>
 #include <kdebug.h>
 #include <kcharsets.h>
+
+#include "groupselection/group_subscription_dialog.h"
 #include "knaccountmanager.h"
 
 
@@ -81,6 +82,10 @@ bool KNGroupInfo::operator< (const KNGroupInfo &gi2) const
   return (name < gi2.name);
 }
 
+uint qHash(const KNGroupInfo& gi)
+{
+    return qHash(gi.name);
+}
 
 //===============================================================================
 
@@ -166,7 +171,7 @@ bool KNGroupListData::readIn(KNJobData *job)
     f.close();
     return true;
   } else {
-    kWarning(5003) <<"unable to open" << f.fileName() <<" reason" << f.error();
+    kWarning() <<"unable to open" << f.fileName() <<" reason" << f.error();
     return false;
   }
 }
@@ -197,7 +202,7 @@ bool KNGroupListData::writeOut()
     f.close();
     return true;
   } else {
-    kWarning(5003) <<"unable to open" << f.fileName() <<" reason" << f.error();
+    kWarning() <<"unable to open" << f.fileName() <<" reason" << f.error();
     return false;
   }
 }
@@ -270,7 +275,7 @@ void KNGroupManager::loadGroups( KNNntpAccount::Ptr a )
       mGroupList.append( group );
       emit groupAdded(group);
     } else {
-      kError(5003) <<"Unable to load" << (*it) <<"!";
+      kError() <<"Unable to load" << (*it) <<"!";
     }
   }
 }
@@ -400,7 +405,7 @@ void KNGroupManager::expireAll( KNNntpAccount::Ptr a )
 
 void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
 {
-  KNGroupDialog* gDialog=new KNGroupDialog((parent!=0)? parent:knGlobals.topWidget, a);
+  GroupSelection::SubscriptionDialog* gDialog = new GroupSelection::SubscriptionDialog(parent, a);
 
   connect( gDialog, SIGNAL(loadList(KNNntpAccount::Ptr)), this, SLOT(slotLoadGroupList(KNNntpAccount::Ptr)) );
   connect( gDialog, SIGNAL(fetchList(KNNntpAccount::Ptr)), this, SLOT(slotFetchGroupList(KNNntpAccount::Ptr)) );
@@ -417,9 +422,9 @@ void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
     KNGroup::Ptr g;
 
     QStringList lst;
-    gDialog->toUnsubscribe(&lst);
+    gDialog->toUnsubscribe(lst);
     if (lst.count()>0) {
-      if (KMessageBox::Yes == KMessageBox::questionYesNoList((parent!=0)? parent:knGlobals.topWidget,i18n("Do you really want to unsubscribe\nfrom these groups?"),
+      if (KMessageBox::Yes == KMessageBox::questionYesNoList(parent, i18n("Do you really want to unsubscribe\nfrom these groups?"),
                                                               lst, QString(), KGuiItem(i18n("Unsubscribe")), KStandardGuiItem::cancel())) {
         for ( QStringList::Iterator it = lst.begin(); it != lst.end(); ++it ) {
           if((g=group(*it, a)))
@@ -429,7 +434,7 @@ void KNGroupManager::showGroupDialog( KNNntpAccount::Ptr a, QWidget *parent )
     }
 
     QList<KNGroupInfo> lst2;
-    gDialog->toSubscribe(&lst2);
+    gDialog->toSubscribe(lst2);
     Q_FOREACH( const KNGroupInfo& var, lst2) {
       subscribeGroup(&var, a);
     }
@@ -482,7 +487,7 @@ bool KNGroupManager::unsubscribeGroup( KNGroup::Ptr g )
              it.fileName() == g->groupname()+".grpinfo" )
           dir.remove( it.fileName() );
       }
-      kDebug(5003) <<"Files deleted!";
+      kDebug() <<"Files deleted!";
 
       emit groupRemoved(g);
       mGroupList.removeAll( g );
@@ -508,7 +513,7 @@ void KNGroupManager::checkGroupForNewHeaders( KNGroup::Ptr g )
   if(!g) g=c_urrentGroup;
   if(!g) return;
   if(g->isLocked()) {
-    kDebug(5003) <<"KNGroupManager::checkGroupForNewHeaders() : group locked - returning";
+    kDebug() << "group locked - returning";
     return;
   }
 
@@ -556,7 +561,7 @@ void KNGroupManager::setCurrentGroup( KNGroup::Ptr g )
 {
   c_urrentGroup=g;
   a_rticleMgr->setGroup(g);
-  kDebug(5003) <<"KNGroupManager::setCurrentGroup() : group changed";
+  kDebug() << "group changed";
 
   if(g) {
     if( !loadHeaders(g) ) {
@@ -627,7 +632,6 @@ void KNGroupManager::processJob(KNJobData *j)
     if (!j->canceled()) {
       if (j->success()) {
         if(group->lastFetchCount()>0) {
-          group->scoreArticles();
           group->processXPostBuffer(true);
           emit groupUpdated( group );
           group->writeConfig();
@@ -651,7 +655,7 @@ void KNGroupManager::processJob(KNJobData *j)
       }
     }
     if( group == c_urrentGroup ) {
-      a_rticleMgr->showHdrs(false);
+      a_rticleMgr->showHdrs();
     }
 
     delete j;

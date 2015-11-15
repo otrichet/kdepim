@@ -45,6 +45,10 @@ class ArticleWindow : public KXmlGuiWindow  {
     /// List of article windows.
     typedef QList<KNode::ArticleWindow*> List;
 
+    /**
+     * Forcefully close all article windows.
+     */
+    static void closeAllWindows();
     /** Close all article windows showing articles from the given collection.
      * @param col The article collection (folder/group).
      * @param force Really close the windows.

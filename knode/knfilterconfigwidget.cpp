@@ -60,8 +60,6 @@ KNFilterConfigWidget::KNFilterConfigWidget( QWidget *parent ) :
   QVBoxLayout *addL=new QVBoxLayout(add);
   addL->setSpacing(5);
   addL->setMargin(8);
-  score = new RangeFilterWidget( i18n("Score"), -99999, 99999, add );
-  addL->addWidget(score);
   age = new RangeFilterWidget( i18n("Age"), 0, 999, add, i18n(" days") );
   addL->addWidget(age);
   lines = new RangeFilterWidget( i18n("Lines"), 0, 99999, add );
@@ -84,7 +82,6 @@ void KNFilterConfigWidget::reset()
   references->clear();
   age->clear();
   lines->clear();
-  score->clear();
   status->clear();
 }
 

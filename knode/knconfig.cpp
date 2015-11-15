@@ -26,47 +26,6 @@
 #include <kiconeffect.h>
 
 
-KNode::Appearance::Appearance()
-{
-  recreateLVIcons();
-  i_cons[newFups]         = UserIcon("newsubs");
-  i_cons[eyes]            = UserIcon("eyes");
-  i_cons[ignore]          = UserIcon("ignore");
-  i_cons[mail]            = SmallIcon("mail-message");
-  i_cons[posting]         = UserIcon("article");
-  i_cons[canceledPosting] = SmallIcon("edit-delete");
-  i_cons[savedRemote]     = SmallIcon("edit-copy");
-  i_cons[group]           = UserIcon("group");
-}
-
-
-void KNode::Appearance::recreateLVIcons()
-{
-  QPixmap tempPix = UserIcon("greyball");
-
-  QImage tempImg=tempPix.toImage();
-  KIconEffect::colorize(tempImg, knGlobals.settings()->readArticleColor(), 1.0);
-  i_cons[greyBall] = QPixmap::fromImage(tempImg);
-
-  tempImg=tempPix.toImage();
-  KIconEffect::colorize(tempImg, knGlobals.settings()->unreadArticleColor(), 1.0);
-  i_cons[redBall] = QPixmap::fromImage(tempImg);
-
-  tempPix = UserIcon("greyballchk");
-
-  tempImg=tempPix.toImage();
-  KIconEffect::colorize(tempImg, knGlobals.settings()->readArticleColor(), 1.0);
-  i_cons[greyBallChkd] = QPixmap::fromImage(tempImg);
-
-  tempImg=tempPix.toImage();
-  KIconEffect::colorize(tempImg, knGlobals.settings()->unreadArticleColor(), 1.0);
-  i_cons[redBallChkd] = QPixmap::fromImage(tempImg);
-}
-
-
-//==============================================================================================================
-
-
 KNode::DisplayedHeaders::DisplayedHeaders()
 {
   QString fname( KStandardDirs::locate( "data","knode/headers.rc" ) );
@@ -89,7 +48,7 @@ KNode::DisplayedHeaders::DisplayedHeaders()
       h->setHeader(cg.readEntry("Header"));
       flags=cg.readEntry("Flags",QList<int>());
       if(h->name().isNull() || h->header().isNull() || (flags.count()!=8)) {
-        kDebug(5003) <<"KNConfig::DisplayedHeaders::DisplayedHeaders() : ignoring invalid/incomplete Header";
+        kDebug() << "ignoring invalid/incomplete Header";
         remove(h);
       }
       else {
@@ -114,7 +73,7 @@ void KNode::DisplayedHeaders::save()
   if(!d_irty)
     return;
 
-  kDebug(5003) <<"KNConfig::DisplayedHeaders::save()";
+  kDebug();
 
   QString dir( KStandardDirs::locateLocal( "data", "knode/" ) );
   if (dir.isNull()) {
@@ -166,7 +125,7 @@ KNDisplayedHeader* KNode::DisplayedHeaders::createNewHeader()
 void KNode::DisplayedHeaders::remove(KNDisplayedHeader *h)
 {
   if ( !mHeaderList.removeAll( h ) )
-    kDebug(5003) <<"KNConfig::DisplayedHeaders::remove() : cannot find pointer in list!";
+    kDebug() << "cannot find pointer in list!";
 
 }
 
@@ -178,7 +137,7 @@ void KNode::DisplayedHeaders::up(KNDisplayedHeader *h)
     mHeaderList.takeAt( idx );
     mHeaderList.insert( idx - 1, h );
   }
-  else kDebug(5003) <<"KNConfig::DisplayedHeaders::up() : item not found in list";
+  else kDebug() << "item not found in list";
 }
 
 
@@ -189,7 +148,7 @@ void KNode::DisplayedHeaders::down(KNDisplayedHeader *h)
     mHeaderList.takeAt( idx );
     mHeaderList.insert( idx + 1, h );
   }
-  else kDebug(5003) <<"KNConfig::DisplayedHeaders::down() : item not found in list";
+  else kDebug() << "item not found in list";
 }
 
 
@@ -276,7 +235,7 @@ void KNode::Cleanup::saveConfig(KConfigGroup &conf)
 
 void KNode::Cleanup::save()
 {
-  kDebug(5003) <<"KNConfig::Cleanup::save()";
+  kDebug();
   if (mGlobal) {
     KConfigGroup conf( knGlobals.config(), "EXPIRE" );
     saveConfig( conf );

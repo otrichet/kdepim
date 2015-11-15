@@ -75,7 +75,7 @@ void KNAccountManager::loadAccounts()
       gManager->loadGroups(a);
       emit accountAdded(a);
     } else {
-      kError(5003) <<"Unable to load account" << (*it) <<"!";
+      kError() <<"Unable to load account" << (*it) <<"!";
     }
   }
 }

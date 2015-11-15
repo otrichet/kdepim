@@ -131,7 +131,6 @@ KNode::ReadNewsPage::ReadNewsPage( const KComponentData &inst,QWidget *parent )
 {
   addTab( new ReadNewsGeneralWidget( inst, this ), i18n("General") );
   addTab( new ReadNewsNavigationWidget( inst, this ), i18n("Navigation") );
-  addTab( new ScoringWidget( inst, this ), i18n("Scoring") );
   addTab( new FilterListWidget( inst, this ), i18n("Filters") );
   addTab( new DisplayedHeadersWidget( knGlobals.configManager()->displayedHeaders(), inst, this ), i18n("Headers") );
   addTab( new ReadNewsViewerWidget( inst, this ), i18n("Viewer") );

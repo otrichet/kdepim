@@ -21,7 +21,6 @@
 #include "knarticlemanager.h"
 #include "knfiltermanager.h"
 #include "knfoldermanager.h"
-#include "knscoring.h"
 #include "knmemorymanager.h"
 #include "knmainwidget.h"
 #include "scheduler.h"
@@ -51,7 +50,6 @@ KNGlobals::KNGlobals() :
   mArtManager( 0 ),
   mFilManager( 0 ),
   mFolManager( 0 ),
-  mScoreManager( 0 ),
   mMemManager( 0 ),
   mSettings( 0 ),
   mArticleFactory( 0 ),
@@ -64,7 +62,6 @@ KNGlobals::~KNGlobals( )
 {
   kDebug();
   mIdentityManager->deleteLater();
-  delete mScoreManager;
   delete mSettings;
 }
 
@@ -150,13 +147,6 @@ KNFolderManager* KNGlobals::folderManager()
   return mFolManager;
 }
 
-KNScoringManager* KNGlobals::scoringManager()
-{
-  if (!mScoreManager)
-    mScoreManager = new KNScoringManager();
-  return mScoreManager;
-}
-
 KNMemoryManager* KNGlobals::memoryManager()
 {
   if(!mMemManager)
@@ -193,10 +183,6 @@ void KNGlobals::reset()
   delete mMemManager;
   mMemManager = 0;
   kDebug() << "Memory Manager deleted";
-
-  delete mScoreManager;
-  mScoreManager = 0;
-  kDebug() << "Score manager deleted";
 
   delete mFolManager;
   mFolManager = 0;

@@ -20,12 +20,6 @@ op1=2
 op2=0
 val1=0
 val2=0
-[SCORE]
-enabled=false
-op1=2
-op2=0
-val1=0
-val2=0
 [STATUS]
 DAT_N=true
 DAT_NS=false

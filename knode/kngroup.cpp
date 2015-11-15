@@ -16,16 +16,15 @@
 #include "kngroup.h"
 
 #include "knglobals.h"
+#include "messagelist/headers_widget.h"
 #include "kncollectionview.h"
 #include "kncollectionviewitem.h"
 #include "kngrouppropdlg.h"
 #include "utilities.h"
 #include "knmainwidget.h"
-#include "knscoring.h"
 #include "knarticlemanager.h"
 #include "kngroupmanager.h"
 #include "knnntpaccount.h"
-#include "headerview.h"
 #include "settings.h"
 #include "utils/locale.h"
 #include "utils/scoped_cursor_override.h"
@@ -178,11 +177,11 @@ const KPIMIdentities::Identity & KNGroup::identity() const
 bool KNGroup::loadHdrs()
 {
   if(isLoaded()) {
-    kDebug(5003) <<"KNGroup::loadHdrs() : nothing to load";
+    kDebug() << "nothing to load";
     return true;
   }
 
-  kDebug(5003) <<"KNGroup::loadHdrs() : loading headers";
+  kDebug() << "loading headers";
   QByteArray buffer, hdrValue;
   QFile f;
   int cnt=0, id, lines, fileFormatVersion, artNumber;
@@ -201,10 +200,10 @@ bool KNGroup::loadHdrs()
       buffer = f.readLine();
       if ( buffer.isEmpty() ){
         if ( f.error() == QFile::NoError ) {
-          kWarning(5003) <<"Found broken line in static-file: Ignored!";
+          kWarning() <<"Found broken line in static-file: Ignored!";
           continue;
         } else {
-          kError(5003) <<"Corrupted static file, IO-error!";
+          kError() <<"Corrupted static file, IO-error!";
           clear();
           return false;
         }
@@ -212,7 +211,7 @@ bool KNGroup::loadHdrs()
 
       QList<QByteArray> splits = buffer.split( '\t' );
       if ( splits.size() < 4 ) {
-        kWarning(5003) <<"Found broken line in static-file: Ignored!";
+        kWarning() <<"Found broken line in static-file: Ignored!";
         continue;
       }
       QList<QByteArray>::ConstIterator it = splits.constBegin();
@@ -306,10 +305,10 @@ bool KNGroup::loadHdrs()
         byteCount = f.read((char*)(&data1), dataSize);
       if ((byteCount == -1)||(byteCount!=dataSize)) {
         if ( f.error() == QFile::NoError ) {
-          kWarning(5003) <<"Found broken entry in dynamic-file: Ignored!";
+          kWarning() <<"Found broken entry in dynamic-file: Ignored!";
           continue;
         } else {
-          kError(5003) <<"Corrupted dynamic file, IO-error!";
+          kError() <<"Corrupted dynamic file, IO-error!";
           clear();
           return false;
         }
@@ -342,7 +341,7 @@ bool KNGroup::loadHdrs()
     return false;
   }
 
-  kDebug(5003) << cnt <<" articles read from file";
+  kDebug() << cnt <<" articles read from file";
   c_ount=length();
 
   // convert old data files into current format:
@@ -417,13 +416,13 @@ void KNGroup::insortNewHeaders( const KIO::UDSEntryList &list, KNJobData *job)
       if ( field < KIO::UDSEntry::UDS_EXTRA || field > KIO::UDSEntry::UDS_EXTRA_END )
         continue;
       QString value = entry.stringValue( field );
-      kDebug(5003) << value;
+      kDebug() << value;
       QString hdrName = value.left( value.indexOf( ':' ) );
       if ( hdrName == "Subject" || hdrName == "From" || hdrName == "Date"
            || hdrName == "Message-ID" || hdrName == "References"
            || hdrName == "Bytes" || hdrName == "Lines" )
         continue;
-      kDebug(5003) <<"Adding optional header:" << hdrName;
+      kDebug() <<"Adding optional header:" << hdrName;
       mOptionalHeaders.append( hdrName.toLatin1() );
     }
   }
@@ -658,7 +657,7 @@ void KNGroup::syncDynamicData()
 
       f.close();
 
-      kDebug(5003) << g_roupname <<" => updated" << cnt <<" entries of dynamic data";
+      kDebug() << g_roupname <<" => updated" << cnt <<" entries of dynamic data";
 
       r_eadCount=readCnt;
     }
@@ -707,7 +706,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
 
   // this method is called from the nntp-thread!!!
 #ifndef NDEBUG
-  kDebug(5003) << "start =" << start << "end =" << end;
+  kDebug() << "start =" << start << "end =" << end;
 #endif
 
   //resort old hdrs
@@ -720,7 +719,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
         if(ref) {
           // this method is called from the nntp-thread!!!
           #ifndef NDEBUG
-          kDebug(5003) << art->id() << ": Old" << oldRef << "New" << art->idRef();
+          kDebug() << art->id() << ": Old" << oldRef << "New" << art->idRef();
           #endif
           resortCnt++;
           art->setChanged(true);
@@ -844,7 +843,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
     if(isLoop) {
       // this method is called from the nntp-thread!!!
       #ifndef NDEBUG
-      kDebug(5003) << "Sorting : loop in" << startId;
+      kDebug() << "Sorting : loop in" << startId;
       #endif
       art=at(idx);
       art->setIdRef(0);
@@ -878,9 +877,9 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
 
   // this method is called from the nntp-thread!!!
 #ifndef NDEBUG
-  kDebug(5003) << "Sorting :" << resortCnt << "headers resorted";
-  kDebug(5003) << "Sorting :" << foundCnt << "references of" << refCnt << "found";
-  kDebug(5003) << "Sorting :" << bySubCnt << "references of" << refCnt << "sorted by subject";
+  kDebug() << "Sorting :" << resortCnt << "headers resorted";
+  kDebug() << "Sorting :" << foundCnt << "references of" << refCnt << "found";
+  kDebug() << "Sorting :" << bySubCnt << "references of" << refCnt << "sorted by subject";
 #endif
 }
 
@@ -906,65 +905,9 @@ KNRemoteArticle::Ptr KNGroup::findReference( KNRemoteArticle::Ptr a )
 }
 
 
-void KNGroup::scoreArticles(bool onlynew)
-{
-  kDebug(5003) <<"KNGroup::scoreArticles()";
-  int len=length(),
-      todo=(onlynew)? lastFetchCount():length();
-
-  if (todo) {
-    // reset the notify collection
-    delete KNScorableArticle::notifyC;
-    KNScorableArticle::notifyC = 0;
-
-    kDebug(5003) <<"scoring" << newCount() <<" articles";
-    kDebug(5003) <<"(total" << length() <<" article in group)";
-    ScopedCursorOverride cursor( Qt::WaitCursor );
-    knGlobals.setStatusMsg(i18n(" Scoring..."));
-
-    int defScore;
-    KScoringManager *sm = knGlobals.scoringManager();
-    sm->initCache(groupname());
-    for(int idx=0; idx<todo; idx++) {
-      KNRemoteArticle::Ptr a = at( len-idx-1 );
-      if ( !a ) {
-        kWarning( 5003 ) <<"found no article at" << len-idx-1;
-        continue;
-      }
-
-      defScore = 0;
-      if (a->isIgnored())
-        defScore = knGlobals.settings()->ignoredThreshold();
-      else if (a->isWatched())
-        defScore = knGlobals.settings()->watchedThreshold();
-
-      if (a->score() != defScore) {
-        a->setScore(defScore);
-        a->setChanged(true);
-      }
-
-      bool read = a->isRead();
-
-      KNScorableArticle sa(a);
-      sm->applyRules(sa);
-
-      if ( a->isRead() != read && !read )
-        incReadCount();
-    }
-
-    knGlobals.setStatusMsg( QString() );
-    cursor.restore();
-
-    //kDebug(5003) << KNScorableArticle::notifyC->collection();
-    if (KNScorableArticle::notifyC)
-      KNScorableArticle::notifyC->displayCollection(knGlobals.topWidget);
-  }
-}
-
-
 void KNGroup::reorganize()
 {
-  kDebug(5003) <<"KNGroup::reorganize()";
+  kDebug();
 
   ScopedCursorOverride cursor( Qt::WaitCursor );
   knGlobals.setStatusMsg(i18n(" Reorganizing headers..."));
@@ -980,7 +923,10 @@ void KNGroup::reorganize()
   buildThreads(length());
   saveStaticData(length(), true);
   saveDynamicData(length(), true);
-  knGlobals.top->headerView()->repaint();
+
+  knGlobals.top->headerView()->showCollection(KNGroup::Ptr());
+  knGlobals.top->headerView()->showCollection(thisGroupPtr());
+
   knGlobals.setStatusMsg( QString() );
 }
 
@@ -1020,7 +966,7 @@ void KNGroup::updateThreadInfo()
   }
 
   if(brokenThread) {
-    kWarning(5003) <<"KNGroup::updateThreadInfo() : Found broken threading information! Restoring ...";
+    kWarning() << "Found broken threading information! Restoring ...";
     reorganize();
     updateThreadInfo();
   }
@@ -1075,7 +1021,6 @@ void KNGroup::dynDataVer0::setData( KNRemoteArticle::Ptr a )
   idRef=a->idRef();
   thrLevel=a->threadingLevel();
   read=a->getReadFlag();
-  score=a->score();
 }
 
 
@@ -1085,7 +1030,6 @@ void KNGroup::dynDataVer0::getData( KNRemoteArticle::Ptr a )
   a->setIdRef(idRef);
   a->setRead(read);
   a->setThreadingLevel(thrLevel);
-  a->setScore(score);
 }
 
 
@@ -1095,7 +1039,6 @@ void KNGroup::dynDataVer1::setData( KNRemoteArticle::Ptr a )
   idRef=a->idRef();
   thrLevel=a->threadingLevel();
   read=a->getReadFlag();
-  score=a->score();
   ignoredWatched = 0;
   if (a->isWatched())
     ignoredWatched = 1;
@@ -1110,7 +1053,6 @@ void KNGroup::dynDataVer1::getData( KNRemoteArticle::Ptr a )
   a->setIdRef(idRef);
   a->setRead(read);
   a->setThreadingLevel(thrLevel);
-  a->setScore(score);
   a->setWatched(ignoredWatched==1);
   a->setIgnored(ignoredWatched==2);
 }

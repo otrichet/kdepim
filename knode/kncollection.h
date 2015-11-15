@@ -15,7 +15,9 @@
 #ifndef KNCOLLECTION_H
 #define KNCOLLECTION_H
 
+#ifndef Q_MOC_RUN
 #include <boost/shared_ptr.hpp>
+#endif
 #include <QString>
 
 class KNCollectionViewItem;
@@ -31,8 +33,7 @@ class KNCollection {
 
   public:
     enum collectionType {   CTnntpAccount, CTgroup,
-                            CTfolder, CTcategory,
-                            CTvirtualGroup };
+                            CTfolder };
 
     /**
      * Shared pointer to a KNCollection. To be used instead of raw KNCollection*.

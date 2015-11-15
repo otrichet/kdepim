@@ -28,25 +28,24 @@ int KNApplication::newInstance()
 {
   kDebug() << "KNApplication::newInstance()";
 
-  if (!mainWidget()) {
+  KNMainWindow *main = findPrimaryWindow();
+
+  if (!main) {
     if ( isSessionRestored() ) {
       int n = 1;
       while (KNMainWindow::canBeRestored(n)){
         if (KNMainWindow::classNameOfToplevel(n)=="KNMainWindow") {
-          KNMainWindow* mainWin = new KNMainWindow;
-          mainWin->restore(n);
-          if ( n == 1 )
-            setMainWidget( mainWin );
+          main = new KNMainWindow;
+          main->restore(n);
           break;
         }
         n++;
       }
     }
 
-    if (!mainWidget()) {
-      KNMainWindow* mainWin = new KNMainWindow;
-      setMainWidget(mainWin);  // this makes the external viewer windows close on shutdown...
-      mainWin->show();
+    if (!main) {
+      main = new KNMainWindow;
+      main->show();
     }
   }
 
@@ -54,11 +53,22 @@ int KNApplication::newInstance()
   KUniqueApplication::newInstance();
 
   // process URLs...
-  KNMainWidget *w = static_cast<KNMainWindow*>(mainWidget())->mainWidget();
+  KNMainWidget *w = main->mainWidget();
   w->handleCommandLine();
 
   kDebug() << "KNApplication::newInstance() done";
   return 0;
+}
+
+KNMainWindow* KNApplication::findPrimaryWindow()
+{
+    Q_FOREACH(QWidget* w, KNApplication::topLevelWidgets()) {
+        KNMainWindow *window = dynamic_cast<KNMainWindow*>(w);
+        if(window) {
+            return window;
+        }
+    }
+    return 0;
 }
 
 

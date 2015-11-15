@@ -17,7 +17,9 @@
 
 #include "knjobdata.h"
 
+#ifndef Q_MOC_RUN
 #include <boost/shared_ptr.hpp>
+#endif
 #include <QFile>
 #include <QColor>
 #include <kmime/kmime_headers.h>
@@ -25,7 +27,6 @@
 #include <kmime/boolflags.h>
 
 class KNLoadHelper;
-class KNHdrViewItem;
 class KNArticleCollection;
 
 /** This class encapsulates a generic article. It provides all the
@@ -41,7 +42,6 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
     typedef QList<KNArticle::Ptr> List;
 
     enum articleType {
-      ATmimeContent,
       ATremote,
       ATlocal
     };
@@ -51,7 +51,7 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
 
     virtual void clear();
 
-    virtual articleType type() const { return ATmimeContent; }
+    virtual articleType type() const = 0;
 
     /** Returns the article id. */
     int id() const            { return i_d; }
@@ -60,15 +60,7 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
      */
     void setId( int i ) { i_d = i; }
 
-    //list item handling
-    KNHdrViewItem* listItem() const           { return i_tem; }
-    /**
-      Sets the headerview item associated to this article.
-      @param i The item associated to this item or 0 to break the link to the previous item.
-      @param a The shared pointer of <strong>this</strong> article.
-    */
-    void setListItem( KNHdrViewItem *i, KNArticle::Ptr a );
-    virtual void updateListItem() {}
+    virtual bool filterResult() = 0;
 
     //network lock (reimplemented from KNJobItem)
     bool isLocked()                      { return f_lags.get(0); }
@@ -86,7 +78,6 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
   protected:
     int i_d; //unique in the given collection
     boost::shared_ptr<KNArticleCollection> c_ol;
-    KNHdrViewItem *i_tem;
 
     KMime::BoolFlags f_lags;
 
@@ -112,7 +103,7 @@ class KNRemoteArticle : public KNArticle {
     ~KNRemoteArticle();
 
     // type
-    articleType type() const { return ATremote; }
+    virtual articleType type() const { return ATremote; }
 
     // content handling
     virtual void parse();
@@ -146,23 +137,14 @@ class KNRemoteArticle : public KNArticle {
                                                         i_dRef=0; }
     KNRemoteArticle::Ptr displayedReference()           { return d_ref; }
     void setDisplayedReference( KNRemoteArticle::Ptr dr ) { d_ref=dr; }
-    bool threadMode()                             { return f_lags.get(9); }
-    void setThreadMode(bool b=true)               { f_lags.set(9, b); }
     unsigned char threadingLevel()                { return t_hrLevel; }
     void setThreadingLevel(unsigned char l)       { t_hrLevel=l; }
-    short score()                                 { return s_core; }
-    void setScore(short s)                        { s_core=s; }
-    unsigned short newFollowUps()                 { return n_ewFups; }
     bool hasNewFollowUps()                        { return (n_ewFups>0); }
     void setNewFollowUps(unsigned short s)        { n_ewFups=s; }
     void incNewFollowUps(unsigned short s=1)      { n_ewFups+=s; }
-    void decNewFollowUps(unsigned short s=1)      { n_ewFups-=s; }
-    unsigned short unreadFollowUps()              { return u_nreadFups; }
     bool hasUnreadFollowUps()                     { return (u_nreadFups>0); }
     void setUnreadFollowUps(unsigned short s)     { u_nreadFups=s; }
     void incUnreadFollowUps(unsigned short s=1)   { u_nreadFups+=s; }
-    void decUnreadFollowUps(unsigned short s=1)   { u_nreadFups-=s; }
-    void thread(List &f);
 
     //filtering
     bool filterResult()                     { return f_lags.get(10); }
@@ -172,31 +154,15 @@ class KNRemoteArticle : public KNArticle {
     bool hasVisibleFollowUps()              { return f_lags.get(12); }
     void setVisibleFollowUps(bool b=true)   { f_lags.set(12, b); }
 
-    // list item handling
-    void initListItem();
-    void updateListItem();
-
     virtual void setForceDefaultCharset( bool b );
-
-    QColor color() const { return c_olor; }
-    void setColor(const QColor& c) { c_olor = c; }
-
-    time_t subThreadChangeDate() { return s_ubThreadChangeDate; }
-    void setSubThreadChangeDate(time_t date) { s_ubThreadChangeDate = date; }
-    // propagate the change date to the root article
-    void propagateThreadChangedDate();
 
   protected:
     int a_rticleNumber;
     int i_dRef;                      // id of a reference-article (0 == none)
     KNRemoteArticle::Ptr d_ref;      // displayed reference-article (may differ from i_dRef)
     unsigned char t_hrLevel;         // quality of threading
-    short s_core;                    // guess what ;-)
-    QColor c_olor;                   // color for the header list
     unsigned short u_nreadFups,      // number of the article's unread follow-ups
-                   n_ewFups;         // number of the article's new follow-ups
-    time_t s_ubThreadChangeDate;     // the last time the sub-thread of this article changed
-                                     // i.e. when the last article arrived...
+                   n_ewFups;         // number of the article's new follow-ups.
 
 }; // KNRemoteArticle
 
@@ -219,7 +185,7 @@ class KNLocalArticle : public KNArticle {
     ~KNLocalArticle();
 
     //type
-    articleType type() const { return ATlocal; }
+    virtual articleType type() const { return ATlocal; }
 
     //send article as mail
     bool doMail()                 { return f_lags.get(2); }
@@ -256,9 +222,6 @@ class KNLocalArticle : public KNArticle {
     //nntp-server id
     int serverId()                { if(!doPost()) return -1; else return s_erverId; }
     void setServerId(int i)       { s_erverId=i; }
-
-    //list item handling
-    void updateListItem();
 
     virtual void setForceDefaultCharset(bool b);
 
@@ -324,5 +287,8 @@ class KNAttachment {
           h_asChanged,
           f_b64;
 };
+
+Q_DECLARE_METATYPE(KNArticle::Ptr);
+Q_DECLARE_METATYPE(KNRemoteArticle::Ptr);
 
 #endif //KNARTICLE_H

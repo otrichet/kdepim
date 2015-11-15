@@ -140,7 +140,6 @@ class KNGroup : public KNArticleCollection , public KNJobItem, public KNode::Set
     /** article handling */
     void updateThreadInfo();
     void reorganize();
-    void scoreArticles(bool onlynew=true);
 
     /** locking */
     bool isLocked()             { return l_ocked; }

@@ -24,20 +24,15 @@
 #include <QList>
 
 
-class Q3ListViewItem;
-class QLineEdit;
 class QSplitter;
 class QTreeWidget;
 class QTreeWidgetItem;
-class K3ListView;
 class KAction;
 class KToggleAction;
 class KSelectAction;
 class KSqueezedTextLabel;
 class KLineEdit;
-class KToolBar;
 class KXMLGUIClient;
-class KNHeaderView;
 class KNCollectionView;
 class KNConfigManager;
 class KNAccountManager;
@@ -46,10 +41,12 @@ class KNFolderManager;
 class KNArticleManager;
 class KNArticleFactory;
 class KNFilterManager;
-class KNScoringManager;
 class KNFilterSelectAction;
 namespace KNode {
   class ArticleWidget;
+  namespace MessageList {
+    class HeadersWidget;
+  }
 }
 class KActionCollection;
 
@@ -69,7 +66,6 @@ public:
   void setStatusMsg(const QString& = QString(), int id=SB_MAIN);
   void setStatusHelpMsg(const QString& text);
   void updateCaption();
-  void disableAccels(bool b=true);
   /** processEvents with some blocking */
   void secureProcessEvents();
 
@@ -86,7 +82,7 @@ public:
   /** Returns the folder tree widget. */
   KNCollectionView* collectionView()const  { return c_olView; }
   /** Returns the article list view. */
-  KNHeaderView*       headerView()const      { return h_drView; }
+  KNode::MessageList::HeadersWidget* headerView() const { return mHeadersView; }
   /** Returns the article viewer. */
   KNode::ArticleWidget* articleViewer() const     { return mArticleViewer; }
   KSqueezedTextLabel*  statusBarLabelGroup() const { return s_tatusGroup; }
@@ -177,21 +173,11 @@ protected:
 
   bool eventFilter(QObject *, QEvent *);
 
-  // convenience methods...
-  void getSelectedArticles( KNArticle::List &l );
-  void getSelectedArticles( KNRemoteArticle::List &l );
-  void getSelectedThreads( KNRemoteArticle::List &l );
-  void getSelectedArticles( KNLocalArticle::List &l );
-  void closeCurrentThread();
-
   //GUI
-  //KAccel          *a_ccel;
   KNode::ArticleWidget *mArticleViewer;
   KNCollectionView *c_olView;
-  KNHeaderView      *h_drView;
+  KNode::MessageList::HeadersWidget *mHeadersView;
   bool b_lockui;
-  KToolBar        *q_uicksearch;
-  QLineEdit       *s_earchLineEdit;
 
   //Core
   KNConfigManager   *c_fgManager;
@@ -201,21 +187,19 @@ protected:
   KNArticleFactory  *a_rtFactory;
   KNFolderManager   *f_olManager;
   KNFilterManager   *f_ilManager;
-  KNScoringManager  *s_coreManager;
 
 protected slots:
-  //listview slots
-  void slotArticleSelected(Q3ListViewItem*);
-  void slotArticleSelectionChanged();
+  /** Called when the selected articles change. */
+  void slotArticlesSelected(const KNArticle::List articles);
   /** Called when the selection collection changed. */
   void slotCollectionSelected();
   /** Called when a collection is renamed. */
   void slotCollectionRenamed( QTreeWidgetItem *i );
-  void slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p);
+  void slotArticleRMB(KNArticle::Ptr article, const QPoint &p);
   /** Display a menu on items of the collections view. */
   void slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos );
   /** Open selected article in own composer/reader window */
-  void slotOpenArticle(Q3ListViewItem *item);
+  void slotOpenArticle(KNArticle::Ptr art);
   void slotHdrViewSortingChanged(int i);
 
   //network slots
@@ -285,12 +269,7 @@ protected:
     *a_ctArtSetThreadUnread,
     *a_ctArtOpenNewWindow;
 
-  // scoring
-  KAction *a_ctScoresEdit,
-    *a_ctReScore,
-    *a_ctScoreLower,
-    *a_ctScoreRaise,
-    *a_ctArtToggleIgnored,
+  KAction *a_ctArtToggleIgnored,
     *a_ctArtToggleWatched;
 
   //header-view local articles
@@ -345,20 +324,12 @@ protected slots:
   void slotArtSortHeadersKeyb();
   void slotArtSearch();
   void slotArtRefreshList();
-  void slotArtCollapseAll();
-  void slotArtExpandAll();
-  void slotArtToggleThread();
-  void slotArtToggleShowThreads();
 
   void slotArtSetArtRead();
   void slotArtSetArtUnread();
   void slotArtSetThreadRead();
   void slotArtSetThreadUnread();
 
-  void slotScoreEdit();
-  void slotReScore();
-  void slotScoreLower();
-  void slotScoreRaise();
   void slotArtToggleIgnored();
   void slotArtToggleWatched();
 
@@ -372,7 +343,6 @@ protected slots:
 
   void slotFetchArticleWithID();
 
-  void slotToggleQuickSearch();
   void slotSettings();
 
   //--------------------------- </Actions> -----------------------------

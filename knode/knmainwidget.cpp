@@ -14,15 +14,13 @@
 
 #include "knmainwidget.h"
 
-#include "headerview.h"
-
-#include <Q3Accel>
 #include <QEvent>
 #include <QLabel>
+#include <QShortcut>
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QSplitter>
-#include <ktoolbar.h>
+#include <KDE/KLineEdit>
 #include <kicon.h>
 #include <kactioncollection.h>
 #include <kinputdialog.h>
@@ -35,7 +33,6 @@
 #include <kstatusbar.h>
 #include <klocale.h>
 #include <kcmdlineargs.h>
-#include <k3listviewsearchline.h>
 #include <khbox.h>
 #include <kselectaction.h>
 #include <kstandardshortcut.h>
@@ -46,7 +43,7 @@
 
 #include "libkdepim/misc/uistatesaver.h"
 #include "libkdepim/misc/broadcaststatus.h"
-#include "libkdepim/addressline/recentaddresses.h"
+#include "libkdepim/addressline/recentaddress/recentaddresses.h"
 using KPIM::BroadcastStatus;
 using KPIM::RecentAddresses;
 
@@ -57,7 +54,7 @@ using MailTransport::TransportManager;
 #include "knarticlewindow.h"
 #include "kncollectionview.h"
 #include "kncollectionviewitem.h"
-#include "knhdrviewitem.h"
+#include "messagelist/headers_widget.h"
 
 //Core
 #include "articlewidget.h"
@@ -73,7 +70,6 @@ using MailTransport::TransportManager;
 #include "knfolder.h"
 #include "kncleanup.h"
 #include "utilities.h"
-#include "knscoring.h"
 #include "knmemorymanager.h"
 #include "scheduler.h"
 #include "settings.h"
@@ -101,7 +97,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   // this will enable keyboard-only actions like that don't appear in any menu
   //actionCollection()->setDefaultShortcutContext( Qt::WindowShortcut );
 
-  Q3Accel *accel = new Q3Accel( this );
   initStatusBar();
   setSpacing( 0 );
   setMargin( 0 );
@@ -126,38 +121,21 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   connect( c_olView, SIGNAL(renamed(QTreeWidgetItem*)),
            this, SLOT(slotCollectionRenamed(QTreeWidgetItem*)) );
 
-  accel->connectItem( accel->insertItem(Qt::Key_Up), mArticleViewer, SLOT(scrollUp()) );
-  accel->connectItem( accel->insertItem(Qt::Key_Down), mArticleViewer, SLOT(scrollDown()) );
-  accel->connectItem( accel->insertItem(Qt::Key_PageUp), mArticleViewer, SLOT(scrollPrior()) );
-  accel->connectItem( accel->insertItem(Qt::Key_PageDown), mArticleViewer, SLOT(scrollNext()) );
+  new QShortcut(Qt::Key_Up, mArticleViewer, SLOT(scrollUp()));
+  new QShortcut(Qt::Key_Down, mArticleViewer, SLOT(scrollDown()));
+  new QShortcut(Qt::Key_PageUp, mArticleViewer, SLOT(scrollPrior()));
+  new QShortcut(Qt::Key_PageDown, mArticleViewer, SLOT(scrollNext()));
 
   //header view
-  QWidget *dummy = new QWidget( mSecondSplitter );
-  QVBoxLayout *vlay = new QVBoxLayout(dummy);
-  vlay->setSpacing( 0 );
-  vlay->setMargin( 0 );
-  h_drView = new KNHeaderView( dummy );
+  mHeadersView = new MessageList::HeadersWidget( mSecondSplitter );
 
-  q_uicksearch = new KToolBar( dummy );
-  QLabel *lbl = new QLabel(i18n("&Search:"),dummy);
-  lbl->setObjectName("kde toolbar widget");
-  q_uicksearch->addWidget( lbl );
-  s_earchLineEdit = new K3ListViewSearchLine( q_uicksearch, h_drView );
-  q_uicksearch->addWidget( s_earchLineEdit );
-  lbl->setBuddy(s_earchLineEdit);
-
-  vlay->addWidget(q_uicksearch);
-  vlay->addWidget(h_drView);
-
-  connect(h_drView, SIGNAL(itemSelected(Q3ListViewItem*)),
-          SLOT(slotArticleSelected(Q3ListViewItem*)));
-  connect(h_drView, SIGNAL(selectionChanged()),
-          SLOT(slotArticleSelectionChanged()));
-  connect(h_drView, SIGNAL(contextMenu(K3ListView*,Q3ListViewItem*,QPoint)),
-          SLOT(slotArticleRMB(K3ListView*,Q3ListViewItem*,QPoint)));
-  connect(h_drView, SIGNAL(doubleClick(Q3ListViewItem*)),
-          SLOT(slotOpenArticle(Q3ListViewItem*)));
-  connect(h_drView, SIGNAL(sortingChanged(int)),
+  connect(mHeadersView, SIGNAL(articlesSelected(const KNArticle::List)),
+          SLOT(slotArticlesSelected(const KNArticle::List)));
+  connect(mHeadersView, SIGNAL(contextMenuRequest(KNArticle::Ptr,QPoint)),
+          SLOT(slotArticleRMB(KNArticle::Ptr,QPoint)));
+  connect(mHeadersView, SIGNAL(doubleClicked(KNArticle::Ptr)),
+          this, SLOT(slotOpenArticle(KNArticle::Ptr)));
+  connect(mHeadersView, SIGNAL(sortingChanged(int)),
           SLOT(slotHdrViewSortingChanged(int)));
 
   //actions
@@ -166,7 +144,7 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
   // splitter setup
   mPrimarySplitter->addWidget( c_olView );
   mPrimarySplitter->addWidget( mSecondSplitter );
-  mSecondSplitter->addWidget( dummy );
+  mSecondSplitter->addWidget( mHeadersView );
   mSecondSplitter->addWidget( mArticleViewer );
 
   //-------------------------------- </GUI> ------------------------------------
@@ -182,7 +160,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   //Article Manager
   a_rtManager = knGlobals.articleManager();
-  a_rtManager->setView(h_drView);
 
   //Group Manager
   g_rpManager = knGlobals.groupManager();
@@ -195,11 +172,6 @@ KNMainWidget::KNMainWidget( KXMLGUIClient* client, QWidget* parent ) :
 
   //Article Factory
   a_rtFactory = KNGlobals::self()->articleFactory();
-
-  // Score Manager
-  s_coreManager = knGlobals.scoringManager();
-  //connect(s_coreManager, SIGNAL(changedRules()), SLOT(slotReScore()));
-  connect(s_coreManager, SIGNAL(finishedEditing()), SLOT(slotReScore()));
 
   QDBusConnection::sessionBus().registerObject( "/", this, QDBusConnection::ExportScriptableSlots );
   //-------------------------------- </CORE> -----------------------------------
@@ -239,8 +211,6 @@ KNMainWidget::~KNMainWidget()
               this, SLOT(slotCollectionSelected()) );
 
   knGlobals.reset(); // cleanup
-
-  h_drView->clear(); //avoid some random crashes in KNHdrViewItem::~KNHdrViewItem()
 }
 
 void KNMainWidget::initStatusBar()
@@ -304,23 +274,6 @@ void KNMainWidget::updateCaption()
   emit signalCaptionChangeRequest(newCaption);
 }
 
-void KNMainWidget::disableAccels(bool b)
-{
-#ifdef __GNUC__
-#warning Port me!
-#endif
-  /*a_ccel->setEnabled(!b);
-  KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
-  KAccel *naccel = mainWin ? mainWin->accel() : 0;
-  if ( naccel )
-    naccel->setEnabled(!b);*/
-  if (b)
-    installEventFilter(this);
-  else
-    removeEventFilter(this);
-}
-
-
 // processEvents with some blocking
 void KNMainWidget::secureProcessEvents()
 {
@@ -329,13 +282,7 @@ void KNMainWidget::secureProcessEvents()
   KMenuBar *mbar =  mainWin ? mainWin->menuBar() : 0;
   if ( mbar )
     mbar->setEnabled(false);
-#ifdef __GNUC__
-#warning Port me!
-#endif
-  /*a_ccel->setEnabled(false);
-  KAccel *naccel = mainWin ? mainWin->accel() : 0;
-  if ( naccel )
-    naccel->setEnabled(false);*/
+
   installEventFilter(this);
 
   qApp->processEvents();
@@ -343,12 +290,7 @@ void KNMainWidget::secureProcessEvents()
   b_lockui = false;
   if ( mbar )
     mbar->setEnabled(true);
-#ifdef __GNUC__
-#warning Port me!
-#endif
-//  a_ccel->setEnabled(true);
-//   if ( naccel )
-//     naccel->setEnabled(true);
+
   removeEventFilter(this);
 }
 
@@ -366,7 +308,7 @@ void KNMainWidget::openURL(const QString &url)
 
 void KNMainWidget::openURL(const KUrl &url)
 {
-  kDebug(5003) << url;
+  kDebug() << url;
   QString host = url.host();
   short int port = url.port();
   KNNntpAccount::Ptr acc;
@@ -406,7 +348,7 @@ void KNMainWidget::openURL(const KUrl &url)
       if ( acc == 0 )
         acc = a_ccManager->first();
     } else {
-      kDebug(5003) <<"KNMainWidget::openURL() URL is not a valid news URL";
+      kDebug() << "Not a valid news URL:" << url;
     }
   }
 
@@ -454,7 +396,7 @@ void KNMainWidget::openURL(const KUrl &url)
         }
       } else {
         // TODO: fetch without group
-        kDebug(5003) <<"KNMainWidget::openURL() account has no groups";
+        kDebug() << "account has no groups";
       }
     }
   }
@@ -464,28 +406,25 @@ void KNMainWidget::openURL(const KUrl &url)
 // update fonts and colors
 void KNMainWidget::configChanged()
 {
-  h_drView->readConfig();
+  mHeadersView->readConfig();
   c_olView->readConfig();
-  a_rtManager->updateListViewItems();
 }
 
 
 void KNMainWidget::initActions()
 {
-  //a_ccel=new KAccel(this);
-
   //navigation
   a_ctNavNextArt = actionCollection()->addAction("go_nextArticle" );
   a_ctNavNextArt->setText(i18n("&Next Article"));
   a_ctNavNextArt->setToolTip(i18n("Go to next article"));
   a_ctNavNextArt->setShortcuts(KShortcut("N; Right"));
-  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), h_drView, SLOT(nextArticle()));
+  connect(a_ctNavNextArt, SIGNAL(triggered(bool)), SLOT(nextArticle()));
 
   a_ctNavPrevArt = actionCollection()->addAction("go_prevArticle" );
   a_ctNavPrevArt->setText(i18n("&Previous Article"));
   a_ctNavPrevArt->setShortcuts(KShortcut("P; Left"));
   a_ctNavPrevArt->setToolTip(i18n("Go to previous article"));
-  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), h_drView, SLOT(prevArticle()));
+  connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), SLOT(previousArticle()));
 
   a_ctNavNextUnreadArt = actionCollection()->addAction("go_nextUnreadArticle");
   a_ctNavNextUnreadArt->setIcon(KIcon("go-next"));
@@ -530,21 +469,6 @@ void KNMainWidget::initActions()
   action->setText(i18n("Select Folder with Focus"));
   connect(action, SIGNAL(triggered(bool)), c_olView, SLOT(selectCurrentFolder()));
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Space));
-
-  action = actionCollection()->addAction("inc_current_article");
-  action->setText(i18n("Focus on Next Article"));
-  connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(incCurrentArticle()));
-  action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Right));
-
-  action = actionCollection()->addAction("dec_current_article");
-  action->setText(i18n("Focus on Previous Article"));
-  connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(decCurrentArticle()));
-  action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Left));
-
-  action = actionCollection()->addAction("select_current_article");
-  action->setText(i18n("Select Article with Focus"));
-  connect(action, SIGNAL(triggered(bool)), h_drView, SLOT(selectCurrentArticle()));
-  action->setShortcut(QKeySequence(Qt::ALT+Qt::Key_Space));
 
   //collection-view - accounts
   a_ctAccProperties = actionCollection()->addAction("account_properties");
@@ -681,12 +605,10 @@ void KNMainWidget::initActions()
   QStringList items;
   items += i18n("By &Subject");
   items += i18n("By S&ender");
-  items += i18n("By S&core");
-  items += i18n("By &Lines");
   items += i18n("By &Date");
   a_ctArtSortHeaders->setItems(items);
   a_ctArtSortHeaders->setShortcutConfigurable(false);
-  connect(a_ctArtSortHeaders, SIGNAL(activated(int)), this, SLOT(slotArtSortHeaders(int)));
+  connect(a_ctArtSortHeaders, SIGNAL(triggered(int)), this, SLOT(slotArtSortHeaders(int)));
 
   a_ctArtSortHeadersKeyb = actionCollection()->addAction("view_Sort_Keyb");
   a_ctArtSortHeadersKeyb->setText(i18n("Sort"));
@@ -715,21 +637,24 @@ void KNMainWidget::initActions()
 
   a_ctArtCollapseAll = actionCollection()->addAction("view_CollapseAll");
   a_ctArtCollapseAll->setText(i18n("&Collapse All Threads"));
-  connect(a_ctArtCollapseAll, SIGNAL(triggered(bool)), SLOT(slotArtCollapseAll()));
+  connect(a_ctArtCollapseAll, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(collapseAllThreads()));
 
   a_ctArtExpandAll = actionCollection()->addAction("view_ExpandAll");
   a_ctArtExpandAll->setText(i18n("E&xpand All Threads"));
-  connect(a_ctArtExpandAll, SIGNAL(triggered(bool)), SLOT(slotArtExpandAll()));
+  connect(a_ctArtExpandAll, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(expandAllThreads()));
 
   a_ctArtToggleThread = actionCollection()->addAction("thread_toggle");
   a_ctArtToggleThread->setText(i18n("&Toggle Subthread"));
-  connect(a_ctArtToggleThread, SIGNAL(triggered(bool)), SLOT(slotArtToggleThread()));
+  connect(a_ctArtToggleThread, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(toggleCurrentItemExpansion()));
   a_ctArtToggleThread->setShortcut(QKeySequence(Qt::Key_T));
 
   a_ctArtToggleShowThreads = actionCollection()->add<KToggleAction>("view_showThreads");
   a_ctArtToggleShowThreads->setText(i18n("Show T&hreads"));
-  connect(a_ctArtToggleShowThreads, SIGNAL(triggered(bool)), SLOT(slotArtToggleShowThreads()));
-
+  connect(a_ctArtToggleShowThreads, SIGNAL(triggered(bool)),
+          mHeadersView, SIGNAL(showThreads(bool)));
   a_ctArtToggleShowThreads->setChecked( knGlobals.settings()->showThreads() );
 
   //header-view - remote articles
@@ -760,27 +685,6 @@ void KNMainWidget::initActions()
   a_ctArtOpenNewWindow->setText(i18n("Open in Own &Window"));
   connect(a_ctArtOpenNewWindow, SIGNAL(triggered(bool)), SLOT(slotArtOpenNewWindow()));
   a_ctArtOpenNewWindow->setShortcut(QKeySequence(Qt::Key_O));
-
-  // scoring
-  a_ctScoresEdit = actionCollection()->addAction("scoreedit");
-  a_ctScoresEdit->setIcon(KIcon("document-properties"));
-  a_ctScoresEdit->setText(i18n("&Edit Scoring Rules..."));
-  connect(a_ctScoresEdit, SIGNAL(triggered(bool)), SLOT(slotScoreEdit()));
-  a_ctScoresEdit->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_E));
-
-  a_ctReScore = actionCollection()->addAction("rescore");
-  a_ctReScore->setText(i18n("Recalculate &Scores"));
-  connect(a_ctReScore, SIGNAL(triggered(bool)), SLOT(slotReScore()));
-
-  a_ctScoreLower = actionCollection()->addAction("scorelower");
-  a_ctScoreLower->setText(i18n("&Lower Score for Author..."));
-  connect(a_ctScoreLower, SIGNAL(triggered(bool)), SLOT(slotScoreLower()));
-  a_ctScoreLower->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_L));
-
-  a_ctScoreRaise = actionCollection()->addAction("scoreraise");
-  a_ctScoreRaise->setText(i18n("&Raise Score for Author..."));
-  connect(a_ctScoreRaise, SIGNAL(triggered(bool)), SLOT(slotScoreRaise()));
-  a_ctScoreRaise->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_I));
 
   a_ctArtToggleIgnored = actionCollection()->addAction("thread_ignore");
   a_ctArtToggleIgnored->setIcon(KIcon("go-bottom"));
@@ -831,7 +735,8 @@ void KNMainWidget::initActions()
 
   a_ctToggleQuickSearch = actionCollection()->add<KToggleAction>("settings_show_quickSearch");
   a_ctToggleQuickSearch->setText(i18n("Show Quick Search"));
-  connect(a_ctToggleQuickSearch, SIGNAL(triggered(bool)), SLOT(slotToggleQuickSearch()));
+  connect(a_ctToggleQuickSearch, SIGNAL(triggered(bool)),
+          mHeadersView, SLOT(toggleSearch(bool)));
 }
 
 bool KNMainWidget::firstStart()
@@ -852,15 +757,12 @@ bool KNMainWidget::firstStart()
 
 void KNMainWidget::readOptions()
 {
-  KConfigGroup conf(knGlobals.config(), "APPEARANCE");
-
-  if (conf.readEntry("quicksearch", true))
-    a_ctToggleQuickSearch->setChecked(true);
-  else
-    q_uicksearch->hide();
   c_olView->readConfig();
-  h_drView->readConfig();
-  a_ctArtSortHeaders->setCurrentItem( h_drView->sortColumn() );
+  mHeadersView->readConfig();
+
+  a_ctToggleQuickSearch->setChecked(mHeadersView->isSearchShown());
+
+  a_ctArtSortHeaders->setCurrentItem( mHeadersView->sortColumn() );
 
   resize(787,478);  // default optimized for 800x600
   //applyMainWindowSettings(KGlobal::config(),"mainWindow_options");
@@ -871,13 +773,10 @@ void KNMainWidget::readOptions()
 
 void KNMainWidget::saveOptions()
 {
-  KConfigGroup conf(knGlobals.config(), "APPEARANCE");
-
-  conf.writeEntry("quicksearch", !q_uicksearch->isHidden());
   //saveMainWindowSettings(KGlobal::config(),"mainWindow_options");
 
   c_olView->writeConfig();
-  h_drView->writeConfig();
+  mHeadersView->writeConfig();
   mArticleViewer->writeConfig();
 
   KConfigGroup cfg( knGlobals.config(), "UI State" );
@@ -887,7 +786,7 @@ void KNMainWidget::saveOptions()
 
 bool KNMainWidget::requestShutdown()
 {
-  kDebug(5003) <<"KNMainWidget::requestShutdown()";
+  kDebug();
 
   if( a_rtFactory->jobsPending() &&
       KMessageBox::No==KMessageBox::warningYesNo(this, i18n(
@@ -905,10 +804,12 @@ articles.\nDo you want to quit anyway?"), QString(), KStandardGuiItem::quit(), K
 
 void KNMainWidget::prepareShutdown()
 {
-  kDebug(5003) <<"KNMainWidget::prepareShutdown()";
+  kDebug();
 
   //cleanup article-views
   ArticleWidget::cleanup();
+
+  ArticleWindow::closeAllWindows();
 
   // expire groups (if necessary)
   KNCleanUp *cup = new KNCleanUp();
@@ -934,7 +835,6 @@ void KNMainWidget::prepareShutdown()
   f_olManager->syncFolders();
   f_ilManager->prepareShutdown();
   a_ccManager->prepareShutdown();
-  s_coreManager->save();
 }
 
 
@@ -978,129 +878,43 @@ bool KNMainWidget::eventFilter(QObject *o, QEvent *e)
   return QWidget::eventFilter(o, e);
 }
 
-
-void KNMainWidget::getSelectedArticles(KNArticle::List &l)
+void KNMainWidget::slotArticlesSelected(const KNArticle::List articles)
 {
-  if(!g_rpManager->currentGroup() && !f_olManager->currentFolder())
-    return;
+  kDebug();
 
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNArticle>( static_cast<KNHdrViewItem*>( i )->art ) );
-}
-
-
-void KNMainWidget::getSelectedArticles(KNRemoteArticle::List &l)
-{
-  if(!g_rpManager->currentGroup()) return;
-
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
-}
-
-
-void KNMainWidget::getSelectedThreads(KNRemoteArticle::List &l)
-{
-  KNRemoteArticle::Ptr art;
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive())) {
-      art = boost::static_pointer_cast<KNRemoteArticle>( static_cast<KNHdrViewItem*>( i )->art );
-      // ignore the article if it is already in the list
-      // (multiple aritcles are selected in one thread)
-      if ( !l.contains(art)  )
-        art->thread(l);
-    }
-}
-
-
-void KNMainWidget::getSelectedArticles( KNLocalArticle::List &l )
-{
-  if(!f_olManager->currentFolder()) return;
-
-  for(Q3ListViewItem *i=h_drView->firstChild(); i; i=i->itemBelow())
-    if(i->isSelected() || (static_cast<KNHdrViewItem*>(i)->isActive()))
-      l.append( boost::static_pointer_cast<KNLocalArticle>( static_cast<KNHdrViewItem*>(i)->art ) );
-}
-
-
-void KNMainWidget::closeCurrentThread()
-{
-  Q3ListViewItem *item = h_drView->currentItem();
-  if (item) {
-    while (item->parent())
-      item = item->parent();
-    h_drView->setCurrentItem(item);
-    item->setOpen(false);
-    h_drView->ensureItemVisible(item);
-  }
-}
-
-void KNMainWidget::slotArticleSelected(Q3ListViewItem *i)
-{
-  kDebug(5003) <<"KNMainWidget::slotArticleSelected(QListViewItem *i)";
   if(b_lockui)
     return;
+
   KNArticle::Ptr selectedArticle;
 
-  if(i)
-    selectedArticle=(static_cast<KNHdrViewItem*>(i))->art;
+  if(!articles.isEmpty()) {
+    selectedArticle = articles.first();
+  }
 
   mArticleViewer->setArticle( selectedArticle );
 
   //actions
-  bool enabled;
-
-  enabled=( selectedArticle && selectedArticle->type()==KNArticle::ATremote );
-  if(a_ctArtSetArtRead->isEnabled() != enabled) {
-    a_ctArtSetArtRead->setEnabled(enabled);
-    a_ctArtSetArtUnread->setEnabled(enabled);
-    a_ctArtSetThreadRead->setEnabled(enabled);
-    a_ctArtSetThreadUnread->setEnabled(enabled);
-    a_ctArtToggleIgnored->setEnabled(enabled);
-    a_ctArtToggleWatched->setEnabled(enabled);
-    a_ctScoreLower->setEnabled(enabled);
-    a_ctScoreRaise->setEnabled(enabled);
-  }
-
-  a_ctArtOpenNewWindow->setEnabled( selectedArticle && (f_olManager->currentFolder()!=f_olManager->outbox())
-                                                    && (f_olManager->currentFolder()!=f_olManager->drafts()));
-
-  enabled=( selectedArticle && selectedArticle->type()==KNArticle::ATlocal );
-  a_ctArtDelete->setEnabled(enabled);
-  a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
-  a_ctArtEdit->setEnabled(enabled && ((f_olManager->currentFolder()==f_olManager->outbox())||
-                                      (f_olManager->currentFolder()==f_olManager->drafts())));
-}
-
-
-void KNMainWidget::slotArticleSelectionChanged()
-{
-  // enable all actions that work with multiple selection
-
-  //actions
   bool enabled = (g_rpManager->currentGroup()!=0);
-
-  if(a_ctArtSetArtRead->isEnabled() != enabled) {
-    a_ctArtSetArtRead->setEnabled(enabled);
-    a_ctArtSetArtUnread->setEnabled(enabled);
-    a_ctArtSetThreadRead->setEnabled(enabled);
-    a_ctArtSetThreadUnread->setEnabled(enabled);
-    a_ctArtToggleIgnored->setEnabled(enabled);
-    a_ctArtToggleWatched->setEnabled(enabled);
-    a_ctScoreLower->setEnabled(enabled);
-    a_ctScoreRaise->setEnabled(enabled);
-  }
+  a_ctArtSetArtRead->setEnabled(enabled);
+  a_ctArtSetArtUnread->setEnabled(enabled);
+  a_ctArtSetThreadRead->setEnabled(enabled);
+  a_ctArtSetThreadUnread->setEnabled(enabled);
+  a_ctArtToggleIgnored->setEnabled(enabled);
+  a_ctArtToggleWatched->setEnabled(enabled);
 
   enabled = (f_olManager->currentFolder()!=0);
   a_ctArtDelete->setEnabled(enabled);
   a_ctArtSendNow->setEnabled(enabled && (f_olManager->currentFolder()==f_olManager->outbox()));
+  a_ctArtEdit->setEnabled(enabled && ((f_olManager->currentFolder()==f_olManager->outbox())||
+                                      (f_olManager->currentFolder()==f_olManager->drafts())));
+  a_ctArtOpenNewWindow->setEnabled( selectedArticle && (f_olManager->currentFolder()!=f_olManager->outbox())
+                                                    && (f_olManager->currentFolder()!=f_olManager->drafts()));
 }
 
 
 void KNMainWidget::slotCollectionSelected()
 {
-  kDebug(5003) <<"KNMainWidget::slotCollectionSelected(QListViewItem *i)";
+  kDebug();
   if(b_lockui)
     return;
   KNCollection::Ptr c;
@@ -1108,9 +922,8 @@ void KNMainWidget::slotCollectionSelected()
   KNGroup::Ptr selectedGroup;
   KNFolder::Ptr selectedFolder;
 
-  s_earchLineEdit->clear();
-  h_drView->clear();
-  slotArticleSelected(0);
+  mHeadersView->showCollection(KNArticleCollection::Ptr());
+  slotArticlesSelected(KNArticle::List());
 
   // mark all articles in current group as not new/read
   if ( knGlobals.settings()->leaveGroupMarkAsRead() )
@@ -1128,15 +941,17 @@ void KNMainWidget::slotCollectionSelected()
         }
       break;
       case KNCollection::CTgroup :
-        if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() )
-          h_drView->setFocus();
+        if ( !mHeadersView->hasFocus() && !mArticleViewer->hasFocus() ) {
+          mHeadersView->setFocus();
+        }
         selectedGroup = boost::static_pointer_cast<KNGroup>( c );
         selectedAccount=selectedGroup->account();
       break;
 
       case KNCollection::CTfolder :
-        if ( !h_drView->hasFocus() && !mArticleViewer->hasFocus() )
-          h_drView->setFocus();
+        if ( !mHeadersView->hasFocus() && !mArticleViewer->hasFocus() ) {
+          mHeadersView->setFocus();
+        }
         selectedFolder = boost::static_pointer_cast<KNFolder>( c );
       break;
 
@@ -1199,7 +1014,6 @@ void KNMainWidget::slotCollectionSelected()
     a_ctArtCollapseAll->setEnabled(enabled);
     a_ctArtExpandAll->setEnabled(enabled);
     a_ctArtToggleShowThreads->setEnabled(enabled);
-    a_ctReScore->setEnabled(enabled);
   }
 
   a_ctFolNewChild->setEnabled(selectedFolder!=0);
@@ -1222,7 +1036,7 @@ void KNMainWidget::slotCollectionSelected()
 
 void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
 {
-  kDebug(5003) <<"KNMainWidget::slotCollectionRenamed(QListViewItem *i)";
+  kDebug();
 
   if (i) {
     static_cast<KNCollectionViewItem*>( i )->collection()->setName( i->text( 0 ) );
@@ -1231,19 +1045,18 @@ void KNMainWidget::slotCollectionRenamed(QTreeWidgetItem *i)
     if ( static_cast<KNCollectionViewItem*>( i )->collection()->type() == KNCollection::CTnntpAccount ) {
       a_ccManager->accountRenamed( boost::static_pointer_cast<KNNntpAccount>( static_cast<KNCollectionViewItem*>( i )->collection() ) );
     }
-    disableAccels(false);
   }
 }
 
 
-void KNMainWidget::slotArticleRMB(K3ListView*, Q3ListViewItem *i, const QPoint &p)
+void KNMainWidget::slotArticleRMB(KNArticle::Ptr article, const QPoint& p)
 {
   if(b_lockui)
     return;
 
-  if(i) {
-    QMenu *popup;
-    if( (static_cast<KNHdrViewItem*>(i))->art->type()==KNArticle::ATremote) {
+  if(article) {
+    QMenu *popup = 0;
+    if(article->type() == KNArticle::ATremote) {
      popup = popupMenu( "remote_popup" );
     } else {
      popup = popupMenu( "local_popup" );
@@ -1280,14 +1093,12 @@ void KNMainWidget::slotCollectionRMB( QTreeWidgetItem *i, const QPoint &pos )
 }
 
 
-void KNMainWidget::slotOpenArticle(Q3ListViewItem *item)
+void KNMainWidget::slotOpenArticle(KNArticle::Ptr art)
 {
   if(b_lockui)
     return;
 
-  if (item) {
-    KNArticle::Ptr art = (static_cast<KNHdrViewItem*>(item))->art;
-
+  if (art) {
     if ((art->type()==KNArticle::ATlocal) && ((f_olManager->currentFolder()==f_olManager->outbox())||
                                                (f_olManager->currentFolder()==f_olManager->drafts()))) {
       a_rtFactory->edit( boost::static_pointer_cast<KNLocalArticle>( art ) );
@@ -1318,21 +1129,23 @@ void KNMainWidget::slotNetworkActive(bool b)
 
 void KNMainWidget::slotNavNextUnreadArt()
 {
-  if ( !h_drView->nextUnreadArticle() )
+  if(!mHeadersView->selectNextUnreadMessage()) {
     c_olView->nextGroup();
+  }
 }
 
 
 void KNMainWidget::slotNavNextUnreadThread()
 {
-  if ( !h_drView->nextUnreadThread() )
+  if(!mHeadersView->selectNextUnreadThread()) {
     c_olView->nextGroup();
+  }
 }
 
 
 void KNMainWidget::slotNavReadThrough()
 {
-  kDebug(5003) <<"KNMainWidget::slotNavReadThrough()";
+  kDebug();
   if ( !mArticleViewer->atBottom() )
     mArticleViewer->scrollNext();
   else if(g_rpManager->currentGroup() != 0)
@@ -1342,7 +1155,7 @@ void KNMainWidget::slotNavReadThrough()
 
 void KNMainWidget::slotAccProperties()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccProperties()";
+  kDebug();
   if(a_ccManager->currentAccount())
     a_ccManager->editProperties(a_ccManager->currentAccount());
   updateCaption();
@@ -1352,9 +1165,8 @@ void KNMainWidget::slotAccProperties()
 
 void KNMainWidget::slotAccRename()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccRename()";
+  kDebug();
   if(a_ccManager->currentAccount()) {
-//     disableAccels(true);   // hack: global accels break the inplace renaming
     c_olView->editItem( a_ccManager->currentAccount()->listItem(), c_olView->labelColumnIndex() );
   }
 }
@@ -1362,15 +1174,15 @@ void KNMainWidget::slotAccRename()
 
 void KNMainWidget::slotAccSubscribe()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccSubscribe()";
+  kDebug();
   if(a_ccManager->currentAccount())
-    g_rpManager->showGroupDialog(a_ccManager->currentAccount());
+    g_rpManager->showGroupDialog(a_ccManager->currentAccount(), this);
 }
 
 
 void KNMainWidget::slotAccExpireAll()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccExpireAll()";
+  kDebug();
   if(a_ccManager->currentAccount())
     g_rpManager->expireAll(a_ccManager->currentAccount());
 }
@@ -1378,7 +1190,7 @@ void KNMainWidget::slotAccExpireAll()
 
 void KNMainWidget::slotAccGetNewHdrs()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccGetNewHdrs()";
+  kDebug();
   if(a_ccManager->currentAccount())
     g_rpManager->checkAll(a_ccManager->currentAccount());
 }
@@ -1387,7 +1199,7 @@ void KNMainWidget::slotAccGetNewHdrs()
 
 void KNMainWidget::slotAccDelete()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccDelete()";
+  kDebug();
   if(a_ccManager->currentAccount()) {
     if (a_ccManager->removeAccount(a_ccManager->currentAccount()))
       slotCollectionSelected();
@@ -1403,7 +1215,7 @@ void KNMainWidget::slotAccGetNewHdrsAll()
 
 void KNMainWidget::slotAccPostNewArticle()
 {
-  kDebug(5003) <<"KNMainWidget::slotAccPostNewArticle()";
+  kDebug();
   if(g_rpManager->currentGroup())
     a_rtFactory->createPosting(g_rpManager->currentGroup());
   else if(a_ccManager->currentAccount())
@@ -1413,7 +1225,7 @@ void KNMainWidget::slotAccPostNewArticle()
 
 void KNMainWidget::slotGrpProperties()
 {
-  kDebug(5003) <<"slotGrpProperties()";
+  kDebug();
   if(g_rpManager->currentGroup())
     g_rpManager->showGroupProperties(g_rpManager->currentGroup());
   updateCaption();
@@ -1423,9 +1235,8 @@ void KNMainWidget::slotGrpProperties()
 
 void KNMainWidget::slotGrpRename()
 {
-  kDebug(5003) <<"slotGrpRename()";
+  kDebug();
   if(g_rpManager->currentGroup()) {
-//     disableAccels(true);   // hack: global accels break the inplace renaming
     c_olView->editItem( g_rpManager->currentGroup()->listItem(),  c_olView->labelColumnIndex() );
   }
 }
@@ -1433,7 +1244,7 @@ void KNMainWidget::slotGrpRename()
 
 void KNMainWidget::slotGrpGetNewHdrs()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpGetNewHdrs()";
+  kDebug();
   if(g_rpManager->currentGroup())
     g_rpManager->checkGroupForNewHeaders(g_rpManager->currentGroup());
 }
@@ -1441,7 +1252,7 @@ void KNMainWidget::slotGrpGetNewHdrs()
 
 void KNMainWidget::slotGrpExpire()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpExpire()";
+  kDebug();
   if(g_rpManager->currentGroup())
     g_rpManager->expireGroupNow(g_rpManager->currentGroup());
 }
@@ -1449,14 +1260,14 @@ void KNMainWidget::slotGrpExpire()
 
 void KNMainWidget::slotGrpReorganize()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpReorganize()";
+  kDebug();
   g_rpManager->reorganizeGroup(g_rpManager->currentGroup());
 }
 
 
 void KNMainWidget::slotGrpUnsubscribe()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpUnsubscribe()";
+  kDebug();
   if(g_rpManager->currentGroup()) {
     if(KMessageBox::Yes==KMessageBox::questionYesNo(knGlobals.topWidget,
        i18n("Do you really want to unsubscribe from %1?", g_rpManager->currentGroup()->groupname()), QString(), KGuiItem(i18n("Unsubscribe")), KStandardGuiItem::cancel()))
@@ -1468,7 +1279,7 @@ void KNMainWidget::slotGrpUnsubscribe()
 
 void KNMainWidget::slotGrpSetAllRead()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpSetAllRead()";
+  kDebug();
 
   a_rtManager->setAllRead(true);
   if ( knGlobals.settings()->markAllReadGoNext() )
@@ -1478,13 +1289,13 @@ void KNMainWidget::slotGrpSetAllRead()
 
 void KNMainWidget::slotGrpSetAllUnread()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpSetAllUnread()";
+  kDebug();
   a_rtManager->setAllRead(false);
 }
 
 void KNMainWidget::slotGrpSetUnread()
 {
-  kDebug(5003) <<"KNMainWidget::slotGrpSetUnread()";
+  kDebug();
   int groupLength = g_rpManager->currentGroup()->length();
 
   bool ok = false;
@@ -1497,7 +1308,7 @@ void KNMainWidget::slotGrpSetUnread()
 
 void KNMainWidget::slotFolNew()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolNew()";
+  kDebug();
   KNFolder::Ptr f = f_olManager->newFolder( KNFolder::Ptr() );
 
   if (f) {
@@ -1510,7 +1321,7 @@ void KNMainWidget::slotFolNew()
 
 void KNMainWidget::slotFolNewChild()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolNew()";
+  kDebug();
   if(f_olManager->currentFolder()) {
     KNFolder::Ptr f = f_olManager->newFolder( f_olManager->currentFolder() );
 
@@ -1525,7 +1336,7 @@ void KNMainWidget::slotFolNewChild()
 
 void KNMainWidget::slotFolDelete()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolDelete()";
+  kDebug();
 
   if(!f_olManager->currentFolder() || f_olManager->currentFolder()->isRootFolder())
     return;
@@ -1547,13 +1358,12 @@ void KNMainWidget::slotFolDelete()
 
 void KNMainWidget::slotFolRename()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolRename()";
+  kDebug();
 
   if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder()) {
     if(f_olManager->currentFolder()->isStandardFolder())
       KMessageBox::sorry(knGlobals.topWidget, i18n("You cannot rename a standard folder."));
     else {
-//       disableAccels(true);   // hack: global accels break the inplace renaming
       c_olView->editItem( f_olManager->currentFolder()->listItem(), c_olView->labelColumnIndex() );
     }
   }
@@ -1562,7 +1372,7 @@ void KNMainWidget::slotFolRename()
 
 void KNMainWidget::slotFolCompact()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolCompact()";
+  kDebug();
   if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder())
     f_olManager->compactFolder(f_olManager->currentFolder());
 }
@@ -1570,14 +1380,14 @@ void KNMainWidget::slotFolCompact()
 
 void KNMainWidget::slotFolCompactAll()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolCompactAll()";
+  kDebug();
   f_olManager->compactAll();
 }
 
 
 void KNMainWidget::slotFolEmpty()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolEmpty()";
+  kDebug();
   if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder()) {
     if(f_olManager->currentFolder()->lockedArticles()>0) {
       KMessageBox::sorry(this,
@@ -1593,7 +1403,7 @@ void KNMainWidget::slotFolEmpty()
 
 void KNMainWidget::slotFolMBoxImport()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolMBoxImport()";
+  kDebug();
   if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder()) {
      f_olManager->importFromMBox(f_olManager->currentFolder());
   }
@@ -1602,7 +1412,7 @@ void KNMainWidget::slotFolMBoxImport()
 
 void KNMainWidget::slotFolMBoxExport()
 {
-  kDebug(5003) <<"KNMainWidget::slotFolMBoxExport()";
+  kDebug();
   if(f_olManager->currentFolder() && !f_olManager->currentFolder()->isRootFolder()) {
     f_olManager->exportToMBox(f_olManager->currentFolder());
   }
@@ -1611,113 +1421,70 @@ void KNMainWidget::slotFolMBoxExport()
 
 void KNMainWidget::slotArtSortHeaders(int i)
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSortHeaders(int i)";
-  h_drView->setSorting( i );
+  kDebug();
+  mHeadersView->setSorting( i );
 }
 
 
 void KNMainWidget::slotArtSortHeadersKeyb()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSortHeadersKeyb()";
+  kDebug();
 
   int newCol = KNHelper::selectDialog(this, i18n("Select Sort Column"), a_ctArtSortHeaders->items(), a_ctArtSortHeaders->currentItem());
   if (newCol != -1)
-    h_drView->setSorting( newCol );
+    mHeadersView->setSorting( newCol );
 }
 
 
 void KNMainWidget::slotArtSearch()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSearch()";
+  kDebug();
   a_rtManager->search();
 }
 
 
 void KNMainWidget::slotArtRefreshList()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtRefreshList()";
-  a_rtManager->showHdrs(true);
+  kDebug();
+  a_rtManager->showHdrs();
 }
-
-
-void KNMainWidget::slotArtCollapseAll()
-{
-  kDebug(5003) <<"KNMainWidget::slotArtCollapseAll()";
-
-  closeCurrentThread();
-  a_rtManager->setAllThreadsOpen(false);
-  if (h_drView->currentItem())
-    h_drView->ensureItemVisible(h_drView->currentItem());
-}
-
-
-void KNMainWidget::slotArtExpandAll()
-{
-  kDebug(5003) <<"KNMainWidget::slotArtExpandAll()";
-
-  a_rtManager->setAllThreadsOpen(true);
-  if (h_drView->currentItem())
-    h_drView->ensureItemVisible(h_drView->currentItem());
-}
-
-
-void KNMainWidget::slotArtToggleThread()
-{
-  kDebug(5003) <<"KNMainWidget::slotArtToggleThread()";
-  if( mArticleViewer->article() && mArticleViewer->article()->listItem()->isExpandable() ) {
-    bool o = !(mArticleViewer->article()->listItem()->isOpen());
-    mArticleViewer->article()->listItem()->setOpen( o );
-  }
-}
-
-
-void KNMainWidget::slotArtToggleShowThreads()
-{
-  kDebug(5003) <<"KNMainWidget::slotArtToggleShowThreads()";
-  if(g_rpManager->currentGroup()) {
-    knGlobals.settings()->setShowThreads( !knGlobals.settings()->showThreads() );
-    a_rtManager->showHdrs(true);
-  }
-}
-
 
 void KNMainWidget::slotArtSetArtRead()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSetArtRead()";
+  kDebug();
   if(!g_rpManager->currentGroup())
     return;
 
   KNRemoteArticle::List l;
-  getSelectedArticles(l);
+  mHeadersView->getSelectedMessages(l);
   a_rtManager->setRead(l, true);
 }
 
 
 void KNMainWidget::slotArtSetArtUnread()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSetArtUnread()";
+  kDebug();
   if(!g_rpManager->currentGroup())
     return;
 
   KNRemoteArticle::List l;
-  getSelectedArticles(l);
+  mHeadersView->getSelectedMessages(l);
   a_rtManager->setRead(l, false);
 }
 
 
 void KNMainWidget::slotArtSetThreadRead()
 {
-  kDebug(5003) <<"slotArtSetThreadRead()";
+  kDebug();
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->setRead(l, true);
 
-  if (h_drView->currentItem()) {
+  if (!l.isEmpty()) {
     if ( knGlobals.settings()->markThreadReadCloseThread() )
-      closeCurrentThread();
+      mHeadersView->collapseCurrentThread();
     if ( knGlobals.settings()->markThreadReadGoNext() )
       slotNavNextUnreadThread();
   }
@@ -1726,74 +1493,26 @@ void KNMainWidget::slotArtSetThreadRead()
 
 void KNMainWidget::slotArtSetThreadUnread()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSetThreadUnread()";
+  kDebug();
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->setRead(l, false);
 }
 
-
-void KNMainWidget::slotScoreEdit()
-{
-  kDebug(5003) <<"KNMainWidget::slotScoreEdit()";
-  s_coreManager->configure();
-}
-
-
-void KNMainWidget::slotReScore()
-{
-  kDebug(5003) <<"KNMainWidget::slotReScore()";
-  if( !g_rpManager->currentGroup() )
-    return;
-
-  g_rpManager->currentGroup()->scoreArticles(false);
-  a_rtManager->showHdrs(true);
-}
-
-
-void KNMainWidget::slotScoreLower()
-{
-  kDebug(5003) <<"KNMainWidget::slotScoreLower() start";
-  if( !g_rpManager->currentGroup() )
-    return;
-
-  if ( mArticleViewer->article() && mArticleViewer->article()->type() == KNArticle::ATremote ) {
-    KNRemoteArticle::Ptr ra = boost::static_pointer_cast<KNRemoteArticle>( mArticleViewer->article() );
-    s_coreManager->addRule(KNScorableArticle(ra), g_rpManager->currentGroup()->groupname(), -10);
-  }
-}
-
-
-void KNMainWidget::slotScoreRaise()
-{
-  kDebug(5003) <<"KNMainWidget::slotScoreRaise() start";
-  if( !g_rpManager->currentGroup() )
-    return;
-
-  if ( mArticleViewer->article() && mArticleViewer->article()->type() == KNArticle::ATremote ) {
-    KNRemoteArticle::Ptr ra = boost::static_pointer_cast<KNRemoteArticle>( mArticleViewer->article() );
-    s_coreManager->addRule(KNScorableArticle(ra), g_rpManager->currentGroup()->groupname(), +10);
-  }
-}
-
-
 void KNMainWidget::slotArtToggleIgnored()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtToggleIgnored()";
+  kDebug();
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   bool revert = !a_rtManager->toggleIgnored(l);
-  a_rtManager->rescoreArticles(l);
 
-  if (h_drView->currentItem() && !revert) {
+  if (!l.isEmpty() && !revert) {
     if ( knGlobals.settings()->ignoreThreadCloseThread() )
-      closeCurrentThread();
+      mHeadersView->collapseCurrentThread();
     if ( knGlobals.settings()->ignoreThreadGoNext() )
       slotNavNextUnreadThread();
   }
@@ -1802,20 +1521,18 @@ void KNMainWidget::slotArtToggleIgnored()
 
 void KNMainWidget::slotArtToggleWatched()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtToggleWatched()";
+  kDebug();
   if( !g_rpManager->currentGroup() )
     return;
 
-  KNRemoteArticle::List l;
-  getSelectedThreads(l);
+  KNRemoteArticle::List l = mHeadersView->getSelectedThreads();
   a_rtManager->toggleWatched(l);
-  a_rtManager->rescoreArticles(l);
 }
 
 
 void KNMainWidget::slotArtOpenNewWindow()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtOpenNewWindow()";
+  kDebug();
 
   if( mArticleViewer->article() ) {
     if ( !ArticleWindow::raiseWindowForArticle( mArticleViewer->article() ) ) {
@@ -1828,36 +1545,33 @@ void KNMainWidget::slotArtOpenNewWindow()
 
 void KNMainWidget::slotArtSendOutbox()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSendOutbox()";
+  kDebug();
   a_rtFactory->sendOutbox();
 }
 
 
 void KNMainWidget::slotArtDelete()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtDelete()";
+  kDebug();
   if (!f_olManager->currentFolder())
     return;
 
   KNLocalArticle::List lst;
-  getSelectedArticles(lst);
+  mHeadersView->getSelectedMessages(lst);
 
   if(!lst.isEmpty())
     a_rtManager->deleteArticles(lst);
-
-  if(h_drView->currentItem())
-    h_drView->setActive( h_drView->currentItem() );
 }
 
 
 void KNMainWidget::slotArtSendNow()
 {
-  kDebug(5003) <<"KNMainWidget::slotArtSendNow()";
+  kDebug();
   if (!f_olManager->currentFolder())
     return;
 
   KNLocalArticle::List lst;
-  getSelectedArticles(lst);
+  mHeadersView->getSelectedMessages(lst);
 
   if(!lst.isEmpty())
     a_rtFactory->sendArticles( lst, true );
@@ -1866,7 +1580,7 @@ void KNMainWidget::slotArtSendNow()
 
 void KNMainWidget::slotArtEdit()
 {
-  kDebug(5003) <<"KNodeVew::slotArtEdit()";
+  kDebug();
   if (!f_olManager->currentFolder())
     return;
 
@@ -1877,14 +1591,14 @@ void KNMainWidget::slotArtEdit()
 
 void KNMainWidget::slotNetCancel()
 {
-  kDebug(5003) <<"KNMainWidget::slotNetCancel()";
+  kDebug();
   knGlobals.scheduler()->cancelJobs();
 }
 
 
 void KNMainWidget::slotFetchArticleWithID()
 {
-  kDebug(5003) <<"KNMainWidget::slotFetchArticleWithID()";
+  kDebug();
   if( !g_rpManager->currentGroup() )
     return;
 
@@ -1908,15 +1622,6 @@ void KNMainWidget::slotFetchArticleWithID()
 
   KNHelper::saveWindowSize("fetchArticleWithID",dlg->size());
   delete dlg;
-}
-
-
-void KNMainWidget::slotToggleQuickSearch()
-{
-  if (q_uicksearch->isHidden())
-    q_uicksearch->show();
-  else
-    q_uicksearch->hide();
 }
 
 
@@ -1975,13 +1680,13 @@ void KNode::FetchArticleIdDlg::slotTextChanged(const QString &_text )
 // Move to the next article
 void KNMainWidget::nextArticle()
 {
-  h_drView->nextArticle();
+  mHeadersView->selectNextMessage();
 }
 
 // Move to the previous article
 void KNMainWidget::previousArticle()
 {
-  h_drView->prevArticle();
+  mHeadersView->selectPreviousMessage();
 }
 
 // Move to the next unread article

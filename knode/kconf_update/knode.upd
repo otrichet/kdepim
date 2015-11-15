@@ -13,3 +13,14 @@ RemoveKey=SortAscending
 RemoveKey=SortColumn
 RemoveKey=UnreadColumn
 
+Id=002
+File=knoderc
+# sortByThreadChangeDate moved to knode.kcfg
+Group=HeaderView,READNEWS
+Key=sortByThreadChangeDate
+# Drop state of the pre-qt4 header view
+RemoveGroup=HeaderView
+# showHeadersSearchLine moved to knode.kcfg
+Group=APPEARANCE,READNEWS
+Key=quicksearch,showHeadersSearchLine
+RemoveGroup=APPEARANCE

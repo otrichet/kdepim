@@ -15,16 +15,14 @@
 #ifndef KNFILTERMANAGER_H
 #define KNFILTERMANAGER_H
 
-#include <qglobal.h>
 #include <QList>
-
 #include <kactionmenu.h>
-#include <kactioncollection.h>
 
 namespace KNode {
 class FilterListWidget;
 }
 
+class KActionCollection;
 class KNArticleFilter;
 
 
@@ -38,16 +36,23 @@ class KNFilterSelectAction : public KActionMenu
                           KActionCollection* parent, const char *name );
     ~KNFilterSelectAction();
 
-    void setCurrentItem(int id);
+    void insertFilterAction(KNArticleFilter *filter);
+    void setCurrentFilter(int id);
+    void clear();
 
   protected slots:
-    void slotMenuActivated(int id);
+    void slotMenuActivated(QAction *action);
 
   signals:
+    /**
+     * Emitted when a filter is selected.
+     * @param id The id of the selected filter.
+     */
     void activated(int id);
 
   private:
-    int currentItem;
+    /// Mapping between ID of filter and QAction.
+    QHash<int, QAction*> mIdActions;
 };
 
 
@@ -82,7 +87,7 @@ class KNFilterManager : public QObject
      */
     void setMenuAction(KNFilterSelectAction *a, QAction *keybA);
 
-  protected:
+  private:
     void loadFilters();
     void saveFilterLists();
     KNArticleFilter* setFilter(const int id);
