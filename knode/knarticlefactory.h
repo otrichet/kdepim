@@ -24,7 +24,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QListWidgetItem>
-#include <kdialog.h>
+#include <KDE/KDialog>
 
 class QLabel;
 class KNComposer;

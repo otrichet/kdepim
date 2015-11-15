@@ -22,7 +22,7 @@
 class KComboBox;
 class KNComposerEditor;
 class QGroupBox;
-namespace KPIMIdentities {
+namespace KIdentityManagement {
   class IdentityCombo;
 }
 

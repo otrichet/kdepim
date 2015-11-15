@@ -15,13 +15,14 @@
 #ifndef KNCOMPOSER_H
 #define KNCOMPOSER_H
 
+#include <Libkdepim/AddresseeLineEdit>
+
 #include "knarticle.h"
 
 #include <kxmlguiwindow.h>
 #include <kdialog.h>
 #include <QList>
 #include <kprocess.h>
-#include <kabc/addresslineedit.h>
 
 
 class KSelectAction;
@@ -269,7 +270,7 @@ class KNComposer::AttachmentPropertiesDlg : public KDialog {
 
 //-----------------------------------------------------------------------------
 /** Line edit for addresses used in the composer. */
-class KNLineEdit : public KABC::AddressLineEdit
+class KNLineEdit : public KPIM::AddresseeLineEdit
 {
     Q_OBJECT
 

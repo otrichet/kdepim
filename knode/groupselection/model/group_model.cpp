@@ -28,7 +28,7 @@
 #include <QtCore/QModelIndex>
 #include <QtCore/QTimer>
 #include <QtGui/QFont>
-#include <KDE/KLocalizedString>
+#include <KI18n/KLocalizedString>
 
 #include "../enums.h"
 #include "kngroupmanager.h"

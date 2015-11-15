@@ -28,17 +28,17 @@
 #include "settings.h"
 #include "settings_container_interface.h"
 
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
 #include <QPointer>
 
 
-using namespace KPIMIdentities;
+using namespace KIdentityManagement;
 
 namespace KNode {
 
 IdentityWidget::IdentityWidget( SettingsContainerInterface *settingsContainer, const KComponentData &inst, QWidget *parent )
-  : KCModule( inst, parent ),
+  : KCModule( parent ),
     mConfigurationContainer( settingsContainer )
 {
   setupUi( this );
@@ -92,7 +92,7 @@ void IdentityWidget::save()
 
 void IdentityWidget::identitySelected( uint uoid )
 {
-  KPIMIdentities::IdentityManager *im = KNGlobals::self()->identityManager();
+  KIdentityManagement::IdentityManager *im = KNGlobals::self()->identityManager();
   const Identity &identity = im->identityForUoid( uoid );
   loadFromIdentity( identity );
 

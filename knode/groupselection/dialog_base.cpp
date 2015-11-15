@@ -25,9 +25,10 @@
 
 #include "dialog_base.h"
 
-#include <QtCore/QTimer>
-#include <KDE/KRecursiveFilterProxyModel>
 #include <KDE/KDebug>
+#include <KDE/KIcon>
+#include <KDE/KRecursiveFilterProxyModel>
+#include <QtCore/QTimer>
 
 #include "enums.h"
 #include "model/checked_state_proxy_model.h"

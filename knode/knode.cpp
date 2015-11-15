@@ -15,23 +15,21 @@
 #include "knglobals.h"
 
 #include <QApplication>
+#include <KDE/KGlobal>
+#include <Libkdepim/BroadcastStatus>
+#include <Libkdepim/ProgressDialog>
+#include <Libkdepim/StatusbarProgressWidget>
 
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kstandardaction.h>
 #include <kdebug.h>
-#include <kmenubar.h>
 #include <kiconloader.h>
 #include <kstatusbar.h>
 #include <klocale.h>
 #include <kactioncollection.h>
 #include <ksqueezedtextlabel.h>
 
-#include "libkdepim/misc/broadcaststatus.h"
-#include "libkdepim/progresswidget/progressdialog.h"
-#include "libkdepim/progresswidget/statusbarprogresswidget.h"
-
-//GUI
 #include "knmainwidget.h"
 #include "kncollectionviewitem.h"
 
@@ -62,7 +60,10 @@ KNMainWindow::KNMainWindow( QWidget* parent )
 
 KNMainWindow::~KNMainWindow()
 {
+  kDebug() << "Port";
+#if 0
   saveMainWindowSettings(knGlobals.config()->group( "mainWindow_options") );
+#endif
 }
 
 void KNMainWindow::openURL( const KUrl& url )
@@ -72,7 +73,10 @@ void KNMainWindow::openURL( const KUrl& url )
 
 void KNMainWindow::slotConfToolbar()
 {
+  kDebug() << "Port";
+#if 0
   saveMainWindowSettings(knGlobals.config()->group( "mainWindow_options") );
+#endif
   KEditToolBar dlg( actionCollection() );
   dlg.setResourceFile( "knodeui.rc" );
   connect(&dlg,SIGNAL(newToolBarConfig()), this, SLOT(slotNewToolbarConfig()));

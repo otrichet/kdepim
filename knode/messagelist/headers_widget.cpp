@@ -25,10 +25,10 @@
 
 #include "headers_widget.h"
 
-#include <QtGui/QSortFilterProxyModel>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QHeaderView>
 #include <KDE/KFilterProxySearchLine>
+#include <QtCore/QSortFilterProxyModel>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QVBoxLayout>
 
 #include "headers_model.h"
 #include "headers_view.h"

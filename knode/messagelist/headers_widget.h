@@ -28,7 +28,7 @@
 
 #include <QtCore/QModelIndex>
 #include <QtCore/QPoint>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 #include "knarticle.h"
 #include "knarticlecollection.h"

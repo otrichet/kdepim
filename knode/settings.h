@@ -19,7 +19,7 @@
 // TODO: remove as soon as XHeader is in it's own file
 #include "knconfig.h"
 
-namespace KPIMIdentities {
+namespace KIdentityManagement {
   class Identity;
 }
 
@@ -77,11 +77,11 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     /**
       Returns the global identity (or the default one when none is set yet).
     */
-    virtual const KPIMIdentities::Identity & identity() const;
+    virtual const KIdentityManagement::Identity & identity() const;
     /**
       Sets the global identity.
     */
-    virtual void setIdentity( const KPIMIdentities::Identity &identity );
+    virtual void setIdentity( const KIdentityManagement::Identity &identity );
 
     /**
       Reimplemented to hide writeConfig() from SettingsContainerInterface
@@ -94,7 +94,7 @@ class KNODE_EXPORT Settings : public SettingsBase, public SettingsContainerInter
     /** Reimplemented from KConfigSkeleton. */
     virtual void usrReadConfig();
     /** Reimplemented from KConfigSkeleton. */
-    virtual void usrWriteConfig();
+    virtual bool usrWriteConfig();
     /** Returns the effective color value of the given config item.
      * @param item The KConfigSkeletonItem.
      */

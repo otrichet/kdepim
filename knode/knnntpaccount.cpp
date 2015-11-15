@@ -25,8 +25,8 @@
 #include <QTimer>
 #include <kconfig.h>
 #include <kdebug.h>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
 #include <kstandarddirs.h>
 
 
@@ -210,15 +210,15 @@ KNode::Cleanup *KNNntpAccount::activeCleanupConfig() const
 }
 
 
-const KPIMIdentities::Identity & KNNntpAccount::identity() const
+const KIdentityManagement::Identity & KNNntpAccount::identity() const
 {
   if ( mIdentityUoid < 0 ) {
-    return KPIMIdentities::Identity::null();
+    return KIdentityManagement::Identity::null();
   }
   return KNGlobals::self()->identityManager()->identityForUoid( mIdentityUoid );
 }
 
-void KNNntpAccount::setIdentity( const KPIMIdentities::Identity &identity )
+void KNNntpAccount::setIdentity( const KIdentityManagement::Identity &identity )
 {
   mIdentityUoid = ( identity.isNull() ? -1 : identity.uoid() );
 }

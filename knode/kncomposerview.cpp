@@ -20,9 +20,9 @@
 #include "settings.h"
 
 #include <KLocale>
-#include <KPIMIdentities/IdentityCombo>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
+#include <KIdentityManagement/IdentityCombo>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
 #include <KPIMUtils/Email>
 
 
@@ -212,8 +212,8 @@ void View::setIdentity( uint uoid )
 
 void View::slotIdentityChanged( uint uoid )
 {
-  KPIMIdentities::IdentityManager *im = KNGlobals::self()->identityManager();
-  KPIMIdentities::Identity identity = im->identityForUoid( uoid );
+  KIdentityManagement::IdentityManager *im = KNGlobals::self()->identityManager();
+  KIdentityManagement::Identity identity = im->identityForUoid( uoid );
   setFrom( identity.fullEmailAddr() );
   if ( KPIMUtils::isValidAddress( from() ) != KPIMUtils::AddressOk ) {
     showFrom( true );
@@ -295,7 +295,7 @@ void View::setFollowupTo( const QString &followupTo )
 
 void View::displayFollowuptoHint()
 {
-  const QString hint = i18nc( "@info/plain This message is place, as an inactive text, in the Followup-To "
+  const QString hint = i18nc( "@info This message is place, as an inactive text, in the Followup-To "
                               "line edit of the message composer when the user select more than one "
                               "group to post his/her message.",
                               "Choose an appropriate group to redirect replies..." );
@@ -310,7 +310,7 @@ void View::displayFollowuptoHint()
 
 void View::hideFollowuptoHint()
 {
-  const QString hint = i18nc( "@info/plain This message is place, as an inactive text, in the Followup-To "
+  const QString hint = i18nc( "@info This message is place, as an inactive text, in the Followup-To "
                               "line edit of the message composer when the user select more than one "
                               "group to post his/her message.",
                               "Choose an appropriate group to redirect replies..." );
@@ -344,10 +344,10 @@ KNComposerEditor * View::editor() const
 
 void View::appendSignature()
 {
-  KPIMIdentities::IdentityManager *im = KNGlobals::self()->identityManager();
-  KPIMIdentities::Identity identity = im->identityForUoid( selectedIdentity() );
-  identity.signature().insertIntoTextEdit( KPIMIdentities::Signature::End,
-                                           KPIMIdentities::Signature::AddSeparator,
+  KIdentityManagement::IdentityManager *im = KNGlobals::self()->identityManager();
+  KIdentityManagement::Identity identity = im->identityForUoid( selectedIdentity() );
+  identity.signature().insertIntoTextEdit( KIdentityManagement::Signature::End,
+                                           KIdentityManagement::Signature::AddSeparator,
                                            mEditor );
 }
 

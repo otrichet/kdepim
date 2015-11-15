@@ -42,7 +42,7 @@ namespace KNode {
   class Scheduler;
   class Settings;
 }
-namespace KPIMIdentities {
+namespace KIdentityManagement {
   class IdentityManager;
 }
 
@@ -91,7 +91,7 @@ class KNODE_EXPORT KNGlobals
     /** Returns the KConfigXT generated settings object. */
     KNode::Settings *settings();
     /** Returns the identity manager. */
-    KPIMIdentities::IdentityManager *identityManager();
+    KIdentityManagement::IdentityManager *identityManager();
 
 
     /** forwarded to top->setStatusMsg() if available */
@@ -118,7 +118,7 @@ class KNODE_EXPORT KNGlobals
     KNMemoryManager       *mMemManager;
     KNode::Settings *mSettings;
     KNArticleFactory *mArticleFactory;
-    KPIMIdentities::IdentityManager * mIdentityManager;
+    KIdentityManagement::IdentityManager * mIdentityManager;
 };
 
 #endif

@@ -132,8 +132,8 @@ This group is usually the place where you expect the discussion you
 
 &lt;p&gt;Remember to subscribe to this group if you are not yet.&lt;/p&gt;
 
-&lt;p&gt;&lt;note&gt;It is also good practice to indicate the &amp;quot;followup-to&amp;quot;
-  in your message to inform readers.&lt;/note&gt;&lt;/p&gt;
+&lt;p&gt;&lt;i&gt;Note&lt;/i&gt;: It is also good practice to indicate the &amp;quot;followup-to&amp;quot;
+  in your message to inform readers.&lt;/p&gt;
 &lt;/qt&gt;</string>
          </property>
          <property name="editable">

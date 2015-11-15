@@ -14,6 +14,8 @@
 
 #include "kngroupmanager.h"
 
+#include <KDE/KGlobal>
+
 #include "articlewidget.h"
 #include "knmainwidget.h"
 #include "knarticlemanager.h"

@@ -14,6 +14,9 @@
 
 #include "knarticle.h"
 
+#include <KDE/KDebug>
+#include <KDE/KGlobal>
+
 #include "kngroup.h"
 #include "knglobals.h"
 #include "knconfigmanager.h"
@@ -30,7 +33,8 @@ using namespace KMime;
 
 
 KNArticle::KNArticle( KNArticleCollection::Ptr c )
-  : i_d( -1 ), c_ol( c )
+  : i_d( -1 ), c_ol( c ),
+    f_lags( 13 )
 {
 }
 
@@ -47,7 +51,7 @@ void KNArticle::clear()
 
 void KNArticle::setLocked(bool b)
 {
-  f_lags.set(0, b);
+  f_lags.setBit(0, b);
   if(c_ol) {  // local articles may have c_ol==0 !
     if(b)
       c_ol->articleLocked();
@@ -64,7 +68,10 @@ KNRemoteArticle::KNRemoteArticle( KNGroup::Ptr g )
  : KNArticle(g), a_rticleNumber(-1), i_dRef(-1), t_hrLevel(0),
    u_nreadFups(0), n_ewFups(0)
 {
+  kDebug() << "Port";
+#if 0
   setDefaultCharset( Locale::defaultCharset( g ) );
+#endif
 
   // Remote article are read-only
   setFrozen( true );
@@ -97,11 +104,14 @@ void KNRemoteArticle::parse()
 
 void KNRemoteArticle::setForceDefaultCharset(bool b)
 {
+  kDebug() << "Port";
+#if 0
   if (!b) { // restore default
     KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( c_ol );
     setDefaultCharset( Locale::defaultCharset( g ) );
   }
   KNArticle::setForceDefaultCharset( b );
+#endif
 }
 
 
@@ -112,7 +122,10 @@ void KNRemoteArticle::setForceDefaultCharset(bool b)
 KNLocalArticle::KNLocalArticle( KNArticleCollection::Ptr c )
   : KNArticle(c), s_Offset(0), e_Offset(0), s_erverId(-1)
 {
+  kDebug() << "Port";
+#if 0
   setDefaultCharset( Locale::defaultCharset() );
+#endif
 }
 
 
@@ -122,9 +135,12 @@ KNLocalArticle::~KNLocalArticle()
 
 void KNLocalArticle::setForceDefaultCharset( bool b )
 {
+  kDebug() << "Port";
+#if 0
   if (!b)  // restore default
     setDefaultCharset( Locale::defaultCharset() );
   KNArticle::setForceDefaultCharset( b );
+#endif
 }
 
 

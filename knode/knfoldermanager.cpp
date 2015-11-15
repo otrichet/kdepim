@@ -14,6 +14,8 @@
 
 #include "knfoldermanager.h"
 
+#include <KI18n/KLocalizedString>
+
 #include "knglobals.h"
 #include "knconfigmanager.h"
 #include "knfolder.h"
@@ -392,6 +394,8 @@ void KNFolderManager::importFromMBox( KNFolder::Ptr f )
 
 void KNFolderManager::exportToMBox( KNFolder::Ptr f )
 {
+  kDebug() << "Port";
+#if 0
   if(!f || f->isRootFolder())
     return;
 
@@ -433,6 +437,7 @@ void KNFolderManager::exportToMBox( KNFolder::Ptr f )
 
     knGlobals.setStatusMsg( QString() );
   }
+#endif
 }
 
 

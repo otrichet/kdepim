@@ -15,6 +15,10 @@
 
 #include "kngroup.h"
 
+#include <KDE/KDateTime>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
+
 #include "knglobals.h"
 #include "messagelist/headers_widget.h"
 #include "kncollectionview.h"
@@ -32,8 +36,6 @@
 #include <kconfig.h>
 #include <kdebug.h>
 #include <klocale.h>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
 #include <QTextStream>
 #include <QByteArray>
 
@@ -165,10 +167,10 @@ KNNntpAccount::Ptr KNGroup::account()
   return boost::static_pointer_cast<KNNntpAccount>( p_arent );
 }
 
-const KPIMIdentities::Identity & KNGroup::identity() const
+const KIdentityManagement::Identity & KNGroup::identity() const
 {
   if ( mIdentityUoid < 0 ) {
-    return KPIMIdentities::Identity::null();
+    return KIdentityManagement::Identity::null();
   }
   return KNGlobals::self()->identityManager()->identityForUoid( mIdentityUoid );
 }
@@ -241,7 +243,7 @@ bool KNGroup::loadHdrs()
         fileFormatVersion = 0;          // KNode <= 0.4 had no version number
       art->setId(id);
       art->lines()->setNumberOfLines(lines);
-      KDateTime dt;
+      QDateTime dt;
       dt.setTime_t( timeT );
       art->date()->setDateTime( dt );
 
@@ -267,8 +269,11 @@ bool KNGroup::loadHdrs()
               || hdrName == "Bytes" || hdrName == "Lines" )
             continue;
           hdrValue = buffer.right( buffer.length() - (pos + 2) );
+          kDebug() << "Port";
+#if 0
           if ( hdrValue.length() > 0 )
             art->setHeader( new KMime::Headers::Generic( hdrName, art.get(), hdrValue ) );
+#endif
         }
       }
 
@@ -475,7 +480,10 @@ void KNGroup::insortNewHeaders( const KIO::UDSEntryList &list, KNJobData *job)
           art->lines()->setNumberOfLines( hdrValue.toInt() );
         } else {
           // optional extra headers
+          kDebug() << "Port";
+#if 0
           art->setHeader( new KMime::Headers::Generic( hdrName.toLatin1(), art.get(), hdrValue.toLatin1() ) );
+#endif
         }
       }
     }
@@ -553,9 +561,12 @@ int KNGroup::saveStaticData(int cnt,bool ovr)
         mbox = art->from()->mailboxes().first();
       ts << mbox.address() << '\t';
 
+  kDebug() << "Port";
+#if 0
       if ( mbox.hasName() )
         ts << KMime::encodeRFC2047String( mbox.name(), art->from()->rfc2047Charset() ) << '\n';
       else
+#endif
         ts << "0\n";
 
       if(!art->references()->isEmpty())
@@ -738,12 +749,15 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
         foundCnt++;
     }
     else {
+      kDebug() << "Port";
+#if 0
       if(art->subject()->isReply()) {
         art->setIdRef(0); //hdr has no references
         art->setThreadingLevel(0);
       }
       else if(art->idRef()==-1)
         refCnt++;
+#endif
     }
 
     if (timer.elapsed() > 200) {           // don't flicker
@@ -889,7 +903,7 @@ KNRemoteArticle::Ptr KNGroup::findReference( KNRemoteArticle::Ptr a )
   QByteArray ref_mid;
   KNRemoteArticle::Ptr ref_art;
 
-  QList<QByteArray> references = a->references()->identifiers();
+  QVector<QByteArray> references = a->references()->identifiers();
 
   for ( int ref_nr = 0; ref_nr < references.count() && ref_nr < SORT_DEPTH; ++ref_nr ) {
     ref_mid = '<' + references.at( references.count() - ref_nr - 1 ) + '>';

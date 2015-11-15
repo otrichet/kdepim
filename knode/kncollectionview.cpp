@@ -14,6 +14,9 @@
 
 #include "kncollectionview.h"
 
+#include <QtCore/QMimeData>
+#include <QtGui/QDrag>
+
 #include "knglobals.h"
 #include "knconfig.h"
 #include "knnntpaccount.h"

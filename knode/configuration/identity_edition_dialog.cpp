@@ -24,12 +24,13 @@
 
 #include "knglobals.h"
 
-#include <KDebug>
-#include <KMessageBox>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
+#include <KDE/KDebug>
+#include <KDE/KIcon>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
+#include <KDE/KMessageBox>
 
-using namespace KPIMIdentities;
+using namespace KIdentityManagement;
 
 namespace KNode {
 
@@ -257,7 +258,7 @@ void IdentityEditionDialog::deleteCurrentIdentity()
   IdentityManager *im = KNGlobals::self()->identityManager();
   const Identity identity = im->modifyIdentityForUoid( mUoids[ mIdentitySelector->currentIndex() ] );
   int answer = KMessageBox::questionYesNo( this,
-                                           i18n( "<qt>Do you really want to remove the identity <emphasis>%1</emphasis>?</qt>",
+                                           i18n( "<qt>Do you really want to remove the identity <i>%1</i>?</qt>",
                                                  identity.identityName() ),
                                            i18nc( "@title:window", "Delete identity" ) );
   if ( answer == KMessageBox::Yes ) {

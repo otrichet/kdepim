@@ -26,8 +26,10 @@
 
 #include "headers_model.h"
 
+#include <KDE/KDebug>
+#include <KI18n/KLocalizedString>
+#include <KIconThemes/KIconLoader>
 #include <QFont>
-#include <KDE/KLocalizedString>
 
 #include "knarticlefilter.h"
 #include "knconfigmanager.h"
@@ -45,7 +47,7 @@ struct Header
 {
     Header(KNArticle::Ptr a)
         : article(a), parent(0), children(),
-          subThreadDate( !a ? 0 : a->date()->dateTime().dateTime().toMSecsSinceEpoch() ),
+          subThreadDate( !a ? 0 : a->date()->dateTime().toMSecsSinceEpoch() ),
           unreadFollowup(false)
     {
     };
@@ -320,7 +322,7 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
                 break;
             case COLUMN_DATE:
                 if(art->date()) {
-                    return mDateFormatter.dateString(art->date()->dateTime().dateTime());
+                    return mDateFormatter.dateString(art->date()->dateTime());
                 }
                 break;
         }
@@ -380,7 +382,7 @@ QVariant HeadersModel::data(const QModelIndex& index, int role) const
                 break;
             case COLUMN_DATE:
                 if(!mSortByThreadChangeDate) {
-                    return art->date()->dateTime().dateTime();
+                    return art->date()->dateTime();
                 } else {
                     return hdr->subThreadDate;
                 }

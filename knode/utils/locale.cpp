@@ -22,13 +22,15 @@
 
 #include "locale.h"
 
+#include <KDE/KDebug>
+
 #include "knglobals.h"
 #include "kngroup.h"
 #include "settings.h"
 
 #include <KCharsets>
 #include <KGlobal>
-#include <kmime/kmime_charfreq.h>
+// #include <kmime/kmime_charfreq.h>
 #include <KLocale>
 
 #include <QTextCodec>
@@ -105,15 +107,21 @@ void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QBy
     return;
   }
 
+  kDebug() << "Port";
+#if 0
   KMime::CharFreq cf( raw );
   if ( cf.isSevenBitText() ) {
     result = raw;
     return;
   }
+#endif
 
   // Transform 8-bit data
   QString properData = QTextCodec::codecForName( charset )->toUnicode( raw );
+  kDebug() << "Port";
+#if 0
   result = KMime::encodeRFC2047String( properData, "UTF-8" );
+#endif
 }
 
 

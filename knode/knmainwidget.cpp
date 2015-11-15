@@ -14,13 +14,19 @@
 
 #include "knmainwidget.h"
 
+#include <QAction>
+#include <KDE/KLineEdit>
+#include <KDE/KStatusBar>
+#include <Libkdepim/UiStateSaver>
+#include <Libkdepim/BroadcastStatus>
+#include <Libkdepim/RecentAddresses>
 #include <QEvent>
+#include <QMenu>
 #include <QLabel>
 #include <QShortcut>
-#include <QVBoxLayout>
-#include <QMenu>
 #include <QSplitter>
-#include <KDE/KLineEdit>
+#include <QVBoxLayout>
+
 #include <kicon.h>
 #include <kactioncollection.h>
 #include <kinputdialog.h>
@@ -41,9 +47,6 @@
 #include <kxmlguifactory.h>
 #include <ksqueezedtextlabel.h>
 
-#include "libkdepim/misc/uistatesaver.h"
-#include "libkdepim/misc/broadcaststatus.h"
-#include "libkdepim/addressline/recentaddress/recentaddresses.h"
 using KPIM::BroadcastStatus;
 using KPIM::RecentAddresses;
 
@@ -215,6 +218,8 @@ KNMainWidget::~KNMainWidget()
 
 void KNMainWidget::initStatusBar()
 {
+  kDebug() << "Port";
+#if 0
   //statusbar
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KStatusBar *sb =  mainWin ? mainWin->statusBar() : 0;
@@ -224,17 +229,21 @@ void KNMainWidget::initStatusBar()
   s_tatusGroup = new KSqueezedTextLabel( QString(), sb );
   s_tatusGroup->setTextElideMode( Qt::ElideRight );
   s_tatusGroup->setAlignment( Qt::AlignLeft | Qt::AlignVCenter );
+#endif
 }
 
 //================================== GUI =================================
 
 void KNMainWidget::setStatusMsg(const QString& text, int id)
 {
+  kDebug() << "Port";
+#if 0
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
   if ( !bar )
     return;
   bar->clearMessage();
+#endif
   if (text.isEmpty() && (id==SB_MAIN)) {
     BroadcastStatus::instance()->setStatusMsg(i18n(" Ready"));
   } else {
@@ -252,10 +261,13 @@ void KNMainWidget::setStatusMsg(const QString& text, int id)
 
 void KNMainWidget::setStatusHelpMsg(const QString& text)
 {
+  kDebug() << "Port";
+#if 0
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
   if ( bar )
     bar->showMessage(text, 2000);
+#endif
 }
 
 
@@ -277,6 +289,8 @@ void KNMainWidget::updateCaption()
 // processEvents with some blocking
 void KNMainWidget::secureProcessEvents()
 {
+  kDebug() << "Port";
+#if 0
   b_lockui = true;
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
   KMenuBar *mbar =  mainWin ? mainWin->menuBar() : 0;
@@ -292,6 +306,7 @@ void KNMainWidget::secureProcessEvents()
     mbar->setEnabled(true);
 
   removeEventFilter(this);
+#endif
 }
 
 
@@ -417,12 +432,12 @@ void KNMainWidget::initActions()
   a_ctNavNextArt = actionCollection()->addAction("go_nextArticle" );
   a_ctNavNextArt->setText(i18n("&Next Article"));
   a_ctNavNextArt->setToolTip(i18n("Go to next article"));
-  a_ctNavNextArt->setShortcuts(KShortcut("N; Right"));
+  a_ctNavNextArt->setShortcut(QKeySequence(Qt::Key_N, Qt::Key_Right));
   connect(a_ctNavNextArt, SIGNAL(triggered(bool)), SLOT(nextArticle()));
 
   a_ctNavPrevArt = actionCollection()->addAction("go_prevArticle" );
   a_ctNavPrevArt->setText(i18n("&Previous Article"));
-  a_ctNavPrevArt->setShortcuts(KShortcut("P; Left"));
+  a_ctNavPrevArt->setShortcut(QKeySequence(Qt::Key_P, Qt::Key_Left));
   a_ctNavPrevArt->setToolTip(i18n("Go to previous article"));
   connect(a_ctNavPrevArt, SIGNAL(triggered(bool)), SLOT(previousArticle()));
 
@@ -455,7 +470,7 @@ void KNMainWidget::initActions()
   connect(a_ctNavReadThrough, SIGNAL(triggered(bool)), SLOT(slotNavReadThrough()));
   a_ctNavReadThrough->setShortcut(QKeySequence(Qt::Key_Space));
 
-  KAction *action = actionCollection()->addAction("inc_current_folder");
+  QAction *action = actionCollection()->addAction("inc_current_folder");
   action->setText(i18n("Focus on Next Folder"));
   connect(action, SIGNAL(triggered(bool)), c_olView, SLOT(incCurrentFolder()));
   action->setShortcut(QKeySequence(Qt::CTRL+Qt::Key_Right));
@@ -607,7 +622,6 @@ void KNMainWidget::initActions()
   items += i18n("By S&ender");
   items += i18n("By &Date");
   a_ctArtSortHeaders->setItems(items);
-  a_ctArtSortHeaders->setShortcutConfigurable(false);
   connect(a_ctArtSortHeaders, SIGNAL(triggered(int)), this, SLOT(slotArtSortHeaders(int)));
 
   a_ctArtSortHeadersKeyb = actionCollection()->addAction("view_Sort_Keyb");
@@ -617,7 +631,6 @@ void KNMainWidget::initActions()
 
   a_ctArtFilter = new KNFilterSelectAction(i18n("&Filter"), "view-filter",
                                            actionCollection(), "view_Filter");
-  a_ctArtFilter->setShortcutConfigurable(false);
 
   a_ctArtFilterKeyb = actionCollection()->addAction("view_Filter_Keyb");
   a_ctArtFilterKeyb->setText(i18n("Filter"));

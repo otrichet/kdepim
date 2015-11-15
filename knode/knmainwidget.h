@@ -27,7 +27,7 @@
 class QSplitter;
 class QTreeWidget;
 class QTreeWidgetItem;
-class KAction;
+class QAction;
 class KToggleAction;
 class KSelectAction;
 class KSqueezedTextLabel;
@@ -210,7 +210,7 @@ protected slots:
 protected:
 
   //navigation
-  KAction   *a_ctNavNextArt,
+  QAction *a_ctNavNextArt,
     *a_ctNavPrevArt,
     *a_ctNavNextUnreadArt,
     *a_ctNavNextUnreadThread,
@@ -219,7 +219,7 @@ protected:
     *a_ctNavReadThrough;
 
   //collection-view - accounts
-  KAction   *a_ctAccProperties,
+  QAction *a_ctAccProperties,
     *a_ctAccRename,
     *a_ctAccSubscribe,
     *a_ctAccExpireAll,
@@ -229,7 +229,7 @@ protected:
     *a_ctAccPostNewArticle;
 
   //collection-view - groups
-  KAction   *a_ctGrpProperties,
+  QAction *a_ctGrpProperties,
     *a_ctGrpRename,
     *a_ctGrpGetNewHdrs,
     *a_ctGrpExpire,
@@ -240,7 +240,7 @@ protected:
     *a_ctGrpSetUnread;
 
   //collection-view - folder
-  KAction   *a_ctFolNew,
+  QAction *a_ctFolNew,
     *a_ctFolNewChild,
     *a_ctFolDelete,
     *a_ctFolRename,
@@ -253,7 +253,7 @@ protected:
   //header-view - list-handling
   KSelectAction         *a_ctArtSortHeaders;
   KNFilterSelectAction  *a_ctArtFilter;
-  KAction               *a_ctArtSortHeadersKeyb,
+  QAction *a_ctArtSortHeadersKeyb,
     *a_ctArtFilterKeyb,
     *a_ctArtSearch,
     *a_ctArtRefreshList,
@@ -263,25 +263,25 @@ protected:
   KToggleAction         *a_ctArtToggleShowThreads;
 
   //header-view - remote articles
-  KAction *a_ctArtSetArtRead,
+  QAction *a_ctArtSetArtRead,
     *a_ctArtSetArtUnread,
     *a_ctArtSetThreadRead,
     *a_ctArtSetThreadUnread,
     *a_ctArtOpenNewWindow;
 
-  KAction *a_ctArtToggleIgnored,
+  QAction *a_ctArtToggleIgnored,
     *a_ctArtToggleWatched;
 
   //header-view local articles
-  KAction *a_ctArtSendOutbox,
+  QAction *a_ctArtSendOutbox,
     *a_ctArtDelete,
     *a_ctArtSendNow,
     *a_ctArtEdit;
 
   //network
-  KAction *a_ctNetCancel;
+  QAction *a_ctNetCancel;
 
-  KAction *a_ctFetchArticleWithID;
+  QAction *a_ctFetchArticleWithID;
 
   // settings menu
   KToggleAction *a_ctToggleQuickSearch;

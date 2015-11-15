@@ -28,7 +28,7 @@
 #include "../enums.h"
 
 #include <QtGui/QFont>
-#include <KDE/KLocalizedString>
+#include <KI18n/KLocalizedString>
 #include <KDE/KDebug>
 
 namespace KNode {

@@ -1,24 +1,25 @@
 set( EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_BINARY_DIR} )
 
 include_directories(
-    ${CMAKE_SOURCE_DIR}/knode
-    ${CMAKE_SOURCE_DIR}/libkdepim/
-    ${KDE4_INCLUDES}
-    ${Boost_INCLUDE_DIR}
-    )
+    BEFORE
+        ${CMAKE_SOURCE_DIR}/knode
+)
 
 
 set( knodetest_SRCS
   knodetest.cpp
 )
-
-kde4_add_unit_test( knodetest
-  TESTNAME knode-test
+add_executable( knodetest
   ${knodetest_SRCS}
 )
-
+ecm_mark_as_test(knode-knodetest)
 target_link_libraries( knodetest
-  knodecommon
-  ${QT_QTCORE_LIBRARY}
-  ${QT_QTTEST_LIBRARY}
+    knodecommon
+    KF5::IdentityManagement
+    KF5::KCMUtils
+    KF5::KDELibs4Support
+    KF5::Libkdepim
+    KF5::Mime
+    Qt5::Test
+    Qt5::Core
 )

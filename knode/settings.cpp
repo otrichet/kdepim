@@ -18,8 +18,8 @@
 #include "utilities.h"
 
 #include <klocale.h>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
 #include <kstandarddirs.h>
 #include <QFile>
 #include <QTextStream>
@@ -49,13 +49,14 @@ void KNode::Settings::usrReadConfig( )
   }
 }
 
-void KNode::Settings::usrWriteConfig( )
+bool KNode::Settings::usrWriteConfig( )
 {
   // write extra header configuration
   QString dir = KStandardDirs::locateLocal( "data", "knode/" );
-  if ( dir.isNull() )
+  if ( dir.isNull() ) {
     KNHelper::displayInternalFileError();
-  else {
+    return false;
+  } else {
     QFile f( dir + "xheaders" );
     if ( f.open( QIODevice::WriteOnly ) ) {
       QTextStream ts( &f );
@@ -63,9 +64,12 @@ void KNode::Settings::usrWriteConfig( )
         ts << (*it).header() << "\n";
       ts.flush();
       f.close();
-    } else
+    } else {
       KNHelper::displayInternalFileError();
+      return false;
+    }
   }
+  return true;
 }
 
 QColor KNode::Settings::effectiveColor( KConfigSkeleton::ItemColor * item ) const
@@ -88,12 +92,12 @@ QFont KNode::Settings::effectiveFont( KConfigSkeleton::ItemFont * item ) const
   return rv;
 }
 
-const KPIMIdentities::Identity & KNode::Settings::identity() const
+const KIdentityManagement::Identity & KNode::Settings::identity() const
 {
   return KNGlobals::self()->identityManager()->identityForUoidOrDefault( SettingsBase::identity() );
 }
 
-void KNode::Settings::setIdentity( const KPIMIdentities::Identity &identity )
+void KNode::Settings::setIdentity( const KIdentityManagement::Identity &identity )
 {
   SettingsBase::setIdentity( identity.uoid() );
 }

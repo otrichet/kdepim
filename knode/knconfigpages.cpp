@@ -13,6 +13,8 @@
 
 #include "knconfigpages.h"
 
+#include <KDE/KDebug>
+
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
 #include "knconfigwidgets.h"
@@ -25,7 +27,7 @@
 // common config page with tabs (code mostly taken from kmail)
 //
 KNode::KCMTabContainer::KCMTabContainer( const KComponentData &inst, QWidget * parent )
-  : KCModule( inst, parent )
+  : KCModule( parent )
 {
   QVBoxLayout *vlay = new QVBoxLayout( this );
   vlay->setSpacing( KDialog::spacingHint() );
@@ -93,7 +95,10 @@ extern "C"
 KNode::AccountsPage::AccountsPage( const KComponentData &inst,QWidget *parent )
   : KCMTabContainer( inst,parent ) {
 
+  kDebug() << "Port";
+#if 0
   addTab( new NntpAccountListWidget( inst, this ), i18n("Newsgroup Servers") );
+#endif
   addTab( KCModuleLoader::loadModule( "kcm_mailtransport", KCModuleLoader::Inline, this ),
           i18n("Mail Server (SMTP)") );
 }
@@ -107,7 +112,7 @@ extern "C"
 {
   KDE_EXPORT KCModule *create_knode_config_appearance( QWidget *parent )
   {
-    KNode::AppearanceWidget *page = new KNode::AppearanceWidget( knGlobals.componentData(), parent );
+    KNode::AppearanceWidget *page = new KNode::AppearanceWidget( parent );
     return page;
   }
 }
@@ -129,11 +134,11 @@ extern "C"
 KNode::ReadNewsPage::ReadNewsPage( const KComponentData &inst,QWidget *parent )
   : KCMTabContainer( inst, parent )
 {
-  addTab( new ReadNewsGeneralWidget( inst, this ), i18n("General") );
-  addTab( new ReadNewsNavigationWidget( inst, this ), i18n("Navigation") );
-  addTab( new FilterListWidget( inst, this ), i18n("Filters") );
-  addTab( new DisplayedHeadersWidget( knGlobals.configManager()->displayedHeaders(), inst, this ), i18n("Headers") );
-  addTab( new ReadNewsViewerWidget( inst, this ), i18n("Viewer") );
+  addTab( new ReadNewsGeneralWidget( this ), i18n("General") );
+  addTab( new ReadNewsNavigationWidget(  this ), i18n("Navigation") );
+  addTab( new FilterListWidget( this ), i18n("Filters") );
+  addTab( new DisplayedHeadersWidget( knGlobals.configManager()->displayedHeaders(), this ), i18n("Headers") );
+  addTab( new ReadNewsViewerWidget( this ), i18n("Viewer") );
 }
 
 
@@ -153,9 +158,9 @@ extern "C"
 KNode::PostNewsPage::PostNewsPage( const KComponentData &inst, QWidget *parent )
   : KCMTabContainer( inst, parent )
 {
-  addTab( new PostNewsTechnicalWidget( inst, this ), i18n("Technical") );
-  addTab( new PostNewsComposerWidget( inst, this ), i18n("Composer") );
-  addTab( new PostNewsSpellingWidget( inst, this ), i18n("Spelling") );
+  addTab( new PostNewsTechnicalWidget( this ), i18n("Technical") );
+  addTab( new PostNewsComposerWidget( this ), i18n("Composer") );
+  addTab( new PostNewsSpellingWidget( this ), i18n("Spelling") );
 }
 
 
@@ -167,7 +172,7 @@ extern "C"
 {
   KDE_EXPORT KCModule *create_knode_config_privacy( QWidget *parent )
   {
-    KNode::PrivacyWidget *page = new KNode::PrivacyWidget( knGlobals.componentData(), parent );
+    KNode::PrivacyWidget *page = new KNode::PrivacyWidget( parent );
     return page;
   }
 }
@@ -181,7 +186,7 @@ extern "C"
 {
   KDE_EXPORT KCModule *create_knode_config_cleanup( QWidget *parent )
   {
-    KNode::CleanupWidget *page = new KNode::CleanupWidget( knGlobals.componentData(), parent );
+    KNode::CleanupWidget *page = new KNode::CleanupWidget( parent );
     return page;
   }
 }

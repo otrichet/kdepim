@@ -16,10 +16,8 @@
 #define KNODE_H
 
 #include <kxmlguiwindow.h>
-#include <kdialog.h>
-#include "resource.h"
 
-#include <qglobal.h>
+#include "resource.h"
 
 class KUrl;
 

@@ -14,9 +14,9 @@
 
 #include "aboutdata.h"
 
-#include "resource.h"
+#include <KI18n/KLocalizedString>
 
-#include <klocale.h>
+#include "resource.h"
 
 namespace KNode
 {
@@ -42,11 +42,11 @@ namespace KNode
   };
 
   AboutData::AboutData()
-    : KAboutData( "knode", 0,
+    : K4AboutData("knode", 0,
                   ki18n("KNode"),
                   KNODE_VERSION,
                   ki18n("A newsreader for KDE"),
-                  KAboutData::License_GPL,
+                  K4AboutData::License_GPL,
                   ki18n("Copyright © 1999–2014 KNode authors"),
                   KLocalizedString(),
                   "http://userbase.kde.org/KNode" )

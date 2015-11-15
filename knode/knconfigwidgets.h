@@ -15,11 +15,13 @@
 #ifndef KNCONFIGWIDGETS_H
 #define KNCONFIGWIDGETS_H
 
+#include <KConfigWidgets/KCModule>
+#include <KDE/KDialog>
+
 #include "knnntpaccount.h"
 #include "knode_export.h"
 
 #include <kpagedialog.h>
-#include <kcmodule.h>
 
 #include "ui_nntpaccountdialog_base.h"
 #include "ui_nntpaccountlistwidget_base.h"
@@ -57,7 +59,7 @@ class KNODE_EXPORT NntpAccountListWidget : public KCModule, private Ui::NntpAcco
 
   public:
     /** Create a new NNTP account list widget. */
-    explicit NntpAccountListWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit NntpAccountListWidget( QWidget *parent = 0 );
 
     /** Reimplemented from KCModule. */
     virtual void load();
@@ -147,7 +149,7 @@ class KNODE_EXPORT AppearanceWidget : public KCModule
      * @param inst The KComponentData.
      * @param parent The parent widget.
      */
-    explicit AppearanceWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit AppearanceWidget( QWidget *parent = 0 );
 
     /** Reimplemented from KCModule. */
     virtual void load();
@@ -247,7 +249,7 @@ class KNODE_EXPORT ReadNewsGeneralWidget : public KCModule, KNode::Ui::ReadNewsG
     /** Create a new general configuration page.
      * @param parent The QWidget parent.
      */
-    explicit ReadNewsGeneralWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit ReadNewsGeneralWidget( QWidget *parent = 0 );
 
     /** Reimplemented from KCModule. */
     virtual void load();
@@ -263,7 +265,7 @@ class KNODE_EXPORT ReadNewsNavigationWidget : public KCModule
     /** Create a new navigation configuration page.
      * @param parent The QWidget parent.
      */
-    explicit ReadNewsNavigationWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit ReadNewsNavigationWidget( QWidget *parent = 0 );
 };
 
 
@@ -274,7 +276,7 @@ class KNODE_EXPORT ReadNewsViewerWidget : public KCModule
     /** Create a new article viewer configuration page.
      * @param parent The QWidget parent.
      */
-    explicit ReadNewsViewerWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit ReadNewsViewerWidget( QWidget *parent = 0 );
 };
 
 
@@ -284,7 +286,7 @@ class KNODE_EXPORT DisplayedHeadersWidget : public KCModule {
   Q_OBJECT
 
   public:
-    DisplayedHeadersWidget( DisplayedHeaders *d, const KComponentData &inst, QWidget *parent = 0 );
+    DisplayedHeadersWidget( DisplayedHeaders *d, QWidget *parent = 0 );
 
     /** Reimplemented from KCModule. */
     virtual void load();
@@ -361,7 +363,7 @@ class KNODE_EXPORT FilterListWidget : public KCModule {
   Q_OBJECT
 
   public:
-    explicit FilterListWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit FilterListWidget( QWidget *parent = 0 );
     ~FilterListWidget();
 
     void load();
@@ -435,7 +437,7 @@ class KNODE_EXPORT PostNewsTechnicalWidget : public KCModule, KNode::Ui::PostNew
   Q_OBJECT
   public:
     /** Create a new configuration widget for technical posting settings. */
-    explicit PostNewsTechnicalWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit PostNewsTechnicalWidget( QWidget *parent = 0 );
 
     /** Reimplemented from KCModule. */
     virtual void load();
@@ -478,7 +480,7 @@ class KNODE_EXPORT PostNewsComposerWidget : public KCModule
     /** Create a new composer configuration widget.
      * @param parent The parent widget.
      */
-    explicit PostNewsComposerWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit PostNewsComposerWidget( QWidget *parent = 0 );
 };
 
 
@@ -486,7 +488,7 @@ class KNODE_EXPORT PostNewsComposerWidget : public KCModule
 class KNODE_EXPORT PostNewsSpellingWidget : public KCModule {
 
   public:
-    explicit PostNewsSpellingWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit PostNewsSpellingWidget( QWidget *parent = 0 );
     ~PostNewsSpellingWidget();
 
     void save();
@@ -503,7 +505,7 @@ class KNODE_EXPORT PrivacyWidget : public KCModule {
   Q_OBJECT
 
   public:
-    explicit PrivacyWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit PrivacyWidget( QWidget *parent = 0 );
     ~PrivacyWidget();
 
     void save();
@@ -547,7 +549,7 @@ class KNODE_EXPORT CleanupWidget : public KCModule {
   Q_OBJECT
 
   public:
-    explicit CleanupWidget( const KComponentData &inst, QWidget *parent = 0 );
+    explicit CleanupWidget( QWidget *parent = 0 );
     ~CleanupWidget();
 
     void load();

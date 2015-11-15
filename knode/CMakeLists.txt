@@ -1,26 +1,22 @@
 project(knode)
 
-add_subdirectory( tests )
+add_definitions( -DTRANSLATION_DOMAIN=\"knode\" )
+# add_definitions( -DQT_NO_CAST_FROM_ASCII )
+# add_definitions( -DQT_NO_CAST_TO_ASCII )
 
+if(BUILD_TESTING)
+    add_subdirectory( tests )
+endif()
 add_subdirectory( pics )
 add_subdirectory( filters )
 add_subdirectory( kconf_update )
 
 include_directories(
-  ${KDE4_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/libkleo
   ${Boost_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/messageviewer
-  ${CMAKE_SOURCE_DIR}/libkdepim/
-  ${CMAKE_SOURCE_DIR}/messagecomposer
 )
 
-add_definitions( -DKDE_DEFAULT_DEBUG_AREA=5003 )
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${KDE4_ENABLE_EXCEPTIONS}" )
-
-
-########### next target ###############
+########### Private library ###############
 
 set(knodecommon_LIB_SRCS
    knconfigmanager.cpp
@@ -49,9 +45,9 @@ set(knodecommon_LIB_SRCS
    kndisplayedheader.cpp
    knsourceviewwindow.cpp
    knarticlewindow.cpp
-   kncomposer.cpp
-   kncomposerview.cpp
-   kncomposereditor.cpp
+#    kncomposer.cpp
+#    kncomposerview.cpp
+#    kncomposereditor.cpp
    knarticlefactory.cpp
    knfiltermanager.cpp
    knstatusfilter.cpp
@@ -67,7 +63,7 @@ set(knodecommon_LIB_SRCS
    knglobals.cpp
    kncollectionview.cpp
    articlewidget.cpp
-   csshelper.cpp
+#    csshelper.cpp
    composer/attachment_view.cpp
    composer/followupto_combobox.cpp
    configuration/identity_widget.cpp
@@ -92,11 +88,10 @@ set(knodecommon_LIB_SRCS
    foldertreewidget.cpp
 )
 
-qt4_add_dbus_adaptor( knodecommon_LIB_SRCS org.kde.knode.xml knmainwidget.h KNMainWidget)
+qt5_add_dbus_adaptor( knodecommon_LIB_SRCS org.kde.knode.xml knmainwidget.h KNMainWidget)
 
 
-
-kde4_add_ui_files(knodecommon_LIB_SRCS
+ki18n_wrap_ui(knodecommon_LIB_SRCS
    nntpaccountdialog_base.ui
    nntpaccountlistwidget_base.ui
    readnewsgeneralwidget_base.ui
@@ -111,60 +106,86 @@ kde4_add_ui_files(knodecommon_LIB_SRCS
    groupselection/helper/group_list_date_picker.ui
 )
 
-kde4_add_kcfg_files(knodecommon_LIB_SRCS settings_base.kcfgc )
+kconfig_add_kcfg_files(knodecommon_LIB_SRCS settings_base.kcfgc )
 
-kde4_add_library(knodecommon ${LIBRARY_TYPE} ${knodecommon_LIB_SRCS})
+add_library(knodecommon ${knodecommon_LIB_SRCS})
+# generate_export_header(knodeprivate BASE_NAME knode)
 
 target_link_libraries(knodecommon
-  ${KDEPIMLIBS_KMIME_LIBS} ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS}
-  ${KDEPIMLIBS_KABC_LIBS} ${KDE4_KHTML_LIBS}
-  ${KDEPIMLIBS_KPIMUTILS_LIBS} ${KDEPIMLIBS_MAILTRANSPORT_LIBS}
-  kleo
-  kdepim kpgp
-  messagecomposer
-  messageviewer
+    PRIVATE
+#         KF5::Contacts
+        KF5::IdentityManagement
+        KF5::I18n
+        KF5::KCMUtils
+        KF5::KDELibs4Support
+        KF5::KHtml
+        KF5::KIOCore
+        KF5::Libkdepim
+        KF5::Libkleo
+        KF5::MailTransport
+        KF5::MessageComposer
+        KF5::Mime
+        KF5::SonnetUi
+        KF5::XmlGui
 )
 
-target_link_libraries(knodecommon LINK_INTERFACE_LIBRARIES ${KDE4_KCMUTILS_LIBS} ${KDE4_KIO_LIBS})
 
 set_target_properties(knodecommon
-   PROPERTIES VERSION ${GENERIC_LIB_VERSION}
-   SOVERSION ${GENERIC_LIB_SOVERSION}
+   PROPERTIES VERSION ${KDEPIM_LIB_VERSION}
+   SOVERSION ${KDEPIM_LIB_SOVERSION}
 )
 install(TARGETS knodecommon ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 
-########### next target ###############
+########### KCM ###############
 
 set(kcm_knode_PART_SRCS knconfigpages.cpp )
+add_library(kcm_knode MODULE ${kcm_knode_PART_SRCS})
+target_link_libraries(kcm_knode
+    PRIVATE
+        knodecommon
+        KF5::ConfigWidgets
+        KF5::IdentityManagement
+        KF5::KCMUtils
+        KF5::KDELibs4Support
+        KF5::Mime
+)
+install(TARGETS kcm_knode  DESTINATION ${KDE_INSTALL_PLUGINDIR})
 
-
-kde4_add_plugin(kcm_knode ${kcm_knode_PART_SRCS})
-
-
-
-target_link_libraries(kcm_knode  ${KDE4_KDECORE_LIBS} knodecommon )
-
-install(TARGETS kcm_knode  DESTINATION ${PLUGIN_INSTALL_DIR})
-
-########### next target ###############
+########### Main binary ###############
 
 set(knode_SRCS knode.cpp knapplication.cpp main.cpp )
+file(GLOB ICONS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/icons/*-apps-knode.png")
+ecm_add_app_icon(knode_SRCS ICONS ${ICONS_SRCS})
+add_executable(knode ${knode_SRCS})
+target_link_libraries(knode
+    PRIVATE
+        knodecommon
+        KF5::KDELibs4Support
+        KF5::Libkdepim
+        KF5::Mime
+        KF5::XmlGui
+)
+install(TARGETS knode  ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
-kde4_add_app_icon(knode_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/icons/hi*-apps-knode.png")
 
-kde4_add_executable(knode ${knode_SRCS})
+########### Install other files ###############
 
-target_link_libraries(knode ${KDE4_KDECORE_LIBS} kdepim knodecommon)
-
-install(TARGETS knode  ${INSTALL_TARGETS_DEFAULT_ARGS} )
-
-
-########### install files ###############
-
-install( PROGRAMS KNode.desktop  DESTINATION ${XDG_APPS_INSTALL_DIR})
-install( FILES knode_config_identity.desktop knode_config_accounts.desktop knode_config_appearance.desktop knode_config_read_news.desktop knode_config_post_news.desktop knode_config_privacy.desktop knode_config_cleanup.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
-install( FILES headers.rc knodeui.rc knreaderui.rc kncomposerui.rc  DESTINATION ${DATA_INSTALL_DIR}/knode)
-install(FILES org.kde.knode.xml DESTINATION ${DBUS_INTERFACES_INSTALL_DIR} )
+install( PROGRAMS KNode.desktop  DESTINATION ${KDE_INSTALL_APPDIR})
+install(FILES knode_config_identity.desktop
+              knode_config_accounts.desktop
+              knode_config_appearance.desktop
+              knode_config_read_news.desktop
+              knode_config_post_news.desktop
+              knode_config_privacy.desktop
+              knode_config_cleanup.desktop
+        DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
+install(FILES knodeui.rc
+              knreaderui.rc
+              kncomposerui.rc
+        DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/knode)
+install(FILES headers.rc
+        DESTINATION ${KDE_INSTALL_DATADIR}/knode)
+install(FILES org.kde.knode.xml DESTINATION ${KDE_INSTALL_DBUSINTERFACEDIR} )
 
 add_subdirectory(icons)

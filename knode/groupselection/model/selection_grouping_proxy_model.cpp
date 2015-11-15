@@ -25,7 +25,7 @@
 
 #include "selection_grouping_proxy_model.h"
 
-#include <KDE/KLocalizedString>
+#include <KI18n/KLocalizedString>
 
 #include "../enums.h"
 

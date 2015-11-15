@@ -26,7 +26,7 @@
 #include <kdialog.h>
 #include <klineedit.h>
 #include <klocale.h>
-#include <KPIMIdentities/Identity>
+#include <KIdentityManagement/Identity>
 
 
 using namespace KNode;
@@ -64,7 +64,7 @@ bool KNode::StringFilter::doFilter( const QString &s )
 // replace placeholders
 void KNode::StringFilter::expand( KNGroup *g )
 {
-  KPIMIdentities::Identity id;
+  KIdentityManagement::Identity id;
   if ( g ) {
     if ( !g->identity().isNull() ) {
       id = g->identity();

@@ -20,11 +20,11 @@
 #ifndef Q_MOC_RUN
 #include <boost/shared_ptr.hpp>
 #endif
+#include <QtCore/QBitArray>
 #include <QFile>
 #include <QColor>
 #include <kmime/kmime_headers.h>
 #include <kmime/kmime_newsarticle.h>
-#include <kmime/boolflags.h>
 
 class KNLoadHelper;
 class KNArticleCollection;
@@ -63,12 +63,12 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
     virtual bool filterResult() = 0;
 
     //network lock (reimplemented from KNJobItem)
-    bool isLocked()                      { return f_lags.get(0); }
+    bool isLocked()                      { return f_lags.at(0); }
     void setLocked(bool b=true);
 
     //prevent that the article is unloaded automatically
-    bool isNotUnloadable()               { return f_lags.get(1); }
-    void setNotUnloadable(bool b=true)   { f_lags.set(1, b); }
+    bool isNotUnloadable()               { return f_lags.at(1); }
+    void setNotUnloadable(bool b=true)   { f_lags.setBit(1, b); }
 
     //article-collection
     boost::shared_ptr<KNArticleCollection> collection() const { return c_ol; }
@@ -79,7 +79,7 @@ class KNArticle : public KMime::NewsArticle, public KNJobItem {
     int i_d; //unique in the given collection
     boost::shared_ptr<KNArticleCollection> c_ol;
 
-    KMime::BoolFlags f_lags;
+    QBitArray f_lags;
 
 }; // KNArticle
 
@@ -113,21 +113,21 @@ class KNRemoteArticle : public KNArticle {
     void setArticleNumber(int number)    { a_rticleNumber = number; }
 
     // status
-    bool isNew()                         { return f_lags.get(2); }
-    void setNew(bool b=true)             { f_lags.set(2, b); }
-    bool getReadFlag()                   { return f_lags.get(3); }
-    bool isRead()                        { return f_lags.get(7) || f_lags.get(3); }   // ignored articles == read
-    void setRead(bool b=true)            { f_lags.set(3, b); }
-    bool isExpired()                     { return f_lags.get(4); }
-    void setExpired(bool b=true)         { f_lags.set(4, b); }
-    bool isKept()                        { return f_lags.get(5); }
-    void setKept(bool b=true)            { f_lags.set(5, b); }
-    bool hasChanged()                    { return f_lags.get(6); }
-    void setChanged(bool b=true)         { f_lags.set(6, b); }
-    bool isIgnored()                     { return f_lags.get(7); }
-    void setIgnored(bool b=true)         { f_lags.set(7, b); }
-    bool isWatched()                     { return f_lags.get(8); }
-    void setWatched(bool b=true)         { f_lags.set(8, b); }
+    bool isNew()                         { return f_lags.at(2); }
+    void setNew(bool b=true)             { f_lags.setBit(2, b); }
+    bool getReadFlag()                   { return f_lags.at(3); }
+    bool isRead()                        { return f_lags.at(7) || f_lags.at(3); }   // ignored articles == read
+    void setRead(bool b=true)            { f_lags.setBit(3, b); }
+    bool isExpired()                     { return f_lags.at(4); }
+    void setExpired(bool b=true)         { f_lags.setBit(4, b); }
+    bool isKept()                        { return f_lags.at(5); }
+    void setKept(bool b=true)            { f_lags.setBit(5, b); }
+    bool hasChanged()                    { return f_lags.at(6); }
+    void setChanged(bool b=true)         { f_lags.setBit(6, b); }
+    bool isIgnored()                     { return f_lags.at(7); }
+    void setIgnored(bool b=true)         { f_lags.setBit(7, b); }
+    bool isWatched()                     { return f_lags.at(8); }
+    void setWatched(bool b=true)         { f_lags.setBit(8, b); }
 
     // thread info
     int idRef()                                     { return i_dRef; }
@@ -147,12 +147,12 @@ class KNRemoteArticle : public KNArticle {
     void incUnreadFollowUps(unsigned short s=1)   { u_nreadFups+=s; }
 
     //filtering
-    bool filterResult()                     { return f_lags.get(10); }
-    void setFilterResult(bool b=true)       { f_lags.set(10, b); }
-    bool isFiltered()                       { return f_lags.get(11); }
-    void setFiltered(bool b=true)           { f_lags.set(11, b); }
-    bool hasVisibleFollowUps()              { return f_lags.get(12); }
-    void setVisibleFollowUps(bool b=true)   { f_lags.set(12, b); }
+    bool filterResult()                     { return f_lags.at(10); }
+    void setFilterResult(bool b=true)       { f_lags.setBit(10, b); }
+    bool isFiltered()                       { return f_lags.at(11); }
+    void setFiltered(bool b=true)           { f_lags.setBit(11, b); }
+    bool hasVisibleFollowUps()              { return f_lags.at(12); }
+    void setVisibleFollowUps(bool b=true)   { f_lags.setBit(12, b); }
 
     virtual void setForceDefaultCharset( bool b );
 
@@ -188,30 +188,30 @@ class KNLocalArticle : public KNArticle {
     virtual articleType type() const { return ATlocal; }
 
     //send article as mail
-    bool doMail()                 { return f_lags.get(2); }
-    void setDoMail(bool b=true)   { f_lags.set(2, b); }
-    bool mailed()                 { return f_lags.get(3); }
-    void setMailed(bool b=true)   { f_lags.set(3, b); }
+    bool doMail()                 { return f_lags.at(2); }
+    void setDoMail(bool b=true)   { f_lags.setBit(2, b); }
+    bool mailed()                 { return f_lags.at(3); }
+    void setMailed(bool b=true)   { f_lags.setBit(3, b); }
 
     //post article to a newsgroup
-    bool doPost()                 { return f_lags.get(4); }
-    void setDoPost(bool b=true)   { f_lags.set(4, b); }
-    bool posted()                 { return f_lags.get(5); }
-    void setPosted(bool b=true)   { f_lags.set(5, b); }
-    bool canceled()               { return f_lags.get(6); }
-    void setCanceled(bool b=true) { f_lags.set(6, b); }
+    bool doPost()                 { return f_lags.at(4); }
+    void setDoPost(bool b=true)   { f_lags.setBit(4, b); }
+    bool posted()                 { return f_lags.at(5); }
+    void setPosted(bool b=true)   { f_lags.setBit(5, b); }
+    bool canceled()               { return f_lags.at(6); }
+    void setCanceled(bool b=true) { f_lags.setBit(6, b); }
 
     // status
     bool pending()                { return ( (doPost() && !posted()) || (doMail() && !mailed()) ); }
     bool isSavedRemoteArticle()   {  return ( !doPost() && !doMail() && editDisabled() ); }
 
     //edit
-    bool editDisabled()               { return f_lags.get(7); }
-    void setEditDisabled(bool b=true) { f_lags.set(7, b); }
+    bool editDisabled()               { return f_lags.at(7); }
+    void setEditDisabled(bool b=true) { f_lags.setBit(7, b); }
 
     //search
-    bool filterResult()                { return f_lags.get(8); }
-    void setFilterResult(bool b=true)  { f_lags.set(8, b); }
+    bool filterResult()                { return f_lags.at(8); }
+    void setFilterResult(bool b=true)  { f_lags.setBit(8, b); }
 
     //MBOX information
     int startOffset() const             { return s_Offset; }

@@ -327,6 +327,7 @@ add_subdirectory(ktnef)
 add_subdirectory(pimsettingexporter)
 add_subdirectory(kalarm)
 add_subdirectory(blogilo)
+add_subdirectory(knode)
 
 
 add_subdirectory(kontact)

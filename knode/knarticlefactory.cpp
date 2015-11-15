@@ -15,6 +15,11 @@
 
 #include "knarticlefactory.h"
 
+#include <KDE/KDebug>
+#include <KDE/KGlobal>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
+
 #include "knglobals.h"
 #include "kngroupmanager.h"
 #include "knaccountmanager.h"
@@ -33,9 +38,7 @@
 #include <QByteArray>
 #include <QList>
 #include <QListWidget>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
-#include <KPIMUtils/Email>
+// #include <KPIMUtils/Email>
 #include <QLabel>
 #include <kiconloader.h>
 #include <klocale.h>
@@ -78,10 +81,13 @@ void KNArticleFactory::createPosting( KNNntpAccount::Ptr a )
   art->setDoPost(true);
   art->setDoMail(false);
 
+  kDebug() << "Port";
+#if 0
   KNComposer *c = new KNComposer( art, QString(), QString(), true, false, false, false );
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#endif
 }
 
 
@@ -100,10 +106,13 @@ void KNArticleFactory::createPosting( KNGroup::Ptr g )
   art->setDoPost(true);
   art->setDoMail(false);
   art->newsgroups()->fromUnicodeString(g->groupname(), art->defaultCharset());
+  kDebug() << "Port";
+#if 0
   KNComposer *c = new KNComposer( art, QString(), QString(), true, false, false, false );
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#endif
 }
 
 
@@ -216,7 +225,10 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   attribution.replace(QRegExp("%NAME"),name);
   if ( !a->from()->isEmpty() )
     attribution.replace(QRegExp("%EMAIL"), QString::fromLatin1(a->from()->addresses().first()));
+  kDebug() << "Port";
+#if 0
   attribution.replace( QRegExp("%DATE"), KGlobal::locale()->formatDateTime(a->date()->dateTime().toLocalZone().dateTime(), KLocale::LongDate) );
+#endif
   QString msid = a->messageID()->identifier();
   attribution.replace( QRegExp("%MSIDX"), msid );
   attribution.replace( QRegExp("%MSID"), QLatin1Char('<') + msid + QLatin1Char('>') );
@@ -267,10 +279,13 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   }
 
   //open composer
+  kDebug() << "Port";
+#if 0
   KNComposer *c=new KNComposer(art, quoted, notRewraped, true, authorDislikesMailCopies, authorWantsMailCopies);
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#endif
 }
 
 
@@ -328,11 +343,14 @@ void KNArticleFactory::createForward( KNArticle::Ptr a )
 
   //------------------------ <Attachments> -------------------------
 
+  kDebug() << "Port";
+#if 0
   if(incAtt) {
     KMime::Content::List al = a->attachments( false );
     foreach ( KMime::Content *c, al )
       art->addContent( new KMime::Content(c->head(), c->body()) );
   }
+#endif
 
   //------------------------ </Attachments> ------------------------
 
@@ -343,10 +361,13 @@ void KNArticleFactory::createForward( KNArticle::Ptr a )
   }
 
   //open composer
+  kDebug() << "Port";
+#if 0
   KNComposer *c = new KNComposer( art, fwd, QString(), true );
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#endif
 }
 
 
@@ -500,10 +521,13 @@ void KNArticleFactory::createSupersede( KNArticle::Ptr a )
     text = textContent->decodedText();
 
   //open composer
+  kDebug() << "Port";
+#if 0
   KNComposer *c=new KNComposer(art, text);
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#endif
 }
 
 
@@ -524,10 +548,13 @@ void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
   art->to()->addAddress((*address));
 
   //open composer
+  kDebug() << "Port";
+#if 0
   KNComposer *c = new KNComposer( art, QString(), QString(), true );
   mCompList.append( c );
   connect(c, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   c->show();
+#endif
 }
 
 
@@ -584,10 +611,13 @@ void KNArticleFactory::edit( KNLocalArticle::Ptr a )
     knGlobals.articleManager()->loadArticle(a);
 
   //open composer
+  kDebug() << "Port";
+#if 0
   com = new KNComposer( a, QString() );
   mCompList.append( com );
   connect(com, SIGNAL(composerDone(KNComposer*)), this, SLOT(slotComposerDone(KNComposer*)));
   com->show();
+#endif
 }
 
 
@@ -691,11 +721,14 @@ bool KNArticleFactory::closeComposeWindows()
 
 void KNArticleFactory::deleteComposerForArticle( KNLocalArticle::Ptr a )
 {
+  kDebug() << "Port";
+#if 0
   KNComposer *com = findComposer( a );
   if ( com ) {
     mCompList.removeAll( com );
     com->deleteLater();
   }
+#endif
 }
 
 
@@ -710,8 +743,11 @@ KNComposer* KNArticleFactory::findComposer( KNLocalArticle::Ptr a )
 
 void KNArticleFactory::configChanged()
 {
+  kDebug() << "Port";
+#if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     (*it)->setConfig( false );
+#endif
 }
 
 
@@ -774,13 +810,15 @@ void KNArticleFactory::processJob(KNJobData *j)
 
 KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const QByteArray &defChset, bool withXHeaders, KNArticle::Ptr origPost )
 {
+  kDebug() << "Port";
+#if 0
   if ( knGlobals.settings()->generateMessageID() && knGlobals.settings()->hostname().isEmpty() ) {
     KMessageBox::sorry(knGlobals.topWidget, i18n("Please set a hostname for the generation\nof the message-id or disable it."));
     return KNLocalArticle::Ptr();
   }
 
   KNLocalArticle::Ptr art( new KNLocalArticle( KNArticleCollection::Ptr() ) );
-  KPIMIdentities::Identity id;
+  KIdentityManagement::Identity id;
 
   if (col) {
     if (col->type() == KNCollection::CTgroup) {
@@ -812,7 +850,7 @@ KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const Q
   } else {
     KMessageBox::sorry( knGlobals.topWidget,
                         i18n( "<qt>Please enter a valid email address for the "
-                              "identity named <emphasis>%1</emphasis> "
+                              "identity named <i>%1</i> "
                               "at the identity section of the configuration dialog.</qt>",
                               id.identityName() ) );
     return KNLocalArticle::Ptr();
@@ -881,6 +919,8 @@ KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const Q
   }
 
   return art;
+#endif
+  return KNLocalArticle::Ptr();
 }
 
 
@@ -927,9 +967,9 @@ and cancel (or supersede) it there."));
   }
   else if ( a->type() == KNArticle::ATremote ) {
     KNRemoteArticle::Ptr remArt = boost::static_pointer_cast<KNRemoteArticle>( a );
-    KPIMIdentities::IdentityManager *im = KNGlobals::self()->identityManager();
+    KIdentityManagement::IdentityManager *im = KNGlobals::self()->identityManager();
     bool ownArticle = false;
-    const QList<QByteArray> fromAddr = remArt->from()->addresses();
+    const QVector<QByteArray> fromAddr = remArt->from()->addresses();
     foreach ( const QByteArray &addr, fromAddr ) {
       if ( im->thatIsMe( QString::fromLatin1( addr ) ) ) {
         ownArticle = true;
@@ -965,6 +1005,8 @@ void KNArticleFactory::showSendErrorDialog()
 
 void KNArticleFactory::slotComposerDone(KNComposer *com)
 {
+  kDebug() << "Port";
+#if 0
   bool delCom=true;
   KNLocalArticle::List lst;
   lst.append(com->article());
@@ -1016,9 +1058,12 @@ void KNArticleFactory::slotComposerDone(KNComposer *com)
     mCompList.removeAll( com );
     com->deleteLater();
   }
+
 #ifdef Q_OS_UNIX
   else
     KWindowSystem::activateWindow(com->winId());
+#endif
+
 #endif
 }
 

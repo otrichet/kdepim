@@ -30,7 +30,7 @@
 #include <kglobal.h>
 #include <KDebug>
 #include <kiconloader.h>
-#include <KPIMIdentities/IdentityManager>
+#include <KIdentityManagement/IdentityManager>
 
 
 class KNGlobalsPrivate
@@ -154,10 +154,10 @@ KNMemoryManager* KNGlobals::memoryManager()
   return mMemManager;
 }
 
-KPIMIdentities::IdentityManager* KNGlobals::identityManager()
+KIdentityManagement::IdentityManager* KNGlobals::identityManager()
 {
   if ( !mIdentityManager ) {
-    mIdentityManager = new KPIMIdentities::IdentityManager( false, 0, "mIdentityManager" );
+    mIdentityManager = new KIdentityManagement::IdentityManager( false, 0, "mIdentityManager" );
   }
   return mIdentityManager;
 }

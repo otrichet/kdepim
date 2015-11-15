@@ -27,7 +27,7 @@ class KNNntpAccount;
 namespace KNode {
   class Cleanup;
 }
-namespace KPIMIdentities {
+namespace KIdentityManagement {
   class Identity;
 }
 
@@ -91,12 +91,12 @@ class KNNntpAccount : public KNCollection , public KNServerInfo, public KNode::S
       Returns this server's specific identity or
       the null identity if there is none.
     */
-    virtual const KPIMIdentities::Identity & identity() const;
+    virtual const KIdentityManagement::Identity & identity() const;
     /**
       Sets this server's specific identity
       @param identity this server's identity of a null identity to unset.
     */
-    virtual void setIdentity( const KPIMIdentities::Identity &identity );
+    virtual void setIdentity( const KIdentityManagement::Identity &identity );
 
     bool intervalChecking() const          { return i_ntervalChecking; }
     int checkInterval() const              { return c_heckInterval; }
@@ -116,7 +116,7 @@ class KNNntpAccount : public KNCollection , public KNServerInfo, public KNode::S
     /**
       Unique object identifier of the identity of this server.
       -1 means there is no specific identity for this group
-      (because KPIMIdentities::Identity::uoid() returns an unsigned int.
+      (because KIdentityManagement::Identity::uoid() returns an unsigned int.
     */
     int mIdentityUoid;
     /** account specific cleanup configuration */

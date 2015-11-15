@@ -51,7 +51,7 @@ class KNODE_EXPORT Startup
   private:
     /**
       Convert KNode-specific Identity objects stored in configuration of KNode and accounts and groups
-      to KPIMIdentities::Identity.
+      to KIdentityManagement::Identity.
       @since 4.5
     */
     void convertPre45Identities() const;

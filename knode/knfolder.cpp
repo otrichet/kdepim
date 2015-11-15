@@ -353,6 +353,8 @@ bool KNFolder::loadArticle( KNLocalArticle::Ptr a )
 
 bool KNFolder::saveArticles( KNLocalArticle::List &l )
 {
+  kDebug() << "Port";
+#if 0
   if(!isLoaded())  // loading should not be done here - keep the StorageManager in sync !!
     return false;
 
@@ -442,6 +444,8 @@ bool KNFolder::saveArticles( KNLocalArticle::List &l )
   }
 
   return ret;
+#endif
+  return false;
 }
 
 
@@ -566,7 +570,7 @@ void KNFolder::DynData::setData( KNLocalArticle::Ptr a )
 void KNFolder::DynData::getData( KNLocalArticle::Ptr a )
 {
   a->setId(id);
-  KDateTime dt;
+  QDateTime dt;
   dt.setTime_t( ti );
   a->date()->setDateTime( dt );
   a->setStartOffset(so);

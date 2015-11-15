@@ -25,6 +25,8 @@
 
 #include "group_list_date_picker.h"
 
+#include <KDE/KGlobal>
+
 namespace KNode {
 namespace GroupSelection {
 

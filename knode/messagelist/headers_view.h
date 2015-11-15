@@ -26,7 +26,7 @@
 #ifndef KNODE_HEADERS_VIEW_H
 #define KNODE_HEADERS_VIEW_H
 
-#include <QtGui/QTreeView>
+#include <QtWidgets/QTreeView>
 
 #include "knarticle.h"
 

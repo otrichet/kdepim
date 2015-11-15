@@ -13,57 +13,52 @@
 
 #include "articlewidget.h"
 
-#include "utils/locale.h"
-
-
+#include <KConfigWidgets/KStandardAction>
+#include <KDE/KDebug>
+#include <KDE/KMimeType>
+#include <KHtml/KHTMLPart>
+#include <KHtml/KHTMLView>
+#include <Libkdepim/AddEmailAddressJob>
+#include <Libkdepim/OpenEmailAddressJob>
+#include <MessageComposer/Util>
 #include <QBuffer>
 #include <QClipboard>
 #include <QDir>
 #include <QFile>
+#include <QHBoxLayout>
 #include <QImage>
 #include <QMenu>
 #include <QStringList>
 #include <QTextCodec>
 #include <QTimer>
-#include <QHBoxLayout>
 
-#include <kaction.h>
+#include <QAction>
 #include <kactioncollection.h>
 #include <kactionmenu.h>
 #include <kascii.h>
 #include <kbookmarkmanager.h>
 #include <kcharsets.h>
-#include <khtml_part.h>
-#include <khtmlview.h>
 #include <kiconloader.h>
 #include <klocale.h>
 #include <kcodecs.h>
 #include <kmessagebox.h>
-#include <kmimetype.h>
 #include <krun.h>
 #include <kselectaction.h>
 #include <kstandarddirs.h>
-#include <kstandardaction.h>
 #include <ktemporaryfile.h>
 #include <ktoggleaction.h>
 #include <kurl.h>
 #include <kxmlguifactory.h>
 #include <kicon.h>
 #include <kde_file.h>
+// #include <libkpgp/kpgp.h>
+// #include <libkpgp/kpgpblock.h>
+// #include <messageviewer/header/kxface.h>
+// #include <kpimutils/kfileio.h>
+// #include <kpimutils/linklocator.h>
+// #include <kpimutils/email.h>
 
-#include <libkdepim/job/addemailaddressjob.h>
-#include <libkdepim/job/openemailaddressjob.h>
-
-#include <libkpgp/kpgp.h>
-#include <libkpgp/kpgpblock.h>
-
-#include <messageviewer/header/kxface.h>
-#include <messagecomposer/utils/util.h>
-#include <kpimutils/kfileio.h>
-#include <kpimutils/linklocator.h>
-#include <kpimutils/email.h>
-
-#include "csshelper.h"
+// #include "csshelper.h"
 #include "knarticle.h"
 #include "knarticlecollection.h"
 #include "knarticlefactory.h"
@@ -80,6 +75,8 @@
 #include "knsourceviewwindow.h"
 #include "nntpjobs.h"
 #include "settings.h"
+#include "utils/locale.h"
+
 
 using namespace KNode;
 
@@ -96,7 +93,7 @@ ArticleWidget::ArticleWidget( QWidget *parent,
   mShowHtml( false ),
   mRot13( false ),
   mForceCharset( false ),
-  mOverrideCharset( KMime::Headers::Latin1 ),
+  mOverrideCharset( "iso-8859-1" ),
   mTimer( 0 ),
   mIsMainViewer( isMainViewer ),
   mGuiClient( guiClient ),
@@ -235,7 +232,6 @@ void ArticleWidget::initActions()
 
   mCharsetSelect = mActionCollection->add<KSelectAction>("set_charset");
   mCharsetSelect->setText( i18n( "Set chars&et" ) );
-  mCharsetSelect->setShortcutConfigurable( false );
   QStringList cs = Utilities::Locale::encodings();
   cs.prepend( i18nc( "@item default character set", "Default") );
   mCharsetSelect->setItems( cs );
@@ -351,8 +347,11 @@ void ArticleWidget::readConfig()
   ra = static_cast<KToggleAction*>( mActionCollection->action( QString("view_headers_%1").arg(mHeaderStyle) ) );
   ra->setChecked( true );
 
+  kDebug() << "Port";
+#if 0
   delete mCSSHelper;
   mCSSHelper = new CSSHelper( mViewer->view() );
+#endif
 
   if ( !knGlobals.settings()->autoMark() )
     mTimer->stop();
@@ -404,12 +403,15 @@ void ArticleWidget::setArticle( KNArticle::Ptr article )
 
 void ArticleWidget::clear()
 {
+  kDebug() << "Port";
+#if 0
   disableActions();
   mViewer->begin();
   mViewer->setUserStyleSheet( mCSSHelper->cssDefinitions( mFixedFontToggle->isChecked() ) );
   mViewer->write( mCSSHelper->htmlHead( mFixedFontToggle->isChecked() ) );
   mViewer->write( QString("</body></html>") );
   mViewer->end();
+#endif
 }
 
 
@@ -428,17 +430,23 @@ void ArticleWidget::displayArticle()
     return;
   }
 
+  kDebug() << "Port";
+#if 0
   if ( mForceCharset != mArticle->forceDefaultCharset()
        || ( mForceCharset && mArticle->defaultCharset() != mOverrideCharset ) ) {
         mArticle->setDefaultCharset( mOverrideCharset );
         mArticle->setForceDefaultCharset( mForceCharset );
   }
+#endif
 
   removeTempFiles();
 
+  kDebug() << "Port";
+#if 0
   mViewer->begin();
   mViewer->setUserStyleSheet( mCSSHelper->cssDefinitions( mFixedFontToggle->isChecked() ) );
   mViewer->write( mCSSHelper->htmlHead( mFixedFontToggle->isChecked() ) );
+#endif
 
   // headers
   displayHeader();
@@ -466,13 +474,18 @@ void ArticleWidget::displayArticle()
 
   // if the article is pgp signed and the user asked for verifying the
   // signature, we show a nice header:
+  kDebug() << "Port";
+#if 0
   QList<Kpgp::Block> pgpBlocks;
   QList<QByteArray> nonPgpBlocks;
   bool containsPGP = Kpgp::Module::prepareMessageForDecryption( mArticle->body(), pgpBlocks, nonPgpBlocks );
+#endif
 
   mViewer->write ( html );
   html.clear();
 
+  kDebug() << "Port";
+#if 0
   if ( containsPGP ) {
     QList<Kpgp::Block>::Iterator pbit = pgpBlocks.begin();
     QList<QByteArray>::Iterator npbit = nonPgpBlocks.begin();
@@ -509,14 +522,18 @@ void ArticleWidget::displayArticle()
       displayBodyBlock( lines );
     }
   }
+#endif
 
   KMime::Headers::ContentType *ct = mArticle->contentType();
 
   // get attachments
   mAttachments.clear();
   mAttachementMap.clear();
+  kDebug() << "Port";
+#if 0
   if( !text || ct->isMultipart() )
     mAttachments = mArticle->attachments( knGlobals.settings()->showAlternativeContents() );
+#endif
 
   // partial message
   if(ct->isPartial()) {
@@ -547,10 +564,13 @@ void ArticleWidget::displayArticle()
       }
     }
     else {
+  kDebug() << "Port";
+#if 0
       if ( !containsPGP ) {
         QStringList lines = text->decodedText( true, knGlobals.settings()->removeTrailingNewlines() ).split( '\n' );
         displayBodyBlock( lines );
       }
+#endif
     }
 
   }
@@ -577,8 +597,11 @@ void ArticleWidget::displayArticle()
 void ArticleWidget::displayErrorMessage( const QString &msg )
 {
   mViewer->begin();
+  kDebug() << "Port";
+#if 0
   mViewer->setUserStyleSheet( mCSSHelper->cssDefinitions( mFixedFontToggle->isChecked() ) );
   mViewer->write( mCSSHelper->htmlHead( mFixedFontToggle->isChecked() ) );
+#endif
   QString errMsg = msg;
   mViewer->write( QString("<b><font size=\"+1\" color=\"red\">") );
   mViewer->write( i18n("An error occurred.") );
@@ -640,9 +663,12 @@ void ArticleWidget::displayHeader()
       headerHtml+="<tr><td colspan=\"2\">";
 
     if ( hb->is("From") ) {
+  kDebug() << "Port";
+#if 0
       headerHtml += QString( "<a href=\"mailto:%1\">%2</a>")
           .arg( KPIMUtils::extractEmailAddress( hb->asUnicodeString() ) )
           .arg( toHtmlString( hb->asUnicodeString(), None ) );
+#endif
       KMime::Headers::Base *orgHdr = mArticle->headerByType( "Organization" );
       if ( orgHdr && !orgHdr->isEmpty() ) {
         headerHtml += "&nbsp;&nbsp;(";
@@ -650,8 +676,11 @@ void ArticleWidget::displayHeader()
         headerHtml += ')';
       }
     } else if ( hb->is("Date") ) {
+      kDebug() << "Port";
+#if 0
       KMime::Headers::Date *date=static_cast<KMime::Headers::Date*>(hb);
       headerHtml += toHtmlString( KGlobal::locale()->formatDateTime(date->dateTime().toLocalZone().dateTime(), KLocale::LongDate, true), None );
+#endif
     } else if ( hb->is("Newsgroups") ) {
       QString groups = hb->asUnicodeString();
       groups.replace( ',', ", " );
@@ -672,6 +701,8 @@ void ArticleWidget::displayHeader()
   }
 
   // X-Face support
+  kDebug() << "Port";
+#if 0
   QString xfhead;
   KMime::Headers::Base *temp = mArticle->headerByType("X-Face");
   if (temp)
@@ -682,6 +713,7 @@ void ArticleWidget::displayHeader()
     xface = QString::fromLatin1( "<div class=\"senderpic\"><img src=\"%1\" width=\"48\" height=\"48\"/></div>" )
       .arg( imgToDataUrl( xf.toImage( xfhead ), "PNG" ) );
   }
+#endif
 
   // fancy header style
   QString html = "<div class=\"fancy header\">";
@@ -692,7 +724,10 @@ void ArticleWidget::displayHeader()
   html += "<table class=\"outer\"><tr><td width=\"100%\"><table>";
   html += headerHtml;
   html += "</table></td>";
+  kDebug() << "Port";
+#if 0
   html += "<td align=\"center\">" + xface + "</td>";
+#endif
   html += "</tr></table>";
 
   // references
@@ -702,7 +737,7 @@ void ArticleWidget::displayHeader()
     html += "<div class=\"spamheader\">";
     html += QString( "<b>%1</b>" ).arg( i18n("References:") );
 
-    QList<QByteArray> references = refs->identifiers();
+    QVector<QByteArray> references = refs->identifiers();
     for ( int i = 0; i < references.count(); ++i ) {
       html += " <a href=\"news:" + references.at(references.count() - i - 1)
           + "\">" + QString::number( i + 1 ) + "</a>";
@@ -732,7 +767,10 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
         // close previous body tag (if any) and open new one
         if ( newLevel != -2 )
           html += "</div>";
+  kDebug() << "Port";
+#if 0
         html += mCSSHelper->nonQuotedFontTag();
+#endif
         newLevel = -1;
         if ( knGlobals.settings()->showSignature() ) {
           html += "<hr size=\"1\"/>";
@@ -752,10 +790,13 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
           if ( oldLevel != -2 )
             html += "</div>"; // close previous level
           // open new level
+  kDebug() << "Port";
+#if 0
           if ( newLevel == -1 )
             html += mCSSHelper->nonQuotedFontTag();
           else
             html += mCSSHelper->quoteFontTag( newLevel );
+#endif
         }
         // output the actual line
         html += toHtmlString( line, ParseURL | FancyFormatting | AllowROT13 ) + "<br/>";
@@ -776,8 +817,10 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
 }
 
 
-QString ArticleWidget::displaySigHeader( const Kpgp::Block &block )
+QString ArticleWidget::displaySigHeader( /*const Kpgp::Block &block*/ )
 {
+  kDebug() << "Port";
+#if 0
   QString signClass = "signErr";
   QString signer = block.signatureUserId();
   QString signerKey = block.signatureKeyId();
@@ -849,6 +892,8 @@ QString ArticleWidget::displaySigHeader( const Kpgp::Block &block )
   html += "</td></tr><tr class=\"" + signClass + "B\"><td>";
   mViewer->write( html );
   return signClass;
+#endif
+  return QString();
 }
 
 
@@ -921,7 +966,7 @@ void ArticleWidget::displayAttachment( KMime::Content *att, int partNum )
     if(mimetypePtr.isNull()) {
       mimetypePtr = KMimeType::mimeType( "text/plain" );
     }
-    QString iconName = mimetypePtr->iconName( QString() );
+    QString iconName = mimetypePtr->iconName();
     QString iconFile = KIconLoader::global()->iconPath( iconName, KIconLoader::Desktop );
     html += "<div><a href=\"" + href + "\"><img src=\"" +
             iconFile + "\" border=\"0\">" + label +
@@ -933,6 +978,8 @@ void ArticleWidget::displayAttachment( KMime::Content *att, int partNum )
 
 QString ArticleWidget::toHtmlString( const QString &line, int flags )
 {
+  kDebug() << "Port";
+#if 0
   int llflags = KPIMUtils::LinkLocator::PreserveSpaces;
   if ( !(flags & ArticleWidget::ParseURL) )
     llflags |= KPIMUtils::LinkLocator::IgnoreUrls;
@@ -945,6 +992,8 @@ QString ArticleWidget::toHtmlString( const QString &line, int flags )
       text = MessageComposer::Util::rot13( line );
   }
   return KPIMUtils::LinkLocator::convertToHtml( text, llflags );
+#endif
+  return QString();
 }
 
 
@@ -1040,8 +1089,11 @@ KUrl ArticleWidget::writeAttachmentToTempFile( KMime::Content *att, int partNum 
 
   QByteArray data = att->decodedContent();
   // ### KMail does crlf2lf conversion here before writing the file
+  kDebug() << "Port";
+#if 0
   if( !KPIMUtils::kByteArrayToFile( data, file.toLocalFile(), false, false, false ) )
     return KUrl();
+#endif
 
   mTempFiles.append( file.toLocalFile() );
   // make file read-only so that nobody gets the impression that he might
@@ -1408,15 +1460,18 @@ void ArticleWidget::slotSetCharset( const QString &charset )
 
   if ( charset == i18nc( "@item default character set", "Default") ) {
     mForceCharset = false;
-    mOverrideCharset = KMime::Headers::Latin1;
+    mOverrideCharset = "iso-8859-1";
   } else {
     mForceCharset = true;
     mOverrideCharset = KGlobal::charsets()->encodingForName( charset ).toLatin1();
   }
 
   if ( mArticle && mArticle->hasContent() ) {
+  kDebug() << "Port";
+#if 0
     mArticle->setDefaultCharset( mOverrideCharset );  // the article will choose the correct default,
     mArticle->setForceDefaultCharset( mForceCharset );     // when we disable the overdrive
+#endif
     updateContents();
   }
 }
@@ -1424,12 +1479,15 @@ void ArticleWidget::slotSetCharset( const QString &charset )
 
 void ArticleWidget::slotSetCharsetKeyboard( )
 {
+  kDebug() << "Port";
+#if 0
   int charset = KNHelper::selectDialog( this, i18n("Select Charset"),
     mCharsetSelect->items(), mCharsetSelect->currentItem() );
   if ( charset != -1 ) {
     mCharsetSelect->setCurrentItem( charset );
     slotSetCharset( mCharsetSelect->items()[charset] );
   }
+#endif
 }
 
 
@@ -1455,10 +1513,13 @@ void ArticleWidget::slotAddBookmark()
   if ( mCurrentURL.isEmpty() )
     return;
   QString filename = KStandardDirs::locateLocal( "data", QString::fromLatin1("konqueror/bookmarks.xml") );
+  kDebug() << "Port";
+#if 0
   KBookmarkManager *bookManager = KBookmarkManager::managerForFile( filename, "konqueror" );
   KBookmarkGroup group = bookManager->root();
   group.addBookmark( mCurrentURL.url(), mCurrentURL );
   bookManager->save();
+#endif
 }
 
 void ArticleWidget::slotAddToAddressBook()

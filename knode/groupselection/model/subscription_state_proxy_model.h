@@ -27,7 +27,7 @@
 #define KNODE_GROUPSELECTION_SUBSCRIPTIONSTATEPROXYMODEL_H
 
 #include <QtCore/QSet>
-#include <QtGui/QSortFilterProxyModel>
+#include <QtCore/QSortFilterProxyModel>
 
 #include "kngroupmanager.h"
 

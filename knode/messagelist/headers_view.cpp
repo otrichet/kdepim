@@ -25,8 +25,8 @@
 
 #include "headers_view.h"
 
-#include <QtGui/QHeaderView>
 #include <KDE/KConfigGroup>
+#include <QtWidgets/QHeaderView>
 
 #include "headers_model.h"
 #include "knglobals.h"

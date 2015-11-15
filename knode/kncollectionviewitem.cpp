@@ -14,6 +14,8 @@
 
 #include "kncollectionviewitem.h"
 
+#include <KDE/KDebug>
+
 #include "kncollectionview.h"
 #include "kngroup.h"
 #include "knfolder.h"
@@ -49,6 +51,8 @@ void KNCollectionViewItem::setUp()
   // Label edition
   setFlags( flags() | Qt::ItemIsEditable );
 
+  kDebug() << "Port";
+#if 0
   // Icons
   if ( protocol() == FolderTreeWidgetItem::News ) {
     // news servers/groups
@@ -75,6 +79,7 @@ void KNCollectionViewItem::setUp()
         setIcon( 0, KIcon("folder") );
     }
   }
+#endif
 }
 
 

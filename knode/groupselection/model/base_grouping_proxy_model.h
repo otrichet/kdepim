@@ -26,8 +26,8 @@
 #ifndef KNODE_GROUPSELECTION_BASEGROUPINGPROXYMODEL_H
 #define KNODE_GROUPSELECTION_BASEGROUPINGPROXYMODEL_H
 
+#include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QVector>
-#include <QtGui/QSortFilterProxyModel>
 
 #include "../enums.h"
 

@@ -23,7 +23,7 @@
 #include "knnntpaccount.h"
 
 #include <kio/job.h>
-#include <KPIMIdentities/Identity>
+#include <KIdentityManagement/Identity>
 #include <QByteArray>
 #include <QList>
 
@@ -163,11 +163,11 @@ class KNGroup : public KNArticleCollection , public KNJobItem, public KNode::Set
       Returns the identity configured for this group.
       It is the null identity if there is none.
     */
-    virtual const KPIMIdentities::Identity & identity() const;
+    virtual const KIdentityManagement::Identity & identity() const;
     /** Sets the identity for this group.
      * @param i The identity or a null Identity to unset it.
      */
-    virtual void setIdentity( const KPIMIdentities::Identity &i )
+    virtual void setIdentity( const KIdentityManagement::Identity &i )
       { mIdentityUoid = ( i.isNull() ? -1 : i.uoid() ); }
 
     /** Returns the posting rights of this group.
@@ -228,7 +228,7 @@ class KNGroup : public KNArticleCollection , public KNJobItem, public KNode::Set
     /**
       Unique object identifier of the identity of this group.
       -1 means there is no specific identity for this group
-      (because KPIMIdentities::Identity::uoid() returns an unsigned int.
+      (because KIdentityManagement::Identity::uoid() returns an unsigned int.
     */
     int mIdentityUoid;
 

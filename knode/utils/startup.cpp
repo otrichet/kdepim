@@ -22,6 +22,11 @@
 
 #include "startup.h"
 
+#include <KDE/KGlobal>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
+#include <KIdentityManagement/Signature>
+
 #include "knaccountmanager.h"
 #include "knglobals.h"
 #include "knnntpaccount.h"
@@ -29,9 +34,6 @@
 #include <KDebug>
 #include <KIconLoader>
 #include <KLocale>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
-#include <KPIMIdentities/Signature>
 #include <KStandardDirs>
 #include <QDir>
 
@@ -106,10 +108,10 @@ void Startup::convertPre45Identities() const
 
 void Startup::convertPre45Identity( KConfigGroup &cg ) const
 {
-  KPIMIdentities::IdentityManager* im = KNGlobals::self()->identityManager();
+  KIdentityManagement::IdentityManager* im = KNGlobals::self()->identityManager();
 
   // Load the identity from cg
-  KPIMIdentities::Identity identity;
+  KIdentityManagement::Identity identity;
   identity.setFullName( cg.readEntry( "Name" ).trimmed() );
   identity.setPrimaryEmailAddress( cg.readEntry( "Email" ).trimmed() );
   identity.setOrganization( cg.readEntry( "Org" ).trimmed() );
@@ -117,7 +119,7 @@ void Startup::convertPre45Identity( KConfigGroup &cg ) const
   identity.setProperty( "Mail-Copies-To", cg.readEntry( "Mail-Copies-To" ).trimmed() );
   identity.setPGPSigningKey( cg.readEntry( "SigningKey" ).toLatin1() );
 
-  KPIMIdentities::Signature signature;
+  KIdentityManagement::Signature signature;
   if ( cg.readEntry( "UseSigFile", false ) ) {
     if ( !cg.readEntry( "sigFile" ).trimmed().isEmpty() ) {
       if ( cg.readEntry( "UseSigGenerator", false ) ) {
@@ -141,14 +143,14 @@ void Startup::convertPre45Identity( KConfigGroup &cg ) const
       || !identity.replyToAddr().isEmpty()
       || !identity.property( "Mail-Copies-To" ).toString().isEmpty()
       || !identity.pgpSigningKey().isEmpty()
-      || identity.signature().type() != KPIMIdentities::Signature::Disabled
+      || identity.signature().type() != KIdentityManagement::Signature::Disabled
    ) {
     // If an identity (even created by another application) has the
     // same information as currently store in KNode, we reused it.
     bool isDuplicate = false;
-    KPIMIdentities::IdentityManager::ConstIterator it = im->begin();
+    KIdentityManagement::IdentityManager::ConstIterator it = im->begin();
     while ( it != im->end() ) {
-      KPIMIdentities::Identity otherId = (*it);
+      KIdentityManagement::Identity otherId = (*it);
       isDuplicate = (
                       identity.fullName() == otherId.fullName()
                    && identity.primaryEmailAddress() == otherId.primaryEmailAddress()

@@ -25,7 +25,7 @@
 #include <kmime/kmime_content.h>
 
 class QTimer;
-class KAction;
+class QAction;
 class KActionCollection;
 class KActionMenu;
 class KHTMLPart;
@@ -133,7 +133,7 @@ class ArticleWidget : public QWidget, public KNJobConsumer {
      */
     void displayBodyBlock( const QStringList &lines );
     /// displays a signature block header
-    QString displaySigHeader( const Kpgp::Block &block );
+    QString displaySigHeader( /*const Kpgp::Block &block*/ );
     /// displays a signature footer
     void displaySigFooter( const QString &signClass );
     /// displays the given attachment
@@ -256,13 +256,13 @@ class ArticleWidget : public QWidget, public KNJobConsumer {
     QAction *mCopySelectionAction;
     QAction *mSelectAllAction;
     QAction *mFindAction;
-    KAction *mViewSourceAction;
-    KAction *mCharsetSelectKeyb;
-    KAction *mReplyAction;
-    KAction *mRemailAction;
-    KAction *mForwardAction;
-    KAction *mCancelAction;
-    KAction *mSupersedeAction;
+    QAction *mViewSourceAction;
+    QAction *mCharsetSelectKeyb;
+    QAction *mReplyAction;
+    QAction *mRemailAction;
+    QAction *mForwardAction;
+    QAction *mCancelAction;
+    QAction *mSupersedeAction;
     KActionMenu *mHeaderStyleMenu;
     KActionMenu *mAttachmentStyleMenu;
     KToggleAction *mFixedFontToggle;

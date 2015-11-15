@@ -27,7 +27,7 @@
 
 #include "../enums.h"
 
-#include <KDE/KLocalizedString>
+#include <KI18n/KLocalizedString>
 
 namespace KNode {
 namespace GroupSelection {

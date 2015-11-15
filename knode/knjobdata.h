@@ -17,12 +17,12 @@
 
 #include "knserverinfo.h"
 
+#include <Libkdepim/ProgressManager>
 #include <QPointer>
 #include <kurl.h>
 #include <kio/global.h>
 #include <QObject>
 #include <QList>
-#include <libkdepim/progresswidget/progressmanager.h>
 
 
 class KJob;

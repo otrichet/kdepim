@@ -23,7 +23,7 @@
 #ifndef KNODE_SETTINGS_CONTAINER_INTERFACE_H
 #define KNODE_SETTINGS_CONTAINER_INTERFACE_H
 
-namespace KPIMIdentities {
+namespace KIdentityManagement {
   class Identity;
 }
 
@@ -47,12 +47,12 @@ class SettingsContainerInterface
 
       It is the null identity if there is none.
     */
-    virtual const KPIMIdentities::Identity & identity() const = 0;
+    virtual const KIdentityManagement::Identity & identity() const = 0;
     /**
       Sets the identity for this group.
       @param identity The identity or a null Identity to unset it.
     */
-    virtual void setIdentity( const KPIMIdentities::Identity &identity ) = 0;
+    virtual void setIdentity( const KIdentityManagement::Identity &identity ) = 0;
 
     /**
       Save the configuration to disk

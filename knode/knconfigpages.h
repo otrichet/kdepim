@@ -14,9 +14,10 @@
 #ifndef KNCONFIGPAGES_H
 #define KNCONFIGPAGES_H
 
-#include "knode_export.h"
-#include <kcmodule.h>
+#include <KDE/KCModule>
+#include <KDE/KComponentData>
 
+#include "knode_export.h"
 
 class QTabWidget;
 

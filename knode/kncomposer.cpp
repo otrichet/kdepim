@@ -14,16 +14,16 @@
 
 #include "kncomposer.h"
 
-#include <KPIMUtils/Email>
-#include <KPIMIdentities/Identity>
-#include <KPIMIdentities/IdentityManager>
+// #include <KPIMUtils/Email>
+#include <KIdentityManagement/Identity>
+#include <KIdentityManagement/IdentityManager>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QtDBus/QtDBus>
 #include <QtGui/QContextMenuEvent>
 #include <qgroupbox.h>
-#include "libkdepim/addressline/recentaddress/recentaddresses.h"
-#include "libkdepim/addressline/recentaddress/recentaddressdialog.h"
+#include <libkdepim/src/addressline/recentaddress/recentaddressdialog.h>
+#include <libkdepim/src/addressline/recentaddress/recentaddresses.h>
 using KPIM::RecentAddresses;
 #include <akonadi/contact/emailaddressselectiondialog.h>
 #include <kcharsets.h>
@@ -35,7 +35,7 @@ using KPIM::RecentAddresses;
 #include <kdebug.h>
 #include <kcombobox.h>
 #include <ktemporaryfile.h>
-#include <libkpgp/kpgpblock.h>
+// #include <libkpgp/kpgpblock.h>
 #include <kcompletionbox.h>
 #include <kxmlguifactory.h>
 #include <kstatusbar.h>
@@ -200,7 +200,7 @@ KNComposer::KNComposer( KNLocalArticle::Ptr a, const QString &text, const QStrin
   //------------------------------- <Actions> --------------------------------------
 
   //file menu
-  KAction *action = actionCollection()->addAction("send_now");
+  QAction *action = actionCollection()->addAction("send_now");
   action->setIcon(KIcon("mail-send"));
   action->setText(i18n("&Send Now"));
   connect(action, SIGNAL(triggered(bool)), SLOT(slotSendNow()));
@@ -726,7 +726,7 @@ bool KNComposer::applyChanges()
 
 
   // Identity (for later edition)
-  const KPIMIdentities::Identity identity = KNGlobals::self()->identityManager()->identityForUoid( v_iew->selectedIdentity() );
+  const KIdentityManagement::Identity identity = KNGlobals::self()->identityManager()->identityForUoid( v_iew->selectedIdentity() );
   if ( !identity.isNull() ) {
     KMime::Headers::Generic *xKnodeIdentity = new KMime::Headers::Generic( "X-KNode-Identity",
                                                                           a_rticle.get(),
@@ -924,8 +924,8 @@ void KNComposer::closeEvent(QCloseEvent *e)
 void KNComposer::initData(const QString &text)
 {
   // Identity
-  KPIMIdentities::IdentityManager *idManager = KNGlobals::self()->identityManager();
-  KPIMIdentities::Identity identity = idManager->defaultIdentity();
+  KIdentityManagement::IdentityManager *idManager = KNGlobals::self()->identityManager();
+  KIdentityManagement::Identity identity = idManager->defaultIdentity();
   KMime::Headers::Base* xKnodeIdentity = a_rticle->headerByType( "X-KNode-Identity" );
   if ( xKnodeIdentity && !xKnodeIdentity->isEmpty() ) {
     uint uoid = xKnodeIdentity->asUnicodeString().toUInt();

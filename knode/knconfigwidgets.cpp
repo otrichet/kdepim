@@ -14,6 +14,12 @@
 
 #include "knconfigwidgets.h"
 
+#include <KDE/KDebug>
+#include <KDE/KGlobal>
+#include <KDE/KHBox>
+#include <KIconThemes/KIconLoader>
+#include <Sonnet/ConfigWidget>
+
 #include "configuration/identity_widget.h"
 #include "knaccountmanager.h"
 #include "knconfigmanager.h"
@@ -36,16 +42,15 @@
 #include <kmessagebox.h>
 #include <kcolordialog.h>
 #include <kfontdialog.h>
-#include <sonnet/configwidget.h>
 #include <kcombobox.h>
-#include <libkpgp/kpgpui.h>
+// #include <libkpgp/kpgpui.h>
 
 
 
 //BEGIN: NNTP account configuration widgets ----------------------------------
 
-KNode::NntpAccountListWidget::NntpAccountListWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::NntpAccountListWidget::NntpAccountListWidget( QWidget *parent ) :
+  KCModule( parent )
 {
   setupUi( this );
 
@@ -186,13 +191,19 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
     mAccount( a ),
     mUseServerForName( false )
 {
+  kDebug() << "Port";
+#if 0
   if ( a->id() != -1 )
     setCaption( i18n("Properties of %1", a->name()) );
   else
     setCaption( i18n("New Account") );
+#endif
   setFaceType( Tabbed );
+  kDebug() << "Port";
+#if 0
   setButtons( Ok | Cancel | Help );
   setDefaultButton( Ok );
+#endif
 
   // server config tab
   QFrame* page = new QFrame( this );
@@ -257,7 +268,10 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
 
   KNHelper::restoreWindowSize("accNewsPropDLG", this, sizeHint());
 
+  kDebug() << "Port";
+#if 0
   setHelp("anc-setting-the-news-account");
+#endif
 }
 
 
@@ -316,7 +330,10 @@ void KNode::NntpAccountConfDialog::slotButtonClicked( int button )
 
     accept();
   } else {
+  kDebug() << "Port";
+#if 0
     KDialog::slotButtonClicked( button );
+#endif
   }
 }
 
@@ -389,8 +406,8 @@ void KNode::AppearanceWidget::FontListItem::setFont( const QFont &font )
 //===================================================================================
 
 
-KNode::AppearanceWidget::AppearanceWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule(inst, parent )
+KNode::AppearanceWidget::AppearanceWidget( QWidget *parent ) :
+  KCModule(parent )
 {
   QGridLayout *topL = new QGridLayout( this );
 
@@ -586,8 +603,8 @@ void KNode::AppearanceWidget::slotFontSelectionChanged()
 //=============================================================================================
 
 
-KNode::ReadNewsGeneralWidget::ReadNewsGeneralWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::ReadNewsGeneralWidget::ReadNewsGeneralWidget( QWidget *parent ) :
+  KCModule( parent )
 {
   setupUi( this );
   addConfig( knGlobals.settings(), this );
@@ -625,8 +642,8 @@ void KNode::ReadNewsGeneralWidget::save()
 //=============================================================================================
 
 
-KNode::ReadNewsNavigationWidget::ReadNewsNavigationWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::ReadNewsNavigationWidget::ReadNewsNavigationWidget( QWidget *parent ) :
+  KCModule( parent )
 {
   KNode::Ui::ReadNewsNavigationWidgetBase ui;
   ui.setupUi( this );
@@ -638,8 +655,8 @@ KNode::ReadNewsNavigationWidget::ReadNewsNavigationWidget( const KComponentData 
 //=============================================================================================
 
 
-KNode::ReadNewsViewerWidget::ReadNewsViewerWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::ReadNewsViewerWidget::ReadNewsViewerWidget( QWidget *parent ) :
+  KCModule( parent )
 {
   KNode::Ui::ReadNewsViewerWidgetBase ui;
   ui.setupUi( this );
@@ -651,8 +668,8 @@ KNode::ReadNewsViewerWidget::ReadNewsViewerWidget( const KComponentData &inst, Q
 //=============================================================================================
 
 
-KNode::DisplayedHeadersWidget::DisplayedHeadersWidget( DisplayedHeaders *d, const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent ),
+KNode::DisplayedHeadersWidget::DisplayedHeadersWidget( DisplayedHeaders *d, QWidget *parent ) :
+  KCModule( parent ),
   s_ave( false ),
   d_ata( d )
 {
@@ -960,8 +977,8 @@ void KNode::DisplayedHeaderConfDialog::slotNameChanged(const QString& str)
 
 //=============================================================================================
 
-KNode::FilterListWidget::FilterListWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent ),
+KNode::FilterListWidget::FilterListWidget( QWidget *parent ) :
+  KCModule( parent ),
   f_ilManager( knGlobals.filterManager() )
 {
   QGridLayout *topL=new QGridLayout(this);
@@ -1233,8 +1250,8 @@ void KNode::FilterListWidget::slotSelectionChangedMenu()
 //=============================================================================================
 
 
-KNode::PostNewsTechnicalWidget::PostNewsTechnicalWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::PostNewsTechnicalWidget::PostNewsTechnicalWidget( QWidget *parent ) :
+  KCModule( parent )
 {
   setupUi( this );
 
@@ -1382,8 +1399,8 @@ QString KNode::XHeaderConfDialog::result() const
 //===================================================================================================
 
 
-KNode::PostNewsComposerWidget::PostNewsComposerWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::PostNewsComposerWidget::PostNewsComposerWidget( QWidget *parent ) :
+  KCModule( parent )
 {
   KNode::Ui::PostNewsComposerWidgetBase ui;
   ui.setupUi( this );
@@ -1395,9 +1412,11 @@ KNode::PostNewsComposerWidget::PostNewsComposerWidget( const KComponentData &ins
 //===================================================================================================
 
 
-KNode::PostNewsSpellingWidget::PostNewsSpellingWidget( const KComponentData &inst, QWidget *parent ) :
-  KCModule( inst, parent )
+KNode::PostNewsSpellingWidget::PostNewsSpellingWidget( QWidget *parent ) :
+  KCModule( parent )
 {
+  kDebug() << "Port";
+#if 0
   QVBoxLayout *topL=new QVBoxLayout(this);
   topL->setSpacing(5);
 
@@ -1406,6 +1425,7 @@ KNode::PostNewsSpellingWidget::PostNewsSpellingWidget( const KComponentData &ins
   connect(c_conf, SIGNAL(configChanged()), SLOT(changed()));
 
   topL->addStretch(1);
+#endif
 }
 
 
@@ -1416,15 +1436,20 @@ KNode::PostNewsSpellingWidget::~PostNewsSpellingWidget()
 
 void KNode::PostNewsSpellingWidget::save()
 {
+  kDebug() << "Port";
+#if 0
   c_conf->save();
+#endif
 }
 
 
 //==============================================================================================================
 
-KNode::PrivacyWidget::PrivacyWidget( const KComponentData &inst,QWidget *parent ) :
-  KCModule(inst, parent )
+KNode::PrivacyWidget::PrivacyWidget( QWidget *parent ) :
+  KCModule(parent )
 {
+  kDebug() << "Port";
+#if 0
   QBoxLayout *topLayout = new QVBoxLayout(this);
   topLayout->setSpacing(5);
   c_onf = new Kpgp::Config( this, false );
@@ -1435,6 +1460,7 @@ KNode::PrivacyWidget::PrivacyWidget( const KComponentData &inst,QWidget *parent 
   topLayout->addStretch(1);
 
   load();
+#endif
 }
 
 
@@ -1445,7 +1471,10 @@ KNode::PrivacyWidget::~PrivacyWidget()
 
 void KNode::PrivacyWidget::save()
 {
+  kDebug() << "Port";
+#if 0
   c_onf->applySettings();
+#endif
 }
 
 
@@ -1551,8 +1580,8 @@ void KNode::GroupCleanupWidget::slotDefaultToggled( bool state )
 }
 
 
-KNode::CleanupWidget::CleanupWidget( const KComponentData &inst,QWidget *parent ) :
-  KCModule(inst, parent ),
+KNode::CleanupWidget::CleanupWidget( QWidget *parent ) :
+  KCModule(parent ),
   d_ata( knGlobals.configManager()->cleanup() )
 {
   QVBoxLayout *topL=new QVBoxLayout(this);

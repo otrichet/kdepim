@@ -14,6 +14,9 @@
 
 #include "kngrouppropdlg.h"
 
+#include <KDE/KDebug>
+#include <KDE/KGlobal>
+
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
 #include "knconfigwidgets.h"
@@ -41,9 +44,12 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
     g_rp(group), n_ickChanged(false)
 {
   setFaceType( Tabbed );
+    kDebug() << "Port";
+#if 0
   setCaption( i18nc( "@title:window %1=newsgroup name", "Properties of %1", group->groupname() ) );
   setButtons( Ok|Cancel|Help );
   setDefaultButton( Ok );
+#endif
 
   // General tab ===============================================
 

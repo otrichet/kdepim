@@ -62,14 +62,14 @@ class KNODE_EXPORT IdentityWidget : public KCModule, private Ui::IdentityWidget
     /**
       Loads the @p identity into this widget.
     */
-    void loadFromIdentity( const KPIMIdentities::Identity &identity );
+    void loadFromIdentity( const KIdentityManagement::Identity &identity );
 
     /**
       Set up this widget.
       @param identity original identity of the settings container passed
       to one of the constructor (may be null)
     */
-    void setup( const KPIMIdentities::Identity &identity );
+    void setup( const KIdentityManagement::Identity &identity );
 
   private slots:
     /**

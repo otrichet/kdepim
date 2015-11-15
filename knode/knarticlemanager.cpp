@@ -115,6 +115,8 @@ void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
 
 QString KNArticleManager::saveContentToTemp(KMime::Content *c)
 {
+  kDebug() << "Port";
+#if 0
   QString path;
   KTemporaryFile* tmpFile;
   KMime::Headers::Base *pathHdr=c->headerByType("X-KNode-Tempfile");  // check for existing temp file
@@ -153,6 +155,8 @@ QString KNArticleManager::saveContentToTemp(KMime::Content *c)
   c->setHeader(pathHdr);
 
   return path;
+#endif
+  return QString();
 }
 
 
@@ -475,14 +479,14 @@ void KNArticleManager::setRead(KNRemoteArticle::List &l, bool r, bool handleXPos
     if( r && knGlobals.settings()->markCrossposts() &&
         handleXPosts && (*it)->newsgroups()->isCrossposted() ) {
 
-      QList<QByteArray> groups = (*it)->newsgroups()->groups();
+      QVector<QByteArray> groups = (*it)->newsgroups()->groups();
       KNGroup::Ptr targetGroup;
       KNRemoteArticle::Ptr xp;
       KNRemoteArticle::List al;
       QByteArray mid = (*it)->messageID()->as7BitString( false );
 
-      for ( QList<QByteArray>::Iterator it2 = groups.begin(); it2 != groups.end(); ++it2 ) {
-        targetGroup = knGlobals.groupManager()->group(*it2, g->account());
+      Q_FOREACH(const QByteArray& group, groups) {
+        targetGroup = knGlobals.groupManager()->group(group, g->account());
         if (targetGroup) {
           if (targetGroup->isLoaded() && (xp=targetGroup->byMessageId(mid)) ) {
             al.clear();

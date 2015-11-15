@@ -24,6 +24,7 @@
 
 #include "../kncomposer.h"
 
+#include <KDE/KDebug>
 #include <QHeaderView>
 #include <QKeyEvent>
 
@@ -72,12 +73,15 @@ void AttachmentView::editCurrentAttachment()
     setCurrentItem( items[ 0 ] );
   }
 
+  kDebug() << "Port";
+#if 0
   AttachmentViewItem *item = static_cast< AttachmentViewItem * >( currentItem() );
   QPointer<KNComposer::AttachmentPropertiesDlg> dlg = new KNComposer::AttachmentPropertiesDlg( item->mAttachment, this );
   if ( dlg->exec() == QDialog::Accepted && dlg ) {
     item->emitDataChanged(); // notify the changes
   }
   delete dlg;
+#endif
 }
 
 

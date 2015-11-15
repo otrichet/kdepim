@@ -14,6 +14,7 @@
 
 #include "knconfigmanager.h"
 
+#include <KDE/KDebug>
 #include <kiconloader.h>
 #include <kwindowsystem.h>
 
@@ -65,7 +66,7 @@ void KNConfigManager::syncConfig()
 
 void KNConfigManager::slotDialogDone()
 {
-  d_ialog->delayedDestruct();
+  d_ialog->deleteLater();
   d_ialog=0;
 }
 
@@ -84,7 +85,10 @@ KNConfigDialog::KNConfigDialog( QWidget *parent )
   addModule ( "knode_config_privacy" );
   addModule ( "knode_config_cleanup" );
 
+  kDebug() << "Port";
+#if 0
   setHelp("anc-setting-your-identity");
+#endif
 
   connect(this, SIGNAL(configCommitted()), this, SLOT(slotConfigCommitted()));
 }

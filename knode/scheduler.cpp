@@ -179,9 +179,14 @@ void Scheduler::slotJobFinished( KNJobData * job )
       dlg.setKeepPassword( false );
       dlg.setPrompt( i18n( "You need to supply a username and a\npassword to access this server" ) );
       dlg.setUsernameReadOnly( false );
+  kDebug() << "Port";
+#if 0
       dlg.setCaption( i18n( "Authentication Failed" ) );
+#endif
       dlg.addCommentLine( i18n( "Server:" ), account->server() );
 
+  kDebug() << "Port";
+#if 0
       if ( dlg.exec() == KDialog::Accepted ) {
         account->setNeedsLogon( true );
         account->setUser( user );
@@ -191,6 +196,7 @@ void Scheduler::slotJobFinished( KNJobData * job )
         job->execute();
         return;
       }
+#endif
     }
   }
 
