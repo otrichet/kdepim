@@ -14,6 +14,8 @@
 
 #include "knaccountmanager.h"
 
+#include <QStandardPaths>
+
 #include "knconfigmanager.h"
 #include "knfoldermanager.h"
 #include "knglobals.h"
@@ -25,7 +27,6 @@
 #include <kconfig.h>
 #include <klocale.h>
 #include <kmessagebox.h>
-#include <kstandarddirs.h>
 #include <kwallet.h>
 
 
@@ -58,7 +59,7 @@ void KNAccountManager::prepareShutdown()
 
 void KNAccountManager::loadAccounts()
 {
-  QString dir( KStandardDirs::locateLocal( "data", "knode/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/") ) ;
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
     return;
@@ -102,7 +103,7 @@ void KNAccountManager::setCurrentAccount( KNNntpAccount::Ptr a )
 bool KNAccountManager::newAccount( KNNntpAccount::Ptr a )
 {
   // find a unused id for the new account...
-  QString dir( KStandardDirs::locateLocal( "data", "knode/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/") ) ;
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
     return false;
@@ -116,7 +117,7 @@ bool KNAccountManager::newAccount( KNNntpAccount::Ptr a )
 
   a->setId(id);
 
-  dir = KStandardDirs::locateLocal( "data", QString( "knode/nntp.%1/" ).arg( a->id() ) );
+  dir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString( "/knode/nntp.%1/" ).arg( a->id() ) ;
   if (!dir.isNull()) {
     mAccounts.append(a);
     emit(accountAdded(a));

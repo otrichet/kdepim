@@ -14,13 +14,14 @@
 
 #include "knconfig.h"
 
+#include <QStandardPaths>
+
 #include "kndisplayedheader.h"
 #include "knglobals.h"
 #include "settings.h"
 #include "utilities.h"
 
 #include <klocale.h>
-#include <kstandarddirs.h>
 #include <kdebug.h>
 #include <kiconloader.h>
 #include <kiconeffect.h>
@@ -28,7 +29,7 @@
 
 KNode::DisplayedHeaders::DisplayedHeaders()
 {
-  QString fname( KStandardDirs::locate( "data","knode/headers.rc" ) );
+  QString fname( QStandardPaths::locate(QStandardPaths::GenericDataLocation, "knode/headers.rc" ) );
 
   if (!fname.isNull()) {
     KConfig headerConf( fname, KConfig::SimpleConfig);
@@ -75,7 +76,7 @@ void KNode::DisplayedHeaders::save()
 
   kDebug();
 
-  QString dir( KStandardDirs::locateLocal( "data", "knode/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/") ) ;
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
     return;

@@ -28,8 +28,9 @@
 
 #include <KDebug>
 #include <KMessageBox>
-#include <KStandardDirs>
+
 #include <QDir>
+#include <QStandardPaths>
 
 using namespace KNode::Utilities;
 
@@ -37,7 +38,7 @@ using namespace KNode::Utilities;
 KNFolderManager::KNFolderManager(KNArticleManager *a) : a_rtManager(a)
 {
   //standard folders
-  QString dir( KStandardDirs::locateLocal( "data", "knode/folders/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/folders/") ) ;
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
     return;
@@ -443,7 +444,7 @@ void KNFolderManager::exportToMBox( KNFolder::Ptr f )
 
 void KNFolderManager::syncFolders()
 {
-  QString dir( KStandardDirs::locateLocal( "data", "knode/folders/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/folders/") ) ;
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
     return;
@@ -461,7 +462,7 @@ void KNFolderManager::syncFolders()
 int KNFolderManager::loadCustomFolders()
 {
   int cnt=0;
-  QString dir( KStandardDirs::locateLocal( "data", "knode/folders/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/folders/") ) ;
   KNFolder::Ptr f;
 
   if (dir.isNull()) {

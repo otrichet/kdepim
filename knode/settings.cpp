@@ -13,6 +13,8 @@
 
 #include "settings.h"
 
+#include <QStandardPaths>
+
 #include "knconfig.h"
 #include "knglobals.h"
 #include "utilities.h"
@@ -20,7 +22,6 @@
 #include <klocale.h>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
-#include <kstandarddirs.h>
 #include <QFile>
 #include <QTextStream>
 
@@ -36,7 +37,7 @@ KNode::Settings::Settings() : SettingsBase()
 void KNode::Settings::usrReadConfig( )
 {
   // read extra header configuration
-  QString dir = KStandardDirs::locateLocal( "data", "knode/" );
+  const QString dir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/");
   if ( !dir.isNull() ) {
     QFile f( dir + "xheaders" );
     if ( f.open( QIODevice::ReadOnly ) ) {
@@ -52,7 +53,7 @@ void KNode::Settings::usrReadConfig( )
 bool KNode::Settings::usrWriteConfig( )
 {
   // write extra header configuration
-  QString dir = KStandardDirs::locateLocal( "data", "knode/" );
+  const QString dir = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/");
   if ( dir.isNull() ) {
     KNHelper::displayInternalFileError();
     return false;

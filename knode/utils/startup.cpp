@@ -26,6 +26,7 @@
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
 #include <KIdentityManagement/Signature>
+#include <QStandardPaths>
 
 #include "knaccountmanager.h"
 #include "knglobals.h"
@@ -34,7 +35,6 @@
 #include <KDebug>
 #include <KIconLoader>
 #include <KLocale>
-#include <KStandardDirs>
 #include <QDir>
 
 
@@ -78,7 +78,7 @@ void Startup::convertPre45Identities() const
   convertPre45Identity( cg );
 
   // Server accounts and groups identities
-  QDir dir( KStandardDirs::locateLocal( "data", "knode/", false/*create*/ ) );
+  QDir dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/knode/" );
   QStringList serverPaths = dir.entryList( QStringList( "nntp.*" ), QDir::Dirs );
   foreach ( const QString &subPath, serverPaths ) {
     QDir serverDir( dir.absolutePath() + '/' + subPath );

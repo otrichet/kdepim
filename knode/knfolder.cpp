@@ -14,6 +14,8 @@
 
 #include "knfolder.h"
 
+#include <QStandardPaths>
+
 #include "articlewidget.h"
 #include "knarticlefactory.h"
 #include "knarticlemanager.h"
@@ -27,7 +29,6 @@
 
 #include <QFileInfo>
 #include <kconfig.h>
-#include <kstandarddirs.h>
 #include <kdebug.h>
 #include <klocale.h>
 
@@ -98,7 +99,7 @@ void KNFolder::updateListItem()
 
 QString KNFolder::path()
 {
-  QString dir( KStandardDirs::locateLocal( "data", "knode/folders/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/folders/") ) ;
   /*if (dir.isNull())
     KNHelper::displayInternalFileError();*/
   return dir;

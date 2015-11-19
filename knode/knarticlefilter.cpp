@@ -12,11 +12,11 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 
-#include <kstandarddirs.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <klocale.h>
 #include <kdebug.h>
+#include <QStandardPaths>
 
 #include "kngroup.h"
 #include "knfolder.h"
@@ -74,8 +74,7 @@ KNArticleFilter::~KNArticleFilter()
 bool KNArticleFilter::loadInfo()
 {
   if (i_d!=-1) {
-    QString fname( KStandardDirs::locate( "data",
-                                          QString( "knode/filters/%1.fltr" ).arg( i_d ) ) );
+    QString fname( QStandardPaths::locate(QStandardPaths::GenericDataLocation, QString( "knode/filters/%1.fltr" ).arg( i_d ) ) );
 
     if (fname.isNull())
       return false;
@@ -95,7 +94,7 @@ bool KNArticleFilter::loadInfo()
 
 void KNArticleFilter::load()
 {
-  QString fname(KStandardDirs::locate( "data", QString( "knode/filters/%1.fltr" ).arg( i_d ) ) );
+  QString fname(QStandardPaths::locate(QStandardPaths::GenericDataLocation, QString( "knode/filters/%1.fltr" ).arg( i_d ) ) );
 
   if (fname.isNull())
     return;
@@ -134,7 +133,7 @@ void KNArticleFilter::save()
 {
   if (i_d==-1)
     return;
-  QString dir( KStandardDirs::locateLocal( "data", "knode/filters/" ) );
+  QString dir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/filters/"));
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
     return;

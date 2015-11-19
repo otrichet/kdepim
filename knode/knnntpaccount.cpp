@@ -14,6 +14,8 @@
 
 #include "knnntpaccount.h"
 
+#include <QStandardPaths>
+
 #include "utilities.h"
 #include "kncollectionviewitem.h"
 #include "knconfigmanager.h"
@@ -27,7 +29,7 @@
 #include <kdebug.h>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
-#include <kstandarddirs.h>
+
 
 
 KNNntpAccountIntervalChecking::KNNntpAccountIntervalChecking(KNNntpAccount* account) : t_imer(0) {
@@ -163,7 +165,7 @@ QString KNNntpAccount::path()
     return QString();
   }
 
-  QString dir( KStandardDirs::locateLocal( "data", QString( "knode/nntp.%1/" ).arg( i_d ) ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString( "/knode/nntp.%1/" ).arg( i_d ) ) ;
   if (dir.isNull())
     KNHelper::displayInternalFileError();
   return (dir);

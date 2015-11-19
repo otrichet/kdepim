@@ -28,6 +28,7 @@
 #include <QHBoxLayout>
 #include <QImage>
 #include <QMenu>
+#include <QStandardPaths>
 #include <QStringList>
 #include <QTextCodec>
 #include <QTimer>
@@ -44,7 +45,6 @@
 #include <kmessagebox.h>
 #include <krun.h>
 #include <kselectaction.h>
-#include <kstandarddirs.h>
 #include <ktemporaryfile.h>
 #include <ktoggleaction.h>
 #include <kurl.h>
@@ -1512,7 +1512,7 @@ void ArticleWidget::slotAddBookmark()
 {
   if ( mCurrentURL.isEmpty() )
     return;
-  QString filename = KStandardDirs::locateLocal( "data", QString::fromLatin1("konqueror/bookmarks.xml") );
+  QString filename = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/konqueror/bookmarks.xml") ;
   kDebug() << "Port";
 #if 0
   KBookmarkManager *bookManager = KBookmarkManager::managerForFile( filename, "konqueror" );

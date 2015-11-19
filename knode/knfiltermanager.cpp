@@ -16,9 +16,9 @@
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kmenu.h>
-#include <kstandarddirs.h>
 #include <kconfig.h>
 #include <kicon.h>
+#include <QStandardPaths>
 
 #include "utilities.h"
 #include "knglobals.h"
@@ -119,7 +119,7 @@ void KNFilterManager::prepareShutdown()
 
 void KNFilterManager::loadFilters()
 {
-  QString fname( KStandardDirs::locate( "data","knode/filters/filters.rc" ) );
+  QString fname( QStandardPaths::locate(QStandardPaths::GenericDataLocation, "knode/filters/filters.rc" ) );
 
   if (!fname.isNull()) {
     KConfig conf( fname, KConfig::SimpleConfig);
@@ -142,7 +142,7 @@ void KNFilterManager::loadFilters()
 
 void KNFilterManager::saveFilterLists()
 {
-  QString dir( KStandardDirs::locateLocal( "data","knode/filters/" ) );
+  QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/filters/") ) ;
 
   if (dir.isNull()) {
     KNHelper::displayInternalFileError();
