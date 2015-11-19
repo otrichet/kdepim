@@ -23,9 +23,6 @@
     <method name="editArticle"/>
     <method name="fetchHeaders"/>
     <method name="expireArticles"/>
-    <method name="handleCommandLine">
-      <arg type="b" direction="out"/>
-    </method>
     <method name="openURL">
       <arg name="url" type="s" direction="in"/>
     </method>

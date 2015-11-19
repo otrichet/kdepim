@@ -16,17 +16,19 @@
 
 #include "knapplication.h"
 
-#include <kwindowsystem.h>
 #include <kdebug.h>
-#include <kcmdlineargs.h>
 
 #include "knode.h"
 #include "knmainwidget.h"
 
-
-int KNApplication::newInstance()
+KNApplication::KNApplication(int &argc, char **argv)
+    : QApplication(argc, argv)
 {
-  kDebug() << "KNApplication::newInstance()";
+}
+
+void KNApplication::launch(const QStringList& params)
+{
+  kDebug();
 
   KNMainWindow *main = findPrimaryWindow();
 
@@ -49,15 +51,11 @@ int KNApplication::newInstance()
     }
   }
 
-  // Handle window activation and startup notification
-  KUniqueApplication::newInstance();
-
   // process URLs...
-  KNMainWidget *w = main->mainWidget();
-  w->handleCommandLine();
-
-  kDebug() << "KNApplication::newInstance() done";
-  return 0;
+  if (!params.isEmpty()) {
+    KNMainWidget *w = main->mainWidget();
+    w->openURL(params.first());
+  }
 }
 
 KNMainWindow* KNApplication::findPrimaryWindow()
@@ -70,5 +68,3 @@ KNMainWindow* KNApplication::findPrimaryWindow()
     }
     return 0;
 }
-
-

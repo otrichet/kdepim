@@ -15,22 +15,16 @@
 #ifndef KNAPPLICATION_H
 #define KNAPPLICATION_H
 
-#include <KDE/KUniqueApplication>
+#include <QApplication>
 
 class KNMainWindow;
 
-/** Conversion of old settings and session restoration. */
-class KNApplication : public KUniqueApplication
+class KNApplication : public QApplication
 {
     Q_OBJECT
   public:
-    KNApplication() : KUniqueApplication()
-    {
-    }
-
-    /** Create new instance of KNode. Make the existing
-        main window active if KNode is already running */
-    int newInstance();
+    KNApplication(int &argc, char **argv);
+    void launch(const QStringList& params);
 
   private:
     KNMainWindow* findPrimaryWindow();

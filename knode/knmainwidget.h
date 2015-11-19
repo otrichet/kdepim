@@ -140,10 +140,6 @@ public:
   /// Expire articles in all groups
   Q_SCRIPTABLE void expireArticles();
 
-  /* Kontact integration */
-  /// Process command-line options
-  Q_SCRIPTABLE bool handleCommandLine();
-
   //end dcop interface
 signals:
   void signalCaptionChangeRequest( const QString& );

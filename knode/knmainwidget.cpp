@@ -1805,19 +1805,6 @@ void KNMainWidget::editArticle()
   slotArtEdit();
 }
 
-bool KNMainWidget::handleCommandLine()
-{
-  bool doneSomething = false;
-  KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
-  if (args->count()>0) {
-    KUrl url=args->url(0);    // we take only one URL
-    openURL(url);
-    doneSomething = true;
-  }
-  args->clear();
-  return doneSomething;
-}
-
 //////////////////////// end D-Bus implementation
 ////////////////////////////////////////////////////////////////////////
 

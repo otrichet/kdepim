@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=knode -caption %c
+Exec=knode -qwindowtitle %c
 Icon=knode
 Terminal=false
 X-DocPath=knode/index.html
@@ -146,6 +146,7 @@ GenericName[x-test]=xxNews Readerxx
 GenericName[zh_CN]=新闻组阅读器
 GenericName[zh_TW]=新聞閱讀器
 MimeType=x-scheme-handler/news;
-X-KDE-StartupNotify=true
+StartupNotify=true
 X-DBUS-StartupType=Unique
+X-DBUS-ServiceName=org.kde.knode
 Categories=Qt;KDE;Network;News;

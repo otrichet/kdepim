@@ -1,47 +1,62 @@
 /*
-    KNode, the KDE newsreader
-    Copyright (c) 1999-2005 the KNode authors.
-    See file AUTHORS for details
+ * Copyright (c) 2015 Olivier Trichet <olivier@trichet.fr>
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
+ */
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software Foundation,
-    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
-*/
+#include <KDBusAddons/KDBusService>
+#include <KI18n/KLocalizedString>
+#include <QCommandLineParser>
 
-#include <kaboutdata.h>
-#include <kcmdlineargs.h>
-#include <kglobal.h>
-#include <klocale.h>
-
-#include "knapplication.h"
-#include "resource.h"
-#include "knode.h"
 #include "aboutdata.h"
-#include "knode_options.h"
+#include "knapplication.h"
 #include "utils/startup.h"
 
-using KNode::AboutData;
 
 int main(int argc, char* argv[])
 {
-  AboutData aboutData;
+    KNApplication app(argc, argv);
 
-  KCmdLineArgs::init( argc, argv, &aboutData );
-  KCmdLineArgs::addCmdLineOptions( knode_options() );
-  KUniqueApplication::addCmdLineOptions();
+    KNode::AboutData aboutData;
+    KAboutData::setApplicationData(aboutData);
 
-  if (!KNApplication::start())
-    return 0;
+    KDBusService service(KDBusService::Unique);
+    // If this point is reached, this is the only running instance
 
-  KNApplication app;
 
-  KNode::Utilities::Startup s;
-  s.loadLibrariesIconsAndTranslations();
-  s.updateDataAndConfiguration();
+    KLocalizedString::setApplicationDomain(aboutData.componentName().toAscii());
 
-  return app.exec();
+    KNode::Utilities::Startup s;
+    s.loadLibrariesIconsAndTranslations();
+    s.updateDataAndConfiguration();
+
+    QCommandLineParser parser;
+    aboutData.setupCommandLine(&parser);
+    parser.addPositionalArgument("url", i18n("A 'news://server/group' URL"), "[url]");
+    // Process the actual command line arguments given by the user
+    parser.process(app);
+
+
+    app.launch(parser.positionalArguments());
+
+    return app.exec();
 }

@@ -161,6 +161,9 @@ add_executable(knode ${knode_SRCS})
 target_link_libraries(knode
     PRIVATE
         knodecommon
+        KF5::CoreAddons
+        KF5::DBusAddons
+        KF5::I18n
         KF5::KDELibs4Support
         KF5::Libkdepim
         KF5::Mime
@@ -171,7 +174,7 @@ install(TARGETS knode  ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
 ########### Install other files ###############
 
-install( PROGRAMS KNode.desktop  DESTINATION ${KDE_INSTALL_APPDIR})
+install( PROGRAMS org.kde.knode.desktop  DESTINATION ${KDE_INSTALL_APPDIR})
 install(FILES knode_config_identity.desktop
               knode_config_accounts.desktop
               knode_config_appearance.desktop

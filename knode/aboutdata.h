@@ -15,14 +15,14 @@
 #ifndef KNODE_ABOUTDATA_H
 #define KNODE_ABOUTDATA_H
 
-#include <KDE/K4AboutData>
+#include <KCoreAddons/KAboutData>
 
 #include "knode_export.h"
 
 namespace KNode
 {
   /** Content of the about dialog. */
-  class KNODE_EXPORT AboutData : public K4AboutData
+  class KNODE_EXPORT AboutData : public KAboutData
   {
   public:
     AboutData();
