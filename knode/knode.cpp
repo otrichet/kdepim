@@ -19,13 +19,13 @@
 #include <Libkdepim/BroadcastStatus>
 #include <Libkdepim/ProgressDialog>
 #include <Libkdepim/StatusbarProgressWidget>
+#include <QtWidgets/QStatusBar>
 
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kstandardaction.h>
 #include <kdebug.h>
 #include <kiconloader.h>
-#include <kstatusbar.h>
 #include <klocale.h>
 #include <kactioncollection.h>
 #include <ksqueezedtextlabel.h>
@@ -36,7 +36,6 @@
 KNMainWindow::KNMainWindow( QWidget* parent )
   : KXmlGuiWindow( parent )
 {
-  //setupStatusBar();
   createStandardStatusBarAction();
   setStandardToolBarMenuEnabled(true);
 

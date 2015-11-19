@@ -15,8 +15,8 @@
 #include "knmainwidget.h"
 
 #include <QAction>
+#include <QtWidgets/QStatusBar>
 #include <KDE/KLineEdit>
-#include <KDE/KStatusBar>
 #include <Libkdepim/UiStateSaver>
 #include <Libkdepim/BroadcastStatus>
 #include <Libkdepim/RecentAddresses>
@@ -36,7 +36,6 @@
 #include <kdebug.h>
 #include <kmenubar.h>
 #include <kiconloader.h>
-#include <kstatusbar.h>
 #include <klocale.h>
 #include <kcmdlineargs.h>
 #include <khbox.h>
@@ -218,32 +217,26 @@ KNMainWidget::~KNMainWidget()
 
 void KNMainWidget::initStatusBar()
 {
-  kDebug() << "Port";
-#if 0
   //statusbar
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
-  KStatusBar *sb =  mainWin ? mainWin->statusBar() : 0;
+  QStatusBar *sb =  mainWin ? mainWin->statusBar() : 0;
   s_tatusFilter = new KSqueezedTextLabel( QString(), sb );
   s_tatusFilter->setTextElideMode( Qt::ElideRight );
   s_tatusFilter->setAlignment( Qt::AlignLeft | Qt::AlignVCenter );
   s_tatusGroup = new KSqueezedTextLabel( QString(), sb );
   s_tatusGroup->setTextElideMode( Qt::ElideRight );
   s_tatusGroup->setAlignment( Qt::AlignLeft | Qt::AlignVCenter );
-#endif
 }
 
 //================================== GUI =================================
 
 void KNMainWidget::setStatusMsg(const QString& text, int id)
 {
-  kDebug() << "Port";
-#if 0
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
-  KStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
+  QStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
   if ( !bar )
     return;
   bar->clearMessage();
-#endif
   if (text.isEmpty() && (id==SB_MAIN)) {
     BroadcastStatus::instance()->setStatusMsg(i18n(" Ready"));
   } else {
@@ -261,13 +254,10 @@ void KNMainWidget::setStatusMsg(const QString& text, int id)
 
 void KNMainWidget::setStatusHelpMsg(const QString& text)
 {
-  kDebug() << "Port";
-#if 0
   KMainWindow *mainWin = dynamic_cast<KMainWindow*>(topLevelWidget());
-  KStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
+  QStatusBar *bar =  mainWin ? mainWin->statusBar() : 0;
   if ( bar )
     bar->showMessage(text, 2000);
-#endif
 }
 
 
