@@ -34,7 +34,7 @@ using KPIM::RecentAddresses;
 #include <kmenu.h>
 #include <kdebug.h>
 #include <kcombobox.h>
-#include <ktemporaryfile.h>
+#include <QTemporaryFile>
 // #include <libkpgp/kpgpblock.h>
 #include <kcompletionbox.h>
 #include <kxmlguifactory.h>
@@ -1284,7 +1284,7 @@ void KNComposer::slotExternalEditor()
     KMessageBox::sorry(this, i18n("No editor configured.\nPlease do this in the settings dialog."));
 
   delete e_ditorTempfile;
-  e_ditorTempfile=new KTemporaryFile();
+  e_ditorTempfile=new QTemporaryFile();
 
   if(!e_ditorTempfile->open()) {
     KNHelper::displayTempFileError(this);

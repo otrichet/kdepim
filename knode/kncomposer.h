@@ -26,10 +26,10 @@
 
 
 class KSelectAction;
-class KTemporaryFile;
 class KToggleAction;
 class QComboBox;
 class QFile;
+class QTemporaryFile;
 namespace KNode {
   namespace Composer {
     class View;
@@ -125,7 +125,7 @@ class KNComposer : public KXmlGuiWindow {
     //edit
     bool e_xternalEdited;
     KProcess *e_xternalEditor;
-    KTemporaryFile *e_ditorTempfile;
+    QTemporaryFile *e_ditorTempfile;
 
     //Attachments
     QList<KNAttachment::Ptr> mDeletedAttachments;

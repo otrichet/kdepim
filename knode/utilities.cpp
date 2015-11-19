@@ -12,21 +12,19 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 
-#include <QByteArray>
-#include <QListWidget>
-#include <QRegExp>
-#include <QCursor>
-
-#include <QHBoxLayout>
-
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kglobalsettings.h>
 #include <kdebug.h>
 #include <kio/netaccess.h>
-#include <ktemporaryfile.h>
 #include <kfiledialog.h>
 #include <kdialog.h>
+#include <QByteArray>
+#include <QCursor>
+#include <QHBoxLayout>
+#include <QListWidget>
+#include <QRegExp>
+#include <QTemporaryFile>
 
 #include "knglobals.h"
 #include "utilities.h"
@@ -80,7 +78,7 @@ QFile* KNSaveHelper::getFile(const QString &dialogTitle)
     }
     return file;
   } else {
-    tmpFile = new KTemporaryFile();
+    tmpFile = new QTemporaryFile();
     if (!tmpFile->open()) {
       KNHelper::displayTempFileError();
       delete tmpFile;

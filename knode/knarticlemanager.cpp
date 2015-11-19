@@ -16,15 +16,14 @@
 
 #include "utils/scoped_cursor_override.h"
 
-#include <QByteArray>
-#include <QList>
 #include <krun.h>
 #include <kmessagebox.h>
 #include <kmimetypetrader.h>
 #include <klocale.h>
 #include <kdebug.h>
 #include <kwindowsystem.h>
-#include <ktemporaryfile.h>
+#include <QDir>
+#include <QTemporaryFile>
 
 #include "articlewidget.h"
 #include "knmainwidget.h"
@@ -68,9 +67,7 @@ KNArticleManager::~KNArticleManager()
 
 void KNArticleManager::deleteTempFiles()
 {
-  for ( QList<KTemporaryFile*>::Iterator it = mTempFiles.begin(); it != mTempFiles.end(); ++it ) {
-    delete (*it);
-  }
+  qDeleteAll(mTempFiles);
   mTempFiles.clear();
 }
 
@@ -115,10 +112,9 @@ void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
 
 QString KNArticleManager::saveContentToTemp(KMime::Content *c)
 {
+  QString path;
   kDebug() << "Port";
 #if 0
-  QString path;
-  KTemporaryFile* tmpFile;
   KMime::Headers::Base *pathHdr=c->headerByType("X-KNode-Tempfile");  // check for existing temp file
 
   if(pathHdr) {
@@ -126,7 +122,7 @@ QString KNArticleManager::saveContentToTemp(KMime::Content *c)
     bool found=false;
 
     // lets see if the tempfile-path is still valid...
-    for ( QList<KTemporaryFile*>::Iterator it = mTempFiles.begin(); it != mTempFiles.end(); ++it ) {
+    for ( QList<QTemporaryFile*>::Iterator it = mTempFiles.begin(); it != mTempFiles.end(); ++it ) {
       if ( (*it)->fileName() == path ) {
         found = true;
         break;
@@ -138,8 +134,9 @@ QString KNArticleManager::saveContentToTemp(KMime::Content *c)
     else
       c->removeHeader("X-KNode-Tempfile");
   }
+#endif
 
-  tmpFile=new KTemporaryFile();
+  QTemporaryFile* tmpFile = new QTemporaryFile();
   if (!tmpFile->open()) {
     KNHelper::displayTempFileError();
     delete tmpFile;
@@ -151,12 +148,13 @@ QString KNArticleManager::saveContentToTemp(KMime::Content *c)
   tmpFile->write(data.data(), data.size());
   tmpFile->flush();
   path=tmpFile->fileName();
+  kDebug() << "Port";
+#if 0
   pathHdr=new KMime::Headers::Generic("X-KNode-Tempfile", c, path, "UTF-8");
   c->setHeader(pathHdr);
+#endif
 
   return path;
-#endif
-  return QString();
 }
 
 

@@ -17,8 +17,8 @@
 
 #include <kurl.h>
 
-class KTemporaryFile;
 class QFile;
+class QTemporaryFile;
 
 //*****************************************************************************
 // utility classes
@@ -42,7 +42,7 @@ private:
   QString s_aveName;
   KUrl url;
   QFile* file;
-  KTemporaryFile* tmpFile;
+  QTemporaryFile* tmpFile;
   static QString lastPath;
 
 };

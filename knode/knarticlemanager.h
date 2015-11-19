@@ -22,10 +22,10 @@
 
 #include <QList>
 
-class KTemporaryFile;
 class KNArticleCollection;
 class KNArticleFilter;
 class KNFilterManager;
+class QTemporaryFile;
 
 namespace KNode {
   class SearchDialog;
@@ -116,7 +116,7 @@ class KNArticleManager : public QObject, public KNJobConsumer {
     KNArticleFilter *f_ilter;
     KNFilterManager *f_ilterMgr;
     KNode::SearchDialog *s_earchDlg;
-    QList<KTemporaryFile*> mTempFiles;
+    QList<QTemporaryFile*> mTempFiles;
 
   Q_SIGNALS:
     void filterChanged(KNArticleFilter *f);

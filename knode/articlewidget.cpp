@@ -15,6 +15,7 @@
 
 #include <KConfigWidgets/KStandardAction>
 #include <KDE/KDebug>
+#include <KDE/KGlobal>
 #include <KDE/KMimeType>
 #include <KHtml/KHTMLPart>
 #include <KHtml/KHTMLView>
@@ -30,6 +31,7 @@
 #include <QMenu>
 #include <QStandardPaths>
 #include <QStringList>
+#include <QTemporaryFile>
 #include <QTextCodec>
 #include <QTimer>
 
@@ -45,7 +47,6 @@
 #include <kmessagebox.h>
 #include <krun.h>
 #include <kselectaction.h>
-#include <ktemporaryfile.h>
 #include <ktoggleaction.h>
 #include <kurl.h>
 #include <kxmlguifactory.h>
@@ -1062,8 +1063,7 @@ void ArticleWidget::updateContents()
 KUrl ArticleWidget::writeAttachmentToTempFile( KMime::Content *att, int partNum )
 {
   // more or less KMail code
-  KTemporaryFile *tempFile = new KTemporaryFile();
-  tempFile->setSuffix( '.' + QString::number( partNum ) );
+  QTemporaryFile *tempFile = new QTemporaryFile(QDir::tempPath() + QLatin1String("/knode_XXXXXX.") + QString::number(partNum));
   tempFile->open();
   KUrl file = KUrl( tempFile->fileName() );
   delete tempFile;
