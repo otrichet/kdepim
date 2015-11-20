@@ -22,20 +22,20 @@
 
 #include "startup.h"
 
+
+#include <KCoreAddons/Kdelibs4ConfigMigrator>
+#include <KCoreAddons/Kdelibs4Migration>
 #include <KDE/KGlobal>
+#include <KDE/KDebug>
+#include <KIconLoader>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
 #include <KIdentityManagement/Signature>
-#include <QStandardPaths>
-
-#include "knaccountmanager.h"
-#include "knglobals.h"
-#include "knnntpaccount.h"
-
-#include <KDebug>
-#include <KIconLoader>
 #include <KLocale>
 #include <QDir>
+#include <QStandardPaths>
+
+#include "knglobals.h"
 
 
 namespace KNode {
@@ -50,13 +50,14 @@ void Startup::loadLibrariesIconsAndTranslations() const
   KGlobal::locale()->insertCatalog( "libkpgp" );
   KGlobal::locale()->insertCatalog( "libmessagecomposer" );
   KGlobal::locale()->insertCatalog( "libmessageviewer" );
-
 }
 
 
 
 void Startup::updateDataAndConfiguration() const
 {
+  migrateKde4To5();
+
   KConfig *conf = KNGlobals::self()->config();
   KConfigGroup cg( conf, "GENERAL" );
   QList<int> updateIds = cg.readEntry( "KNode::Utilities::Startup::updateId", QList<int>() );
@@ -66,6 +67,31 @@ void Startup::updateDataAndConfiguration() const
   }
   cg.writeEntry( "KNode::Utilities::Startup::updateId", updateIds );
 }
+
+void Startup::migrateKde4To5() const
+{
+  // Config & ui.rc file
+  Kdelibs4ConfigMigrator cfmigrator(QLatin1String("knode"));
+  QStringList configFiles;
+  configFiles << QLatin1String("knoderc");
+  QStringList rcFiles;
+  rcFiles << QLatin1String("knodeui.rc"), QLatin1String("knreaderui.rc"), QLatin1String("kncomposerui.rc");
+  cfmigrator.setConfigFiles(configFiles);
+  cfmigrator.setUiFiles(rcFiles);
+  bool migrating = cfmigrator.migrate();
+
+  // Data
+  if(migrating) {
+    Kdelibs4Migration datamigrator;
+    const QDir oldDataDir( datamigrator.locateLocal("data", "knode/") );
+    const QDir newDataDir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/") );
+    if(oldDataDir.exists() && !newDataDir.exists()) {
+        kDebug() << "Moving data from" << oldDataDir.absolutePath() << "to" << newDataDir.absolutePath();
+        QDir().rename(oldDataDir.absolutePath(), newDataDir.absolutePath());
+    }
+  }
+}
+
 
 void Startup::convertPre45Identities() const
 {

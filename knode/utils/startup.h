@@ -50,6 +50,11 @@ class KNODE_EXPORT Startup
 
   private:
     /**
+     * Migrate configuration files from $HOME/.kde/... to XDG_*_HOME (KDE 4 -> 5).
+     */
+    void migrateKde4To5() const;
+
+    /**
       Convert KNode-specific Identity objects stored in configuration of KNode and accounts and groups
       to KIdentityManagement::Identity.
       @since 4.5
