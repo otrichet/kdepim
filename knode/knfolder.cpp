@@ -24,12 +24,12 @@
 #include "knfoldermanager.h"
 #include "knglobals.h"
 #include "knmainwidget.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "utils/scoped_cursor_override.h"
 
 #include <QFileInfo>
 #include <kconfig.h>
-#include <kdebug.h>
 #include <klocale.h>
 
 using namespace KNode;
@@ -169,18 +169,18 @@ void KNFolder::setParent( KNCollection::Ptr p )
 bool KNFolder::loadHdrs()
 {
   if(isLoaded()) {
-    kDebug() << "already loaded";
+    qCDebug(KNODE_LOG) << "already loaded";
     return true;
   }
 
   if(!i_ndexFile.open(QIODevice::ReadOnly)) {
-    kError() << "cannot open index-file!";
+    qCCritical(KNODE_LOG) << "cannot open index-file!";
     closeFiles();
     return false;
   }
 
   if(!m_boxFile.open(QIODevice::ReadOnly)) {
-    kError() << "cannot open mbox-file!";
+    qCCritical(KNODE_LOG) << "cannot open mbox-file!";
     closeFiles();
     return false;
   }
@@ -200,11 +200,11 @@ bool KNFolder::loadHdrs()
     byteCount=i_ndexFile.read((char*)(&dynamic), sizeof(DynData));
     if(byteCount!=sizeof(DynData)) {
       if( i_ndexFile.error() == QFile::NoError ) {
-        kWarning() << "found broken entry in index-file: Ignored!";
+        qCWarning(KNODE_LOG) << "found broken entry in index-file: Ignored!";
         continue;
       }
       else {
-        kError() << "corrupted index-file, IO-error!";
+        qCCritical(KNODE_LOG) << "corrupted index-file, IO-error!";
         closeFiles();
         clear();
         return false;
@@ -218,7 +218,7 @@ bool KNFolder::loadHdrs()
 
     //read overview
     if ( !m_boxFile.seek( art->startOffset() ) ) {
-      kError() << "cannot set mbox file-pointer!";
+      qCCritical(KNODE_LOG) << "cannot set mbox file-pointer!";
       closeFiles();
       clear();
       return false;
@@ -228,11 +228,11 @@ bool KNFolder::loadHdrs()
       tmp.resize( tmp.length() - 1 );
     if(tmp.isEmpty()) {
       if( m_boxFile.error() == QFile::NoError ) {
-        kWarning() <<"found broken entry in mbox-file: Ignored!";
+        qCWarning(KNODE_LOG) <<"found broken entry in mbox-file: Ignored!";
         continue;
       }
       else {
-        kError() << "corrupted mbox-file, IO-error!";
+        qCCritical(KNODE_LOG) << "corrupted mbox-file, IO-error!";
         closeFiles();
         clear();
         return false;
@@ -318,14 +318,14 @@ bool KNFolder::loadArticle( KNLocalArticle::Ptr a )
 
   closeFiles();
   if(!m_boxFile.open(QIODevice::ReadOnly)) {
-    kError() << "cannot open mbox file:"
+    qCCritical(KNODE_LOG) << "cannot open mbox file:"
                   << m_boxFile.fileName();
     return false;
   }
 
   //set file-pointer
   if ( !m_boxFile.seek( a->startOffset() ) ) {
-    kError() << "cannot set mbox file-pointer!";
+    qCCritical(KNODE_LOG) << "cannot set mbox file-pointer!";
     closeFiles();
     return false;
   }
@@ -339,7 +339,7 @@ bool KNFolder::loadArticle( KNLocalArticle::Ptr a )
   int readBytes=m_boxFile.read(buff.data(), size);
   closeFiles();
   if ( readBytes < (int)(size) && m_boxFile.error() != QFile::NoError ) {  // cannot read file
-    kError() << "corrupted mbox file, IO-error!";
+    qCCritical(KNODE_LOG) << "corrupted mbox file, IO-error!";
     return false;
   }
 
@@ -354,13 +354,13 @@ bool KNFolder::loadArticle( KNLocalArticle::Ptr a )
 
 bool KNFolder::saveArticles( KNLocalArticle::List &l )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if(!isLoaded())  // loading should not be done here - keep the StorageManager in sync !!
     return false;
 
   if(!m_boxFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
-    kError() << "cannot open mbox-file!";
+    qCCritical(KNODE_LOG) << "cannot open mbox-file!";
     closeFiles();
     return false;
   }
@@ -427,7 +427,7 @@ bool KNFolder::saveArticles( KNLocalArticle::List &l )
 
     }
     else {
-      kError() << "article not in folder!";
+      qCCritical(KNODE_LOG) << "article not in folder!";
       ret=false;
     }
 
@@ -521,7 +521,7 @@ void KNFolder::syncIndex(bool force)
     return;
 
   if(!i_ndexFile.open(QIODevice::WriteOnly)) {
-    kError() << "cannot open index-file!";
+    qCCritical(KNODE_LOG) << "cannot open index-file!";
     closeFiles();
     return;
   }

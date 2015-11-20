@@ -26,14 +26,15 @@
 
 #include "headers_model.h"
 
-#include <KDE/KDebug>
 #include <KI18n/KLocalizedString>
 #include <KIconThemes/KIconLoader>
+#include <QDebug>
 #include <QFont>
 
 #include "knarticlefilter.h"
 #include "knconfigmanager.h"
 #include "knfiltermanager.h"
+#include "knode_debug.h"
 #include "settings.h"
 
 namespace KNode
@@ -242,7 +243,7 @@ void HeadersModel::reload(const KNArticleCollection::Ptr collection)
                     mFilter->doFilter(boost::dynamic_pointer_cast<KNFolder>(collection));
                     break;
                 default:
-                    kError() << "Invalid collection type:" << collection->type();
+                    qCCritical(KNODE_LOG) << "Invalid collection type:" << collection->type();
                     break;
             }
         }

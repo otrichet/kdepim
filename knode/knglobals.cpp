@@ -23,12 +23,12 @@
 #include "knfoldermanager.h"
 #include "knmemorymanager.h"
 #include "knmainwidget.h"
+#include "knode_debug.h"
 #include "scheduler.h"
 #include "settings.h"
 
 #include <kconfig.h>
 #include <kglobal.h>
-#include <KDebug>
 #include <kiconloader.h>
 #include <KIdentityManagement/IdentityManager>
 
@@ -55,12 +55,12 @@ KNGlobals::KNGlobals() :
   mArticleFactory( 0 ),
   mIdentityManager( 0 )
 {
-  kDebug();
+  qCDebug(KNODE_LOG);
 }
 
 KNGlobals::~KNGlobals( )
 {
-  kDebug();
+  qCDebug(KNODE_LOG);
   mIdentityManager->deleteLater();
   delete mSettings;
 }
@@ -182,37 +182,37 @@ void KNGlobals::reset()
 {
   delete mMemManager;
   mMemManager = 0;
-  kDebug() << "Memory Manager deleted";
+  qCDebug(KNODE_LOG) << "Memory Manager deleted";
 
   delete mFolManager;
   mFolManager = 0;
-  kDebug() << "Folder Manager deleted";
+  qCDebug(KNODE_LOG) << "Folder Manager deleted";
 
   delete mFilManager;
   mFilManager = 0;
-  kDebug() << "Filter Manager deleted";
+  qCDebug(KNODE_LOG) << "Filter Manager deleted";
 
   delete mArtManager;
   mArtManager = 0;
-  kDebug() << "Article Manager deleted";
+  qCDebug(KNODE_LOG) << "Article Manager deleted";
 
   delete mGrpManager;
   mGrpManager = 0;
-  kDebug() << "Group Manager deleted";
+  qCDebug(KNODE_LOG) << "Group Manager deleted";
 
   delete mAccManager;
   mAccManager = 0;
-  kDebug() << "Account Manager deleted";
+  qCDebug(KNODE_LOG) << "Account Manager deleted";
 
   delete mCfgManager;
   mCfgManager = 0;
-  kDebug() << "Config deleted";
+  qCDebug(KNODE_LOG) << "Config deleted";
 
   delete mScheduler;
   mScheduler = 0;
-  kDebug() << "Scheduler deleted";
+  qCDebug(KNODE_LOG) << "Scheduler deleted";
 
   delete mArticleFactory;
   mArticleFactory = 0;
-  kDebug() <<" Article Factory deleted";
+  qCDebug(KNODE_LOG) <<" Article Factory deleted";
 }

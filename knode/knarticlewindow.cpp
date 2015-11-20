@@ -15,9 +15,10 @@
 
 #include "knarticlewindow.h"
 
-#include <KDE/KDebug>
+#include <QDebug>
 
 #include "articlewidget.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "knglobals.h"
 #include "knmainwidget.h"
@@ -103,7 +104,7 @@ ArticleWindow::ArticleWindow( KNArticle::Ptr art )
   : KXmlGuiWindow( 0 )
 {
   setObjectName( "articleWindow" );
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if ( knGlobals.componentData().isValid() )
     setComponentData( knGlobals.componentData() );
@@ -139,7 +140,7 @@ ArticleWindow::ArticleWindow( KNArticle::Ptr art )
 ArticleWindow::~ArticleWindow()
 {
   mInstances.removeAll( this );
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   saveMainWindowSettings(knGlobals.config()->group( "articleWindow_options") );
 #endif

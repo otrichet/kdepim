@@ -22,11 +22,13 @@
 
 #include "attachment_view.h"
 
-#include "../kncomposer.h"
-
-#include <KDE/KDebug>
+#include <QDebug>
 #include <QHeaderView>
 #include <QKeyEvent>
+
+
+#include "../kncomposer.h"
+#include "knode_debug.h"
 
 
 namespace KNode {
@@ -73,7 +75,7 @@ void AttachmentView::editCurrentAttachment()
     setCurrentItem( items[ 0 ] );
   }
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   AttachmentViewItem *item = static_cast< AttachmentViewItem * >( currentItem() );
   QPointer<KNComposer::AttachmentPropertiesDlg> dlg = new KNComposer::AttachmentPropertiesDlg( item->mAttachment, this );

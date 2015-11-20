@@ -14,10 +14,10 @@
 
 #include "knarticlecollection.h"
 
-#include "knarticle.h"
-
-#include <KDebug>
 #include <QByteArray>
+
+#include "knarticle.h"
+#include "knode_debug.h"
 
 
 KNArticleVector::KNArticleVector(KNArticleVector *master, SortingType sorting)
@@ -221,7 +221,7 @@ KNArticle::Ptr KNArticleCollection::byMessageId( const QByteArray &mid )
 {
   if(m_idIndex.isEmpty()) {
     m_idIndex.syncWithMaster();
-    kDebug() << "created index";
+    qCDebug(KNODE_LOG) << "created index";
   }
   return m_idIndex.bsearch(mid);
 }

@@ -14,14 +14,15 @@
 
 #include "kncollectionviewitem.h"
 
-#include <KDE/KDebug>
+#include <kiconloader.h>
+#include <QDebug>
 
 #include "kncollectionview.h"
 #include "kngroup.h"
 #include "knfolder.h"
+#include "knode_debug.h"
 #include "knconfigmanager.h"
 
-#include <kiconloader.h>
 
 
 KNCollectionViewItem::KNCollectionViewItem( FolderTreeWidget *parent, Protocol protocol, FolderType type) :
@@ -51,7 +52,7 @@ void KNCollectionViewItem::setUp()
   // Label edition
   setFlags( flags() | Qt::ItemIsEditable );
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   // Icons
   if ( protocol() == FolderTreeWidgetItem::News ) {

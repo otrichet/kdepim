@@ -29,12 +29,12 @@
 #include "knarticlemanager.h"
 #include "kngroupmanager.h"
 #include "knnntpaccount.h"
+#include "knode_debug.h"
 #include "settings.h"
 #include "utils/locale.h"
 #include "utils/scoped_cursor_override.h"
 
 #include <kconfig.h>
-#include <kdebug.h>
 #include <klocale.h>
 #include <QTextStream>
 #include <QByteArray>
@@ -179,11 +179,11 @@ const KIdentityManagement::Identity & KNGroup::identity() const
 bool KNGroup::loadHdrs()
 {
   if(isLoaded()) {
-    kDebug() << "nothing to load";
+    qCDebug(KNODE_LOG) << "nothing to load";
     return true;
   }
 
-  kDebug() << "loading headers";
+  qCDebug(KNODE_LOG) << "loading headers";
   QByteArray buffer, hdrValue;
   QFile f;
   int cnt=0, id, lines, fileFormatVersion, artNumber;
@@ -202,10 +202,10 @@ bool KNGroup::loadHdrs()
       buffer = f.readLine();
       if ( buffer.isEmpty() ){
         if ( f.error() == QFile::NoError ) {
-          kWarning() <<"Found broken line in static-file: Ignored!";
+          qCWarning(KNODE_LOG) <<"Found broken line in static-file: Ignored!";
           continue;
         } else {
-          kError() <<"Corrupted static file, IO-error!";
+          qCCritical(KNODE_LOG) <<"Corrupted static file, IO-error!";
           clear();
           return false;
         }
@@ -213,7 +213,7 @@ bool KNGroup::loadHdrs()
 
       QList<QByteArray> splits = buffer.split( '\t' );
       if ( splits.size() < 4 ) {
-        kWarning() <<"Found broken line in static-file: Ignored!";
+        qCWarning(KNODE_LOG) <<"Found broken line in static-file: Ignored!";
         continue;
       }
       QList<QByteArray>::ConstIterator it = splits.constBegin();
@@ -269,7 +269,7 @@ bool KNGroup::loadHdrs()
               || hdrName == "Bytes" || hdrName == "Lines" )
             continue;
           hdrValue = buffer.right( buffer.length() - (pos + 2) );
-          kDebug() << "Port";
+          qCDebug(KNODE_LOG) << "Port";
 #if 0
           if ( hdrValue.length() > 0 )
             art->setHeader( new KMime::Headers::Generic( hdrName, art.get(), hdrValue ) );
@@ -310,10 +310,10 @@ bool KNGroup::loadHdrs()
         byteCount = f.read((char*)(&data1), dataSize);
       if ((byteCount == -1)||(byteCount!=dataSize)) {
         if ( f.error() == QFile::NoError ) {
-          kWarning() <<"Found broken entry in dynamic-file: Ignored!";
+          qCWarning(KNODE_LOG) <<"Found broken entry in dynamic-file: Ignored!";
           continue;
         } else {
-          kError() <<"Corrupted dynamic file, IO-error!";
+          qCCritical(KNODE_LOG) <<"Corrupted dynamic file, IO-error!";
           clear();
           return false;
         }
@@ -346,7 +346,7 @@ bool KNGroup::loadHdrs()
     return false;
   }
 
-  kDebug() << cnt <<" articles read from file";
+  qCDebug(KNODE_LOG) << cnt <<" articles read from file";
   c_ount=length();
 
   // convert old data files into current format:
@@ -421,13 +421,13 @@ void KNGroup::insortNewHeaders( const KIO::UDSEntryList &list, KNJobData *job)
       if ( field < KIO::UDSEntry::UDS_EXTRA || field > KIO::UDSEntry::UDS_EXTRA_END )
         continue;
       QString value = entry.stringValue( field );
-      kDebug() << value;
+      qCDebug(KNODE_LOG) << value;
       QString hdrName = value.left( value.indexOf( ':' ) );
       if ( hdrName == "Subject" || hdrName == "From" || hdrName == "Date"
            || hdrName == "Message-ID" || hdrName == "References"
            || hdrName == "Bytes" || hdrName == "Lines" )
         continue;
-      kDebug() <<"Adding optional header:" << hdrName;
+      qCDebug(KNODE_LOG) <<"Adding optional header:" << hdrName;
       mOptionalHeaders.append( hdrName.toLatin1() );
     }
   }
@@ -480,7 +480,7 @@ void KNGroup::insortNewHeaders( const KIO::UDSEntryList &list, KNJobData *job)
           art->lines()->setNumberOfLines( hdrValue.toInt() );
         } else {
           // optional extra headers
-          kDebug() << "Port";
+          qCDebug(KNODE_LOG) << "Port";
 #if 0
           art->setHeader( new KMime::Headers::Generic( hdrName.toLatin1(), art.get(), hdrValue.toLatin1() ) );
 #endif
@@ -561,7 +561,7 @@ int KNGroup::saveStaticData(int cnt,bool ovr)
         mbox = art->from()->mailboxes().first();
       ts << mbox.address() << '\t';
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
       if ( mbox.hasName() )
         ts << KMime::encodeRFC2047String( mbox.name(), art->from()->rfc2047Charset() ) << '\n';
@@ -668,7 +668,7 @@ void KNGroup::syncDynamicData()
 
       f.close();
 
-      kDebug() << g_roupname <<" => updated" << cnt <<" entries of dynamic data";
+      qCDebug(KNODE_LOG) << g_roupname <<" => updated" << cnt <<" entries of dynamic data";
 
       r_eadCount=readCnt;
     }
@@ -717,7 +717,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
 
   // this method is called from the nntp-thread!!!
 #ifndef NDEBUG
-  kDebug() << "start =" << start << "end =" << end;
+  qCDebug(KNODE_LOG) << "start =" << start << "end =" << end;
 #endif
 
   //resort old hdrs
@@ -730,7 +730,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
         if(ref) {
           // this method is called from the nntp-thread!!!
           #ifndef NDEBUG
-          kDebug() << art->id() << ": Old" << oldRef << "New" << art->idRef();
+          qCDebug(KNODE_LOG) << art->id() << ": Old" << oldRef << "New" << art->idRef();
           #endif
           resortCnt++;
           art->setChanged(true);
@@ -749,7 +749,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
         foundCnt++;
     }
     else {
-      kDebug() << "Port";
+      qCDebug(KNODE_LOG) << "Port";
 #if 0
       if(art->subject()->isReply()) {
         art->setIdRef(0); //hdr has no references
@@ -857,7 +857,7 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
     if(isLoop) {
       // this method is called from the nntp-thread!!!
       #ifndef NDEBUG
-      kDebug() << "Sorting : loop in" << startId;
+      qCDebug(KNODE_LOG) << "Sorting : loop in" << startId;
       #endif
       art=at(idx);
       art->setIdRef(0);
@@ -891,9 +891,9 @@ void KNGroup::buildThreads(int cnt, KNJobData *job)
 
   // this method is called from the nntp-thread!!!
 #ifndef NDEBUG
-  kDebug() << "Sorting :" << resortCnt << "headers resorted";
-  kDebug() << "Sorting :" << foundCnt << "references of" << refCnt << "found";
-  kDebug() << "Sorting :" << bySubCnt << "references of" << refCnt << "sorted by subject";
+  qCDebug(KNODE_LOG) << "Sorting :" << resortCnt << "headers resorted";
+  qCDebug(KNODE_LOG) << "Sorting :" << foundCnt << "references of" << refCnt << "found";
+  qCDebug(KNODE_LOG) << "Sorting :" << bySubCnt << "references of" << refCnt << "sorted by subject";
 #endif
 }
 
@@ -921,7 +921,7 @@ KNRemoteArticle::Ptr KNGroup::findReference( KNRemoteArticle::Ptr a )
 
 void KNGroup::reorganize()
 {
-  kDebug();
+  qCDebug(KNODE_LOG);
 
   ScopedCursorOverride cursor( Qt::WaitCursor );
   knGlobals.setStatusMsg(i18n(" Reorganizing headers..."));
@@ -980,7 +980,7 @@ void KNGroup::updateThreadInfo()
   }
 
   if(brokenThread) {
-    kWarning() << "Found broken threading information! Restoring ...";
+    qCWarning(KNODE_LOG) << "Found broken threading information! Restoring ...";
     reorganize();
     updateThreadInfo();
   }

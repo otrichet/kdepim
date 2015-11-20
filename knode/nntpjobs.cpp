@@ -12,12 +12,13 @@
 
 #include "nntpjobs.h"
 
-#include "kngroup.h"
-#include "kngroupmanager.h"
-#include "knserverinfo.h"
-#include <kdebug.h>
 #include <klocale.h>
 #include <QDir>
+
+#include "kngroup.h"
+#include "kngroupmanager.h"
+#include "knode_debug.h"
+#include "knserverinfo.h"
 
 KNode::GroupListJob::GroupListJob( KNJobConsumer *c, KNServerInfo::Ptr a, KNJobItem::Ptr i, bool incremental )
   : KNJobData( KNJobData::JTFetchGroups, c, a, i ),
@@ -79,7 +80,7 @@ void KNode::GroupListJob::slotEntries( KIO::Job * job, const KIO::UDSEntryList &
     } else {
       subscribed = false;
     }
-    kDebug() << "Found group " << name;
+    qCDebug(KNODE_LOG) << "Found group " << name;
     if ( mIncremental )
       mGroupList.append(KNGroupInfo( name, desc, true, subscribed, access ) );
     else

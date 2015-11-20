@@ -19,9 +19,11 @@ include_directories(
 ########### Private library ###############
 
 set(knodecommon_LIB_SRCS
+   knapplication.cpp
    knconfigmanager.cpp
    knconfig.cpp
    knconfigwidgets.cpp
+   knode.cpp
    settings.cpp
    scheduler.cpp
    knjobdata.cpp
@@ -87,6 +89,10 @@ set(knodecommon_LIB_SRCS
    treewidget.cpp
    foldertreewidget.cpp
 )
+ecm_qt_declare_logging_category(knodecommon_LIB_SRCS
+                                HEADER knode_debug.h
+                                IDENTIFIER KNODE_LOG
+                                CATEGORY_NAME log_knode)
 
 qt5_add_dbus_adaptor( knodecommon_LIB_SRCS org.kde.knode.xml knmainwidget.h KNMainWidget)
 
@@ -113,7 +119,6 @@ add_library(knodecommon ${knodecommon_LIB_SRCS})
 
 target_link_libraries(knodecommon
     PRIVATE
-#         KF5::Contacts
         KF5::IdentityManagement
         KF5::I18n
         KF5::KCMUtils
@@ -144,7 +149,6 @@ add_library(kcm_knode MODULE ${kcm_knode_PART_SRCS})
 target_link_libraries(kcm_knode
     PRIVATE
         knodecommon
-        KF5::ConfigWidgets
         KF5::IdentityManagement
         KF5::KCMUtils
         KF5::KDELibs4Support
@@ -154,7 +158,7 @@ install(TARGETS kcm_knode  DESTINATION ${KDE_INSTALL_PLUGINDIR})
 
 ########### Main binary ###############
 
-set(knode_SRCS knode.cpp knapplication.cpp main.cpp )
+set(knode_SRCS main.cpp )
 file(GLOB ICONS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/icons/*-apps-knode.png")
 ecm_add_app_icon(knode_SRCS ICONS ${ICONS_SRCS})
 add_executable(knode ${knode_SRCS})
@@ -165,9 +169,6 @@ target_link_libraries(knode
         KF5::DBusAddons
         KF5::I18n
         KF5::KDELibs4Support
-        KF5::Libkdepim
-        KF5::Mime
-        KF5::XmlGui
 )
 install(TARGETS knode  ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 

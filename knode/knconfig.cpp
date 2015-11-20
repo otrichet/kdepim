@@ -18,13 +18,12 @@
 
 #include "kndisplayedheader.h"
 #include "knglobals.h"
+#include "knode_debug.h"
 #include "settings.h"
 #include "utilities.h"
 
 #include <klocale.h>
-#include <kdebug.h>
 #include <kiconloader.h>
-#include <kiconeffect.h>
 
 
 KNode::DisplayedHeaders::DisplayedHeaders()
@@ -49,7 +48,7 @@ KNode::DisplayedHeaders::DisplayedHeaders()
       h->setHeader(cg.readEntry("Header"));
       flags=cg.readEntry("Flags",QList<int>());
       if(h->name().isNull() || h->header().isNull() || (flags.count()!=8)) {
-        kDebug() << "ignoring invalid/incomplete Header";
+        qCDebug(KNODE_LOG) << "ignoring invalid/incomplete Header";
         remove(h);
       }
       else {
@@ -74,7 +73,7 @@ void KNode::DisplayedHeaders::save()
   if(!d_irty)
     return;
 
-  kDebug();
+  qCDebug(KNODE_LOG);
 
   QString dir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/") ) ;
   if (dir.isNull()) {
@@ -126,7 +125,7 @@ KNDisplayedHeader* KNode::DisplayedHeaders::createNewHeader()
 void KNode::DisplayedHeaders::remove(KNDisplayedHeader *h)
 {
   if ( !mHeaderList.removeAll( h ) )
-    kDebug() << "cannot find pointer in list!";
+    qCDebug(KNODE_LOG) << "cannot find pointer in list!";
 
 }
 
@@ -138,7 +137,7 @@ void KNode::DisplayedHeaders::up(KNDisplayedHeader *h)
     mHeaderList.takeAt( idx );
     mHeaderList.insert( idx - 1, h );
   }
-  else kDebug() << "item not found in list";
+  else qCDebug(KNODE_LOG) << "item not found in list";
 }
 
 
@@ -149,7 +148,7 @@ void KNode::DisplayedHeaders::down(KNDisplayedHeader *h)
     mHeaderList.takeAt( idx );
     mHeaderList.insert( idx + 1, h );
   }
-  else kDebug() << "item not found in list";
+  else qCDebug(KNODE_LOG) << "item not found in list";
 }
 
 
@@ -236,7 +235,7 @@ void KNode::Cleanup::saveConfig(KConfigGroup &conf)
 
 void KNode::Cleanup::save()
 {
-  kDebug();
+  qCDebug(KNODE_LOG);
   if (mGlobal) {
     KConfigGroup conf( knGlobals.config(), "EXPIRE" );
     saveConfig( conf );

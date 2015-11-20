@@ -12,15 +12,15 @@
 
 #include "mailsendjob.h"
 
-#include "knarticle.h"
-#include "knserverinfo.h"
-
 #include <mailtransport/transportmanager.h>
 #include <mailtransport/transportjob.h>
-
-#include <kdebug.h>
 #include <klocale.h>
 #include <kio/job.h>
+
+#include "knarticle.h"
+#include "knode_debug.h"
+#include "knserverinfo.h"
+
 
 using namespace MailTransport;
 

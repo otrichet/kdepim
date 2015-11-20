@@ -15,7 +15,6 @@
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kglobalsettings.h>
-#include <kdebug.h>
 #include <kio/netaccess.h>
 #include <kfiledialog.h>
 #include <kdialog.h>
@@ -27,6 +26,7 @@
 #include <QTemporaryFile>
 
 #include "knglobals.h"
+#include "knode_debug.h"
 #include "utilities.h"
 
 

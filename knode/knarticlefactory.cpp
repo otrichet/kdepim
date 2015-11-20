@@ -15,13 +15,14 @@
 
 #include "knarticlefactory.h"
 
-#include <KDE/KDebug>
 #include <KDE/KGlobal>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
+#include <QDebug>
 
 #include "knglobals.h"
 #include "kngroupmanager.h"
+#include "knode_debug.h"
 #include "knaccountmanager.h"
 #include "knfoldermanager.h"
 #include "knarticlemanager.h"
@@ -81,7 +82,7 @@ void KNArticleFactory::createPosting( KNNntpAccount::Ptr a )
   art->setDoPost(true);
   art->setDoMail(false);
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *c = new KNComposer( art, QString(), QString(), true, false, false, false );
   mCompList.append( c );
@@ -106,7 +107,7 @@ void KNArticleFactory::createPosting( KNGroup::Ptr g )
   art->setDoPost(true);
   art->setDoMail(false);
   art->newsgroups()->fromUnicodeString(g->groupname(), art->defaultCharset());
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *c = new KNComposer( art, QString(), QString(), true, false, false, false );
   mCompList.append( c );
@@ -225,7 +226,7 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   attribution.replace(QRegExp("%NAME"),name);
   if ( !a->from()->isEmpty() )
     attribution.replace(QRegExp("%EMAIL"), QString::fromLatin1(a->from()->addresses().first()));
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   attribution.replace( QRegExp("%DATE"), KGlobal::locale()->formatDateTime(a->date()->dateTime().toLocalZone().dateTime(), KLocale::LongDate) );
 #endif
@@ -279,7 +280,7 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   }
 
   //open composer
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *c=new KNComposer(art, quoted, notRewraped, true, authorDislikesMailCopies, authorWantsMailCopies);
   mCompList.append( c );
@@ -343,7 +344,7 @@ void KNArticleFactory::createForward( KNArticle::Ptr a )
 
   //------------------------ <Attachments> -------------------------
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if(incAtt) {
     KMime::Content::List al = a->attachments( false );
@@ -361,7 +362,7 @@ void KNArticleFactory::createForward( KNArticle::Ptr a )
   }
 
   //open composer
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *c = new KNComposer( art, fwd, QString(), true );
   mCompList.append( c );
@@ -521,7 +522,7 @@ void KNArticleFactory::createSupersede( KNArticle::Ptr a )
     text = textContent->decodedText();
 
   //open composer
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *c=new KNComposer(art, text);
   mCompList.append( c );
@@ -548,7 +549,7 @@ void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
   art->to()->addAddress((*address));
 
   //open composer
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *c = new KNComposer( art, QString(), QString(), true );
   mCompList.append( c );
@@ -611,7 +612,7 @@ void KNArticleFactory::edit( KNLocalArticle::Ptr a )
     knGlobals.articleManager()->loadArticle(a);
 
   //open composer
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   com = new KNComposer( a, QString() );
   mCompList.append( com );
@@ -721,7 +722,7 @@ bool KNArticleFactory::closeComposeWindows()
 
 void KNArticleFactory::deleteComposerForArticle( KNLocalArticle::Ptr a )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KNComposer *com = findComposer( a );
   if ( com ) {
@@ -743,7 +744,7 @@ KNComposer* KNArticleFactory::findComposer( KNLocalArticle::Ptr a )
 
 void KNArticleFactory::configChanged()
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   for ( QList<KNComposer*>::Iterator it = mCompList.begin(); it != mCompList.end(); ++it )
     (*it)->setConfig( false );
@@ -810,7 +811,7 @@ void KNArticleFactory::processJob(KNJobData *j)
 
 KNLocalArticle::Ptr KNArticleFactory::newArticle( KNCollection::Ptr col, const QByteArray &defChset, bool withXHeaders, KNArticle::Ptr origPost )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if ( knGlobals.settings()->generateMessageID() && knGlobals.settings()->hostname().isEmpty() ) {
     KMessageBox::sorry(knGlobals.topWidget, i18n("Please set a hostname for the generation\nof the message-id or disable it."));
@@ -1005,7 +1006,7 @@ void KNArticleFactory::showSendErrorDialog()
 
 void KNArticleFactory::slotComposerDone(KNComposer *com)
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   bool delCom=true;
   KNLocalArticle::List lst;

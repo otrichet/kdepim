@@ -16,9 +16,8 @@
 
 #include "knapplication.h"
 
-#include <kdebug.h>
-
 #include "knode.h"
+#include "knode_debug.h"
 #include "knmainwidget.h"
 
 KNApplication::KNApplication(int &argc, char **argv)
@@ -28,7 +27,7 @@ KNApplication::KNApplication(int &argc, char **argv)
 
 void KNApplication::launch(const QStringList& params)
 {
-  kDebug();
+  qCDebug(KNODE_LOG);
 
   KNMainWindow *main = findPrimaryWindow();
 

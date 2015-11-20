@@ -29,7 +29,6 @@
 
 #include <QtGui/QFont>
 #include <KI18n/KLocalizedString>
-#include <KDE/KDebug>
 
 namespace KNode {
 namespace GroupSelection {

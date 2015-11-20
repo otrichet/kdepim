@@ -15,6 +15,9 @@
 #include "knfoldermanager.h"
 
 #include <KI18n/KLocalizedString>
+#include <KMessageBox>
+#include <QDir>
+#include <QStandardPaths>
 
 #include "knglobals.h"
 #include "knconfigmanager.h"
@@ -24,13 +27,9 @@
 #include "kncleanup.h"
 #include "knmemorymanager.h"
 #include "knmainwidget.h"
+#include "knode_debug.h"
 #include "utils/scoped_cursor_override.h"
 
-#include <KDebug>
-#include <KMessageBox>
-
-#include <QDir>
-#include <QStandardPaths>
 
 using namespace KNode::Utilities;
 
@@ -82,7 +81,7 @@ void KNFolderManager::setCurrentFolder( KNFolder::Ptr f )
   c_urrentFolder=f;
   a_rtManager->setFolder(f);
 
-  kDebug() << "folder changed";
+  qCDebug(KNODE_LOG) << "folder changed";
 
   if(f && !f->isRootFolder()) {
     if( loadHeaders(f) )
@@ -395,7 +394,7 @@ void KNFolderManager::importFromMBox( KNFolder::Ptr f )
 
 void KNFolderManager::exportToMBox( KNFolder::Ptr f )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if(!f || f->isRootFolder())
     return;

@@ -14,7 +14,6 @@
 #include "articlewidget.h"
 
 #include <KConfigWidgets/KStandardAction>
-#include <KDE/KDebug>
 #include <KDE/KGlobal>
 #include <KDE/KMimeType>
 #include <KHtml/KHTMLPart>
@@ -25,6 +24,7 @@
 #include <QBuffer>
 #include <QClipboard>
 #include <QDir>
+#include <QDebug>
 #include <QFile>
 #include <QHBoxLayout>
 #include <QImage>
@@ -73,6 +73,7 @@
 #include "kngroup.h"
 #include "knmainwidget.h"
 #include "knnntpaccount.h"
+#include "knode_debug.h"
 #include "knsourceviewwindow.h"
 #include "nntpjobs.h"
 #include "settings.h"
@@ -348,7 +349,7 @@ void ArticleWidget::readConfig()
   ra = static_cast<KToggleAction*>( mActionCollection->action( QString("view_headers_%1").arg(mHeaderStyle) ) );
   ra->setChecked( true );
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   delete mCSSHelper;
   mCSSHelper = new CSSHelper( mViewer->view() );
@@ -404,7 +405,7 @@ void ArticleWidget::setArticle( KNArticle::Ptr article )
 
 void ArticleWidget::clear()
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   disableActions();
   mViewer->begin();
@@ -431,7 +432,7 @@ void ArticleWidget::displayArticle()
     return;
   }
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if ( mForceCharset != mArticle->forceDefaultCharset()
        || ( mForceCharset && mArticle->defaultCharset() != mOverrideCharset ) ) {
@@ -442,9 +443,9 @@ void ArticleWidget::displayArticle()
 
   removeTempFiles();
 
-  kDebug() << "Port";
-#if 0
   mViewer->begin();
+  qCDebug(KNODE_LOG) << "Port";
+#if 0
   mViewer->setUserStyleSheet( mCSSHelper->cssDefinitions( mFixedFontToggle->isChecked() ) );
   mViewer->write( mCSSHelper->htmlHead( mFixedFontToggle->isChecked() ) );
 #endif
@@ -470,12 +471,12 @@ void ArticleWidget::displayArticle()
   if ( text && !canDecodeText( text->contentType()->charset() ) ) {
     html += QString("<table width=\"100%\" border=\"0\"><tr><td bgcolor=\"#FF0000\">%1</td></tr></table>")
       .arg( i18n("Unknown charset. Default charset is used instead.") );
-    kDebug() <<"unknown charset =" << text->contentType()->charset();
+    qCDebug(KNODE_LOG) <<"unknown charset =" << text->contentType()->charset();
   }
 
   // if the article is pgp signed and the user asked for verifying the
   // signature, we show a nice header:
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   QList<Kpgp::Block> pgpBlocks;
   QList<QByteArray> nonPgpBlocks;
@@ -485,7 +486,7 @@ void ArticleWidget::displayArticle()
   mViewer->write ( html );
   html.clear();
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if ( containsPGP ) {
     QList<Kpgp::Block>::Iterator pbit = pgpBlocks.begin();
@@ -530,7 +531,7 @@ void ArticleWidget::displayArticle()
   // get attachments
   mAttachments.clear();
   mAttachementMap.clear();
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if( !text || ct->isMultipart() )
     mAttachments = mArticle->attachments( knGlobals.settings()->showAlternativeContents() );
@@ -565,7 +566,7 @@ void ArticleWidget::displayArticle()
       }
     }
     else {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
       if ( !containsPGP ) {
         QStringList lines = text->decodedText( true, knGlobals.settings()->removeTrailingNewlines() ).split( '\n' );
@@ -598,7 +599,7 @@ void ArticleWidget::displayArticle()
 void ArticleWidget::displayErrorMessage( const QString &msg )
 {
   mViewer->begin();
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   mViewer->setUserStyleSheet( mCSSHelper->cssDefinitions( mFixedFontToggle->isChecked() ) );
   mViewer->write( mCSSHelper->htmlHead( mFixedFontToggle->isChecked() ) );
@@ -664,7 +665,7 @@ void ArticleWidget::displayHeader()
       headerHtml+="<tr><td colspan=\"2\">";
 
     if ( hb->is("From") ) {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
       headerHtml += QString( "<a href=\"mailto:%1\">%2</a>")
           .arg( KPIMUtils::extractEmailAddress( hb->asUnicodeString() ) )
@@ -677,7 +678,7 @@ void ArticleWidget::displayHeader()
         headerHtml += ')';
       }
     } else if ( hb->is("Date") ) {
-      kDebug() << "Port";
+      qCDebug(KNODE_LOG) << "Port";
 #if 0
       KMime::Headers::Date *date=static_cast<KMime::Headers::Date*>(hb);
       headerHtml += toHtmlString( KGlobal::locale()->formatDateTime(date->dateTime().toLocalZone().dateTime(), KLocale::LongDate, true), None );
@@ -702,7 +703,7 @@ void ArticleWidget::displayHeader()
   }
 
   // X-Face support
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   QString xfhead;
   KMime::Headers::Base *temp = mArticle->headerByType("X-Face");
@@ -725,7 +726,7 @@ void ArticleWidget::displayHeader()
   html += "<table class=\"outer\"><tr><td width=\"100%\"><table>";
   html += headerHtml;
   html += "</table></td>";
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   html += "<td align=\"center\">" + xface + "</td>";
 #endif
@@ -768,7 +769,7 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
         // close previous body tag (if any) and open new one
         if ( newLevel != -2 )
           html += "</div>";
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
         html += mCSSHelper->nonQuotedFontTag();
 #endif
@@ -791,7 +792,7 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
           if ( oldLevel != -2 )
             html += "</div>"; // close previous level
           // open new level
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
           if ( newLevel == -1 )
             html += mCSSHelper->nonQuotedFontTag();
@@ -820,7 +821,7 @@ void ArticleWidget::displayBodyBlock( const QStringList &lines )
 
 QString ArticleWidget::displaySigHeader( /*const Kpgp::Block &block*/ )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   QString signClass = "signErr";
   QString signer = block.signatureUserId();
@@ -979,7 +980,7 @@ void ArticleWidget::displayAttachment( KMime::Content *att, int partNum )
 
 QString ArticleWidget::toHtmlString( const QString &line, int flags )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   int llflags = KPIMUtils::LinkLocator::PreserveSpaces;
   if ( !(flags & ArticleWidget::ParseURL) )
@@ -1036,7 +1037,7 @@ bool ArticleWidget::inlinePossible( KMime::Content *c )
 
 bool ArticleWidget::canDecodeText( const QByteArray &charset ) const
 {
-  kDebug() << charset;
+  qCDebug(KNODE_LOG) << charset;
   if ( charset.isEmpty() )
     return false;
   bool ok = true;
@@ -1089,7 +1090,7 @@ KUrl ArticleWidget::writeAttachmentToTempFile( KMime::Content *att, int partNum 
 
   QByteArray data = att->decodedContent();
   // ### KMail does crlf2lf conversion here before writing the file
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if( !KPIMUtils::kByteArrayToFile( data, file.toLocalFile(), false, false, false ) )
     return KUrl();
@@ -1241,7 +1242,7 @@ void ArticleWidget::slotURLClicked( const KUrl &url, bool forceOpen)
   }
   // handle news URL's
   if ( url.protocol() == "news" ) {
-    kDebug() << url;
+    qCDebug(KNODE_LOG) << url;
     knGlobals.top->openURL( url );
     return;
   }
@@ -1467,7 +1468,7 @@ void ArticleWidget::slotSetCharset( const QString &charset )
   }
 
   if ( mArticle && mArticle->hasContent() ) {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
     mArticle->setDefaultCharset( mOverrideCharset );  // the article will choose the correct default,
     mArticle->setForceDefaultCharset( mForceCharset );     // when we disable the overdrive
@@ -1479,7 +1480,7 @@ void ArticleWidget::slotSetCharset( const QString &charset )
 
 void ArticleWidget::slotSetCharsetKeyboard( )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   int charset = KNHelper::selectDialog( this, i18n("Select Charset"),
     mCharsetSelect->items(), mCharsetSelect->currentItem() );
@@ -1513,7 +1514,7 @@ void ArticleWidget::slotAddBookmark()
   if ( mCurrentURL.isEmpty() )
     return;
   QString filename = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/konqueror/bookmarks.xml") ;
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KBookmarkManager *bookManager = KBookmarkManager::managerForFile( filename, "konqueror" );
   KBookmarkGroup group = bookManager->root();

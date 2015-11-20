@@ -22,20 +22,20 @@
 
 #include "startup.h"
 
-
 #include <KCoreAddons/Kdelibs4ConfigMigrator>
 #include <KCoreAddons/Kdelibs4Migration>
 #include <KDE/KGlobal>
-#include <KDE/KDebug>
 #include <KIconLoader>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
 #include <KIdentityManagement/Signature>
 #include <KLocale>
+#include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
 
 #include "knglobals.h"
+#include "knode_debug.h"
 
 
 namespace KNode {
@@ -86,7 +86,7 @@ void Startup::migrateKde4To5() const
     const QDir oldDataDir( datamigrator.locateLocal("data", "knode/") );
     const QDir newDataDir( QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + QString::fromLatin1("/knode/") );
     if(oldDataDir.exists() && !newDataDir.exists()) {
-        kDebug() << "Moving data from" << oldDataDir.absolutePath() << "to" << newDataDir.absolutePath();
+        qCDebug(KNODE_LOG) << "Moving data from" << oldDataDir.absolutePath() << "to" << newDataDir.absolutePath();
         QDir().rename(oldDataDir.absolutePath(), newDataDir.absolutePath());
     }
   }
@@ -99,7 +99,7 @@ void Startup::convertPre45Identities() const
   KConfigGroup cg;
 
   // Global identity
-  kDebug() << "Converting global identity";
+  qCDebug(KNODE_LOG) << "Converting global identity";
   cg = KConfigGroup( KNGlobals::self()->config(), "IDENTITY" );
   convertPre45Identity( cg );
 
@@ -110,11 +110,11 @@ void Startup::convertPre45Identities() const
     QDir serverDir( dir.absolutePath() + '/' + subPath );
     // server account
     QFile f( serverDir.absolutePath() + "/info" );
-    kDebug() << "Reading" << f.fileName();
+    qCDebug(KNODE_LOG) << "Reading" << f.fileName();
     if ( f.exists() ) {
       conf = KSharedConfig::openConfig( f.fileName(), KConfig::SimpleConfig );
       cg = KConfigGroup( conf, QString() );
-      kDebug() << "Converting identity of account from" << f.fileName() << ':' << cg.readEntry( "server" );
+      qCDebug(KNODE_LOG) << "Converting identity of account from" << f.fileName() << ':' << cg.readEntry( "server" );
       convertPre45Identity( cg );
 
       // groups
@@ -124,7 +124,7 @@ void Startup::convertPre45Identities() const
         if ( infoFile.exists() ) {
           conf = KSharedConfig::openConfig( infoFile.fileName(), KConfig::SimpleConfig );
           cg = KConfigGroup( conf, QString() );
-          kDebug() << "Converting identity of group from" << infoFile.fileName();
+          qCDebug(KNODE_LOG) << "Converting identity of group from" << infoFile.fileName();
           convertPre45Identity( cg );
         }
       }
@@ -194,16 +194,16 @@ void Startup::convertPre45Identity( KConfigGroup &cg ) const
 
     if ( isDuplicate ) {
       identity = (*it);
-      kDebug() << "An identity containing the same information was found : " << identity.identityName();
+      qCDebug(KNODE_LOG) << "An identity containing the same information was found : " << identity.identityName();
     } else {
       identity = im->newFromExisting( identity, im->makeUnique( identity.fullName() ) );
       // Ensure that this new identity is seen by the Iterator above in the next call of this method.
       im->commit();
-      kDebug() << "Adding a new identity named " << identity.identityName();
+      qCDebug(KNODE_LOG) << "Adding a new identity named " << identity.identityName();
     }
     cg.writeEntry( "identity", identity.uoid() );
   } else {
-    kDebug() << "Empty identity found";
+    qCDebug(KNODE_LOG) << "Empty identity found";
   }
 
   // Delete old entry

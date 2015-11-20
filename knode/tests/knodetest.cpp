@@ -22,7 +22,7 @@
 
 #include "knodetest.h"
 
-#include <utils/locale.h>
+#include "utils/locale.h"
 using namespace KNode::Utilities;
 
 
@@ -30,10 +30,9 @@ using namespace KNode::Utilities;
 #include <KCharsets>
 #include <KGlobal>
 #include <KLocale>
-
-#include <QDebug>
 #include <QMap>
 #include <QTest>
+
 
 
 void KNodeTest::testUtilitiesLocale()

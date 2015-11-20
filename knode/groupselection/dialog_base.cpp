@@ -25,7 +25,6 @@
 
 #include "dialog_base.h"
 
-#include <KDE/KDebug>
 #include <KDE/KIcon>
 #include <KDE/KRecursiveFilterProxyModel>
 #include <QtCore/QTimer>

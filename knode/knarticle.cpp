@@ -14,18 +14,18 @@
 
 #include "knarticle.h"
 
-#include <KDE/KDebug>
+#include <kcodecs.h>
 #include <KDE/KGlobal>
+#include <kmimetype.h>
+#include <QDebug>
 
 #include "kngroup.h"
+#include "knode_debug.h"
 #include "knglobals.h"
 #include "knconfigmanager.h"
 #include "settings.h"
 #include "utilities.h"
 #include "utils/locale.h"
-
-#include <kcodecs.h>
-#include <kmimetype.h>
 
 
 using namespace KNode::Utilities;
@@ -68,7 +68,7 @@ KNRemoteArticle::KNRemoteArticle( KNGroup::Ptr g )
  : KNArticle(g), a_rticleNumber(-1), i_dRef(-1), t_hrLevel(0),
    u_nreadFups(0), n_ewFups(0)
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   setDefaultCharset( Locale::defaultCharset( g ) );
 #endif
@@ -104,7 +104,7 @@ void KNRemoteArticle::parse()
 
 void KNRemoteArticle::setForceDefaultCharset(bool b)
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if (!b) { // restore default
     KNGroup::Ptr g = boost::static_pointer_cast<KNGroup>( c_ol );
@@ -122,7 +122,7 @@ void KNRemoteArticle::setForceDefaultCharset(bool b)
 KNLocalArticle::KNLocalArticle( KNArticleCollection::Ptr c )
   : KNArticle(c), s_Offset(0), e_Offset(0), s_erverId(-1)
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   setDefaultCharset( Locale::defaultCharset() );
 #endif
@@ -135,7 +135,7 @@ KNLocalArticle::~KNLocalArticle()
 
 void KNLocalArticle::setForceDefaultCharset( bool b )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if (!b)  // restore default
     setDefaultCharset( Locale::defaultCharset() );

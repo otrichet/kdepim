@@ -20,7 +20,6 @@
 #include <kmessagebox.h>
 #include <kmimetypetrader.h>
 #include <klocale.h>
-#include <kdebug.h>
 #include <kwindowsystem.h>
 #include <QDir>
 #include <QTemporaryFile>
@@ -28,6 +27,7 @@
 #include "articlewidget.h"
 #include "knmainwidget.h"
 #include "knglobals.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "knarticlemanager.h"
 #include "kngroupmanager.h"
@@ -113,7 +113,7 @@ void KNArticleManager::saveArticleToFile( KNArticle::Ptr a, QWidget *parent )
 QString KNArticleManager::saveContentToTemp(KMime::Content *c)
 {
   QString path;
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   KMime::Headers::Base *pathHdr=c->headerByType("X-KNode-Tempfile");  // check for existing temp file
 
@@ -148,7 +148,7 @@ QString KNArticleManager::saveContentToTemp(KMime::Content *c)
   tmpFile->write(data.data(), data.size());
   tmpFile->flush();
   path=tmpFile->fileName();
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   pathHdr=new KMime::Headers::Generic("X-KNode-Tempfile", c, path, "UTF-8");
   c->setHeader(pathHdr);
@@ -361,7 +361,7 @@ void KNArticleManager::copyIntoFolder( KNArticle::List &l, KNFolder::Ptr f )
 void KNArticleManager::moveIntoFolder( KNLocalArticle::List &l, KNFolder::Ptr f )
 {
   if(!f) return;
-  kDebug() <<" Target folder:" << f->name();
+  qCDebug(KNODE_LOG) <<" Target folder:" << f->name();
 
   f->setNotUnloadable(true);
 

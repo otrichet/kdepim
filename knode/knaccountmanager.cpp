@@ -14,20 +14,20 @@
 
 #include "knaccountmanager.h"
 
+#include <kconfig.h>
+#include <klocale.h>
+#include <kmessagebox.h>
+#include <kwallet.h>
+#include <QDir>
 #include <QStandardPaths>
 
 #include "knconfigmanager.h"
 #include "knfoldermanager.h"
 #include "knglobals.h"
 #include "kngroupmanager.h"
+#include "knode_debug.h"
 #include "utilities.h"
 
-#include <QDir>
-#include <kdebug.h>
-#include <kconfig.h>
-#include <klocale.h>
-#include <kmessagebox.h>
-#include <kwallet.h>
 
 
 
@@ -76,7 +76,7 @@ void KNAccountManager::loadAccounts()
       gManager->loadGroups(a);
       emit accountAdded(a);
     } else {
-      kError() <<"Unable to load account" << (*it) <<"!";
+      qCCritical(KNODE_LOG) <<"Unable to load account" << (*it) <<"!";
     }
   }
 }

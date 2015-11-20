@@ -16,6 +16,7 @@
 
 #include <QStandardPaths>
 
+#include "knode_debug.h"
 #include "utilities.h"
 #include "kncollectionviewitem.h"
 #include "knconfigmanager.h"
@@ -26,7 +27,6 @@
 
 #include <QTimer>
 #include <kconfig.h>
-#include <kdebug.h>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
 

@@ -28,6 +28,7 @@
 #include "resource.h"
 #include "knarticlewindow.h"
 #include "knmemorymanager.h"
+#include "knode_debug.h"
 #include "settings.h"
 #include "utils/locale.h"
 
@@ -39,7 +40,6 @@
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kiconloader.h>
-#include <kdebug.h>
 #include <kcharsets.h>
 
 #include "groupselection/group_subscription_dialog.h"
@@ -173,7 +173,7 @@ bool KNGroupListData::readIn(KNJobData *job)
     f.close();
     return true;
   } else {
-    kWarning() <<"unable to open" << f.fileName() <<" reason" << f.error();
+    qCWarning(KNODE_LOG) <<"unable to open" << f.fileName() <<" reason" << f.error();
     return false;
   }
 }
@@ -204,7 +204,7 @@ bool KNGroupListData::writeOut()
     f.close();
     return true;
   } else {
-    kWarning() <<"unable to open" << f.fileName() <<" reason" << f.error();
+    qCWarning(KNODE_LOG) <<"unable to open" << f.fileName() <<" reason" << f.error();
     return false;
   }
 }
@@ -277,7 +277,7 @@ void KNGroupManager::loadGroups( KNNntpAccount::Ptr a )
       mGroupList.append( group );
       emit groupAdded(group);
     } else {
-      kError() <<"Unable to load" << (*it) <<"!";
+      qCCritical(KNODE_LOG) <<"Unable to load" << (*it) <<"!";
     }
   }
 }
@@ -489,7 +489,7 @@ bool KNGroupManager::unsubscribeGroup( KNGroup::Ptr g )
              it.fileName() == g->groupname()+".grpinfo" )
           dir.remove( it.fileName() );
       }
-      kDebug() <<"Files deleted!";
+      qCDebug(KNODE_LOG) <<"Files deleted!";
 
       emit groupRemoved(g);
       mGroupList.removeAll( g );
@@ -515,7 +515,7 @@ void KNGroupManager::checkGroupForNewHeaders( KNGroup::Ptr g )
   if(!g) g=c_urrentGroup;
   if(!g) return;
   if(g->isLocked()) {
-    kDebug() << "group locked - returning";
+    qCDebug(KNODE_LOG) << "group locked - returning";
     return;
   }
 
@@ -563,7 +563,7 @@ void KNGroupManager::setCurrentGroup( KNGroup::Ptr g )
 {
   c_urrentGroup=g;
   a_rticleMgr->setGroup(g);
-  kDebug() << "group changed";
+  qCDebug(KNODE_LOG) << "group changed";
 
   if(g) {
     if( !loadHeaders(g) ) {

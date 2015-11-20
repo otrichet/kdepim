@@ -14,10 +14,10 @@
 
 #include "knconfigwidgets.h"
 
-#include <KDE/KDebug>
 #include <KDE/KGlobal>
 #include <KDE/KHBox>
 #include <KIconThemes/KIconLoader>
+#include <QDebug>
 #include <Sonnet/ConfigWidget>
 
 #include "configuration/identity_widget.h"
@@ -27,6 +27,7 @@
 #include "kngroupmanager.h"
 #include "knglobals.h"
 #include "knnntpaccount.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "knfiltermanager.h"
 #include "knarticlefilter.h"
@@ -191,7 +192,7 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
     mAccount( a ),
     mUseServerForName( false )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   if ( a->id() != -1 )
     setCaption( i18n("Properties of %1", a->name()) );
@@ -199,7 +200,7 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
     setCaption( i18n("New Account") );
 #endif
   setFaceType( Tabbed );
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   setButtons( Ok | Cancel | Help );
   setDefaultButton( Ok );
@@ -268,7 +269,7 @@ KNode::NntpAccountConfDialog::NntpAccountConfDialog( KNNntpAccount *a, QWidget *
 
   KNHelper::restoreWindowSize("accNewsPropDLG", this, sizeHint());
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   setHelp("anc-setting-the-news-account");
 #endif
@@ -330,7 +331,7 @@ void KNode::NntpAccountConfDialog::slotButtonClicked( int button )
 
     accept();
   } else {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
     KDialog::slotButtonClicked( button );
 #endif
@@ -1415,7 +1416,7 @@ KNode::PostNewsComposerWidget::PostNewsComposerWidget( QWidget *parent ) :
 KNode::PostNewsSpellingWidget::PostNewsSpellingWidget( QWidget *parent ) :
   KCModule( parent )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   QVBoxLayout *topL=new QVBoxLayout(this);
   topL->setSpacing(5);
@@ -1436,7 +1437,7 @@ KNode::PostNewsSpellingWidget::~PostNewsSpellingWidget()
 
 void KNode::PostNewsSpellingWidget::save()
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   c_conf->save();
 #endif
@@ -1448,7 +1449,7 @@ void KNode::PostNewsSpellingWidget::save()
 KNode::PrivacyWidget::PrivacyWidget( QWidget *parent ) :
   KCModule(parent )
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   QBoxLayout *topLayout = new QVBoxLayout(this);
   topLayout->setSpacing(5);
@@ -1471,7 +1472,7 @@ KNode::PrivacyWidget::~PrivacyWidget()
 
 void KNode::PrivacyWidget::save()
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   c_onf->applySettings();
 #endif

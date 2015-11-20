@@ -22,13 +22,15 @@
 
 #include "identity_edition_dialog.h"
 
-#include "knglobals.h"
-
-#include <KDE/KDebug>
 #include <KDE/KIcon>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
 #include <KDE/KMessageBox>
+#include <QDebug>
+
+#include "knglobals.h"
+#include "knode_debug.h"
+
 
 using namespace KIdentityManagement;
 
@@ -128,7 +130,7 @@ void IdentityEditionDialog::slotButtonClicked( int button )
 void IdentityEditionDialog::identitySelected( int index )
 {
   if ( index < 0 || index >= mUoids.size() ) {
-    kWarning() << "Bad state: called with the index" << index << "when mUoids.size()==" << mUoids.size();
+    qCWarning(KNODE_LOG) << "Bad state: called with the index" << index << "when mUoids.size()==" << mUoids.size();
     return;
   }
 
@@ -235,7 +237,7 @@ void IdentityEditionDialog::changeIdentityName( const QString &newName )
 {
     IdentityManager *im = KNGlobals::self()->identityManager();
     Identity &identity = im->modifyIdentityForUoid( mCurrentIdentityUoid );
-    kDebug() << "Change identity name from" << identity.identityName() << "to" << newName;
+    qCDebug(KNODE_LOG) << "Change identity name from" << identity.identityName() << "to" << newName;
     Q_ASSERT( !identity.isNull() );
     identity.setIdentityName( newName );
 
@@ -251,7 +253,7 @@ void IdentityEditionDialog::changeIdentityName( const QString &newName )
 void IdentityEditionDialog::deleteCurrentIdentity()
 {
   if ( mUoids.size() <= 1 ) {
-    kWarning() << "Only one identity left and deleteCurrentIdentity() was called!";
+    qCWarning(KNODE_LOG) << "Only one identity left and deleteCurrentIdentity() was called!";
     return;
   }
 

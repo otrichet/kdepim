@@ -15,11 +15,11 @@
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <klocale.h>
-#include <kdebug.h>
 #include <QStandardPaths>
 
 #include "kngroup.h"
 #include "knfolder.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "knarticlefilter.h"
 
@@ -123,7 +123,7 @@ void KNArticleFilter::load()
 
   l_oaded=true;
 
-  kDebug() << "filter loaded:" << n_ame;
+  qCDebug(KNODE_LOG) << "filter loaded:" << n_ame;
 
 }
 
@@ -167,7 +167,7 @@ void KNArticleFilter::save()
   group = conf.group("REFERENCES");
   references.save(group);
 
-  kDebug() << "filter saved:" << n_ame;
+  qCDebug(KNODE_LOG) << "filter saved:" << n_ame;
 }
 
 
@@ -267,7 +267,7 @@ void KNArticleFilter::doFilter( KNGroup::Ptr g )
     }
   }
 
-  kDebug() << "matched" << c_ount
+  qCDebug(KNODE_LOG) << "matched" << c_ount
                 << "articles , merged" << mergeCnt
                 << "threads by subject";
 

@@ -13,14 +13,12 @@
 
 #include "knconfigpages.h"
 
-#include <KDE/KDebug>
+#include <kcmoduleloader.h>
 
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
 #include "knconfigwidgets.h"
 #include "settings.h"
-
-#include <kcmoduleloader.h>
 
 
 //
@@ -93,12 +91,9 @@ extern "C"
 }
 
 KNode::AccountsPage::AccountsPage( const KComponentData &inst,QWidget *parent )
-  : KCMTabContainer( inst,parent ) {
-
-  kDebug() << "Port";
-#if 0
-  addTab( new NntpAccountListWidget( inst, this ), i18n("Newsgroup Servers") );
-#endif
+  : KCMTabContainer( inst,parent )
+{
+  addTab( new NntpAccountListWidget( this ), i18n("Newsgroup Servers") );
   addTab( KCModuleLoader::loadModule( "kcm_mailtransport", KCModuleLoader::Inline, this ),
           i18n("Mail Server (SMTP)") );
 }

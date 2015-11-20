@@ -12,26 +12,26 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 #include "knode.h"
-#include "knglobals.h"
 
-#include <QApplication>
 #include <KDE/KGlobal>
 #include <Libkdepim/BroadcastStatus>
 #include <Libkdepim/ProgressDialog>
 #include <Libkdepim/StatusbarProgressWidget>
+#include <QApplication>
 #include <QtWidgets/QStatusBar>
 
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kstandardaction.h>
-#include <kdebug.h>
 #include <kiconloader.h>
 #include <klocale.h>
 #include <kactioncollection.h>
 #include <ksqueezedtextlabel.h>
 
-#include "knmainwidget.h"
 #include "kncollectionviewitem.h"
+#include "knglobals.h"
+#include "knmainwidget.h"
+#include "knode_debug.h"
 
 KNMainWindow::KNMainWindow( QWidget* parent )
   : KXmlGuiWindow( parent )
@@ -59,7 +59,7 @@ KNMainWindow::KNMainWindow( QWidget* parent )
 
 KNMainWindow::~KNMainWindow()
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   saveMainWindowSettings(knGlobals.config()->group( "mainWindow_options") );
 #endif
@@ -72,7 +72,7 @@ void KNMainWindow::openURL( const KUrl& url )
 
 void KNMainWindow::slotConfToolbar()
 {
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   saveMainWindowSettings(knGlobals.config()->group( "mainWindow_options") );
 #endif

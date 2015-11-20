@@ -32,7 +32,6 @@ using KPIM::RecentAddresses;
 #include <kshortcutsdialog.h>
 #include <kedittoolbar.h>
 #include <kmenu.h>
-#include <kdebug.h>
 #include <kcombobox.h>
 #include <QTemporaryFile>
 // #include <libkpgp/kpgpblock.h>
@@ -45,6 +44,7 @@ using KPIM::RecentAddresses;
 
 #include "groupselection/group_selection_dialog.h"
 #include "knarticlemanager.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "knmainwidget.h"
 #include "knaccountmanager.h"
@@ -441,7 +441,7 @@ void KNComposer::slotCut()
     ((KTextEdit*)fw)->cut();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->cut();
-  else kDebug() <<"wrong focus widget";
+  else qCDebug(KNODE_LOG) <<"wrong focus widget";
 }
 
 void KNComposer::slotCopy()
@@ -453,7 +453,7 @@ void KNComposer::slotCopy()
     ((KTextEdit*)fw)->copy();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->copy();
-  else kDebug() <<"wrong focus widget";
+  else qCDebug(KNODE_LOG) <<"wrong focus widget";
 
 }
 
@@ -467,7 +467,7 @@ void KNComposer::slotPaste()
     ((KTextEdit*)fw)->paste();
   else if (fw->inherits("QLineEdit"))
     ((QLineEdit*)fw)->paste();
-  else kDebug() <<"wrong focus widget";
+  else qCDebug(KNODE_LOG) <<"wrong focus widget";
 }
 
 void KNComposer::slotSelectAll()
@@ -862,7 +862,7 @@ bool KNComposer::applyChanges()
               codec=KGlobal::locale()->codecForEncoding();
 
           block.setText( codec->fromUnicode(tmpText) );
-          kDebug() <<"signing article from" << article()->from()->addresses();
+          qCDebug(KNODE_LOG) <<"signing article from" << article()->from()->addresses();
           if( block.clearsign( signingKey, codec->name() ) == Kpgp::Ok ) {
               QByteArray result = block.text();
               tmp = codec->toUnicode(result.data(), result.length() );

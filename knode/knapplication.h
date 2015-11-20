@@ -17,9 +17,11 @@
 
 #include <QApplication>
 
+#include "knode_export.h"
+
 class KNMainWindow;
 
-class KNApplication : public QApplication
+class KNODE_EXPORT KNApplication : public QApplication
 {
     Q_OBJECT
   public:

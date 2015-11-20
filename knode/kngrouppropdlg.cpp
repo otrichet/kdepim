@@ -14,14 +14,15 @@
 
 #include "kngrouppropdlg.h"
 
-#include <KDE/KDebug>
 #include <KDE/KGlobal>
+#include <QDebug>
 
 #include "configuration/identity_widget.h"
 #include "knconfigmanager.h"
 #include "knconfigwidgets.h"
 #include "knglobals.h"
 #include "kngroup.h"
+#include "knode_debug.h"
 #include "utilities.h"
 #include "utils/locale.h"
 
@@ -44,7 +45,7 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
     g_rp(group), n_ickChanged(false)
 {
   setFaceType( Tabbed );
-    kDebug() << "Port";
+    qCDebug(KNODE_LOG) << "Port";
 #if 0
   setCaption( i18nc( "@title:window %1=newsgroup name", "Properties of %1", group->groupname() ) );
   setButtons( Ok|Cancel|Help );

@@ -26,7 +26,6 @@
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kseparator.h>
-#include <kdebug.h>
 
 #include "knfolder.h"
 #include "knglobals.h"
@@ -36,6 +35,7 @@
 #include "kngroupmanager.h"
 #include "knarticlemanager.h"
 #include "knnntpaccount.h"
+#include "knode_debug.h"
 
 
 KNCleanUp::KNCleanUp() :  d_lg(0)
@@ -180,7 +180,7 @@ void KNCleanUp::expireGroup( KNGroup::Ptr g, bool showResult )
   g->writeConfig();
   leftCnt=g->count();
 
-  kDebug() << g->groupname() << ":"
+  qCDebug(KNODE_LOG) << g->groupname() << ":"
     << delCnt << "deleted ," << leftCnt << "left";
 
   if(showResult)

@@ -13,15 +13,14 @@
 */
 
 
-#include <kdebug.h>
 #include <klocale.h>
 #include <kio/job.h>
-
 #include <libkdepim/progressmanager.h>
 
 #include "knarticle.h"
 #include "knglobals.h"
 #include "knnntpaccount.h"
+#include "knode_debug.h"
 #include "scheduler.h"
 
 
@@ -167,13 +166,13 @@ void KNJobData::createProgressItem()
 
 void KNJobData::slotJobPercent( KJob*, unsigned long percent )
 {
-  kDebug() <<"Progress:" << percent;
+  qCDebug(KNODE_LOG) <<"Progress:" << percent;
   setProgress( percent );
 }
 
 void KNJobData::slotJobInfoMessage( KJob*, const QString &msg )
 {
-  kDebug() <<"Status:" << msg;
+  qCDebug(KNODE_LOG) <<"Status:" << msg;
   setStatus( msg );
 }
 

@@ -14,10 +14,11 @@
 
 #include "knconfigmanager.h"
 
-#include <KDE/KDebug>
 #include <kiconloader.h>
 #include <kwindowsystem.h>
+#include <QDebug>
 
+#include "knode_debug.h"
 #include "utilities.h"
 #include "knglobals.h"
 #include "articlewidget.h"
@@ -85,7 +86,7 @@ KNConfigDialog::KNConfigDialog( QWidget *parent )
   addModule ( "knode_config_privacy" );
   addModule ( "knode_config_cleanup" );
 
-  kDebug() << "Port";
+  qCDebug(KNODE_LOG) << "Port";
 #if 0
   setHelp("anc-setting-your-identity");
 #endif

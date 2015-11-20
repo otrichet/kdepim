@@ -19,9 +19,8 @@
 #include "knarticlemanager.h"
 #include "kngroupmanager.h"
 #include "knfoldermanager.h"
+#include "knode_debug.h"
 #include "settings.h"
-
-#include <KDebug>
 
 
 KNMemoryManager::KNMemoryManager()
@@ -45,11 +44,11 @@ void KNMemoryManager::updateCacheEntry( KNArticleCollection::Ptr c )
   if( (ci=findCacheEntry(c, true)) ) { // item is taken from the list
     oldSize=ci->storageSize;
     ci->sync();
-    kDebug() << "collection (" << c->name() <<") updated";
+    qCDebug(KNODE_LOG) << "collection (" << c->name() <<") updated";
   }
   else {
     ci=new CollectionItem(c);
-    kDebug() << "collection (" << c->name() <<") added";
+    qCDebug(KNODE_LOG) << "collection (" << c->name() <<") added";
   }
 
   mColList.append(ci);
@@ -67,7 +66,7 @@ void KNMemoryManager::removeCacheEntry( KNArticleCollection::Ptr c )
     c_ollCacheSize -= ci->storageSize;
     delete ci;
 
-    kDebug() << "collection removed (" << c->name() <<"),"
+    qCDebug(KNODE_LOG) << "collection removed (" << c->name() <<"),"
                   << mColList.count() << "collections left in cache";
   }
 }
@@ -91,11 +90,11 @@ void KNMemoryManager::updateCacheEntry( KNArticle::Ptr a )
   if( (ai=findCacheEntry(a, true)) ) {
     oldSize=ai->storageSize;
     ai->sync();
-    kDebug() << "article updated";
+    qCDebug(KNODE_LOG) << "article updated";
   }
   else {
     ai=new ArticleItem(a);
-    kDebug() << "article added";
+    qCDebug(KNODE_LOG) << "article added";
   }
 
   mArtList.append(ai);
@@ -112,7 +111,7 @@ void KNMemoryManager::removeCacheEntry( KNArticle::Ptr a )
     a_rtCacheSize -= ai->storageSize;
     delete ai;
 
-    kDebug() << "article removed,"
+    qCDebug(KNODE_LOG) << "article removed,"
                   << mArtList.count() << "articles left in cache";
 
   }
@@ -173,7 +172,7 @@ void KNMemoryManager::checkMemoryUsageCollections()
     }
   }
 
-  kDebug() << mColList.count() << "collections in cache => Usage :"
+  qCDebug(KNODE_LOG) << mColList.count() << "collections in cache => Usage :"
                 << ( c_ollCacheSize*100.0 / maxSize ) << "%";
 }
 
@@ -196,7 +195,7 @@ void KNMemoryManager::checkMemoryUsageArticles()
     }
   }
 
-  kDebug() << mArtList.count() << "articles in cache => Usage :"
+  qCDebug(KNODE_LOG) << mArtList.count() << "articles in cache => Usage :"
                 << ( a_rtCacheSize*100.0 / maxSize ) << "%";
 }
 
