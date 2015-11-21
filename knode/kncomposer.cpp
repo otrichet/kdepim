@@ -1055,7 +1055,7 @@ void KNComposer::insertFile(bool clear, bool box)
 {
   KNLoadHelper helper(this);
   QFile *file = helper.getFile(i18n("Insert File"));
-  KUrl url;
+  QUrl url;
   QString boxName;
 
   if (file) {
@@ -1064,7 +1064,7 @@ void KNComposer::insertFile(bool clear, bool box)
     if (url.isLocalFile())
       boxName = url.toLocalFile();
     else
-      boxName = url.prettyUrl();
+      boxName = url.toDisplayString();
 
     insertFile(file,clear,box,boxName);
   }
@@ -1503,7 +1503,7 @@ void KNComposer::slotAttachmentPopup( const QPoint &point )
 
 void KNComposer::dragEnterEvent( QDragEnterEvent *event )
 {
-  if ( KUrl::List::canDecode( event->mimeData() ) ) {
+  if ( event->mimeData()->hasUrls() ) {
     event->setDropAction( Qt::CopyAction );
     event->accept();
   }
@@ -1511,9 +1511,9 @@ void KNComposer::dragEnterEvent( QDragEnterEvent *event )
 
 void KNComposer::dropEvent( QDropEvent *event )
 {
-  KUrl::List urls = KUrl::List::fromMimeData( event->mimeData() );
+  QList<QUrl> urls = event->mimeData()->urls();
 
-  foreach ( const KUrl &url, urls ) {
+  foreach ( const QUrl &url, urls ) {
     KNLoadHelper *helper = new KNLoadHelper(this);
 
     if (helper->setURL(url)) {

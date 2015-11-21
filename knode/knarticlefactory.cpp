@@ -561,26 +561,16 @@ void KNArticleFactory::createMail(KMime::Types::Mailbox *address)
 
 void KNArticleFactory::sendMailExternal(const QString &address, const QString &subject, const QString &body)
 {
-  KUrl mailtoURL;
-  QStringList queries;
-  QString query;
-  mailtoURL.setProtocol("mailto");
+  QUrl mailtoURL;
+  QUrlQuery query;
+  mailtoURL.setScheme("mailto");
 
   if (!address.isEmpty())
     mailtoURL.setPath(address);
   if (!subject.isEmpty())
-    queries.append(QLatin1String("subject=")+KUrl::toPercentEncoding(subject));
+    query.addQueryItem(QLatin1String("subject"), subject);
   if (!body.isEmpty())
-    queries.append(QLatin1String("body=")+KUrl::toPercentEncoding(body));
-
-  if (queries.count() > 0) {
-    query = '?';
-    for ( QStringList::Iterator it = queries.begin(); it != queries.end(); ++it ) {
-      if (it != queries.begin())
-        query.append( '&' );
-      query.append((*it));
-    }
-  }
+    query.addQueryItem(QLatin1String("body"), body);
 
   if (!query.isEmpty())
     mailtoURL.setQuery(query);

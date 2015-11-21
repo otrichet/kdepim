@@ -73,7 +73,7 @@ public:
   virtual QSize sizeHint() const;
 
   /** handle URL given as command-line argument */
-  void openURL(const KUrl &url);
+  void openURL(const QUrl &url);
   void openURL(const QString &url);
 
   /** update fonts and colors */

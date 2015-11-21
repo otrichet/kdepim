@@ -308,14 +308,14 @@ QSize KNMainWidget::sizeHint() const
 
 void KNMainWidget::openURL(const QString &url)
 {
-  openURL(KUrl(url));
+  openURL(QUrl(url));
 }
 
-void KNMainWidget::openURL(const KUrl &url)
+void KNMainWidget::openURL(const QUrl &url)
 {
   qCDebug(KNODE_LOG) << url;
   QString host = url.host();
-  short int port = url.port();
+  int port = url.port();
   KNNntpAccount::Ptr acc;
 
   if (url.url().left(7) == "news://") {
@@ -337,10 +337,10 @@ void KNMainWidget::openURL(const KUrl &url)
       if(port!=-1)
         acc->setPort(port);
 
-      if(url.hasUser() && url.hasPass()) {
+      if(!url.userName().isEmpty() && !url.password().isEmpty()) {
         acc->setNeedsLogon(true);
-        acc->setUser(url.user());
-        acc->setPass(url.pass());
+        acc->setUser(url.userName());
+        acc->setPass(url.password());
       }
 
       if(!a_ccManager->newAccount(acc))
@@ -358,11 +358,11 @@ void KNMainWidget::openURL(const KUrl &url)
   }
 
   if (acc) {
-    QString decodedUrl = KUrl::fromPercentEncoding( url.url().toLatin1() );
+    const QString decodedUrl = url.url();
     bool isMID=decodedUrl.contains('@' );
 
     if (!isMID) {
-      QString groupname=url.path( KUrl::RemoveTrailingSlash );
+      QString groupname = url.adjusted(QUrl::StripTrailingSlash).path();
       while(groupname.startsWith('/'))
         groupname.remove(0,1);
       QTreeWidgetItem *item=0;
@@ -386,7 +386,7 @@ void KNMainWidget::openURL(const KUrl &url)
         c_olView->setActive( item );
       }
     } else {
-      QString groupname = decodedUrl.mid( url.protocol().length()+1 );
+      QString groupname = decodedUrl.mid( url.scheme().length()+1 );
       KNGroup::Ptr g = g_rpManager->currentGroup();
       if (g == 0)
         g = g_rpManager->firstGroupOfAccount(acc);

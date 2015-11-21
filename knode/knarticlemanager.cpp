@@ -29,7 +29,6 @@
 #include "knglobals.h"
 #include "knode_debug.h"
 #include "utilities.h"
-#include "knarticlemanager.h"
 #include "kngroupmanager.h"
 #include "knsearchdialog.h"
 #include "knfiltermanager.h"
@@ -164,9 +163,8 @@ void KNArticleManager::openContent(KMime::Content *c)
   if(path.isNull()) return;
 
   KService::Ptr offer = KMimeTypeTrader::self()->preferredService(c->contentType()->mimeType(), "Application");
-  KUrl::List lst;
-  KUrl url;
-  url.setPath(path);
+  QList<QUrl> lst;
+  QUrl url = QUrl::fromLocalFile(path);
   lst.append(url);
 
   if (offer)

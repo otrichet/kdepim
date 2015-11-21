@@ -65,10 +65,6 @@ KNMainWindow::~KNMainWindow()
 #endif
 }
 
-void KNMainWindow::openURL( const KUrl& url )
-{
-  m_mainWidget->openURL( url );
-}
 
 void KNMainWindow::slotConfToolbar()
 {

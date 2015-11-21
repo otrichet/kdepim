@@ -32,7 +32,7 @@ void KNode::GroupListJob::execute()
 
   KNGroupListData::Ptr target = boost::static_pointer_cast<KNGroupListData>( data() );
 
-  KUrl destination = baseUrl();
+  QUrl destination = baseUrl();
   QStringList query;
   if ( target->getDescriptions )
     query << "desc=true";
@@ -147,13 +147,13 @@ void KNode::ArticleListJob::execute()
 
   KNGroup::Ptr target = boost::static_pointer_cast<KNGroup>( data() );
 
-  KUrl destination = baseUrl();
-  destination.setPath( target->groupname() );
-  QStringList query;
-  query << "first=" + QString::number( target->lastNr() + 1 );
+  QUrl destination = baseUrl();
+  destination.setPath( '/' + target->groupname() );
+  QUrlQuery query;
+  query.addQueryItem("first", QString::number( target->lastNr() + 1 ));
   if ( target->lastNr() <= 0 ) // first fetch
-    query << "max=" + QString::number( target->maxFetch() );
-  destination.setQuery( query.join( "&" ) );
+    query.addQueryItem("max", QString::number( target->maxFetch() ));
+  destination.setQuery(query);
   KIO::ListJob* job = KIO::listDir( destination, KIO::HideProgressInfo, true );
   connect( job, SIGNAL(entries(KIO::Job*,KIO::UDSEntryList)),
            SLOT(slotEntries(KIO::Job*,KIO::UDSEntryList)) );
@@ -211,17 +211,17 @@ void KNode::ArticleFetchJob::execute()
 {
   KNRemoteArticle::Ptr target = boost::static_pointer_cast<KNRemoteArticle>( data() );
 
-  KUrl url = baseUrl();
+  QUrl url = baseUrl();
 
-  url.addPath( boost::static_pointer_cast<KNGroup>( target->collection() )->groupname() );
+  url.setPath( '/' + boost::static_pointer_cast<KNGroup>( target->collection() )->groupname() );
 
   // By default, fetch articles by their server-side Id.
   // (some server does not understand the "ARTICLE <msg-id>" command correctly (bug #193550))
   if ( target->articleNumber() != -1 ) {
-    url.addPath( QString::number( target->articleNumber() ) );
+    url.setPath( url.path() + '/' + QString::number( target->articleNumber() ) );
   } else {
     // User asked to fetch a message by its msg-id
-    url.addPath( target->messageID()->as7BitString( false ) );
+    url.setPath( url.path() + '/' + target->messageID()->as7BitString( false ) );
   }
 
   KIO::Job* job = KIO::storedGet( url, KIO::NoReload, KIO::HideProgressInfo );
@@ -257,7 +257,7 @@ void KNode::ArticlePostJob::execute( )
 {
   KNLocalArticle::Ptr target = boost::static_pointer_cast<KNLocalArticle>( data() );
 
-  KUrl url = baseUrl();
+  QUrl url = baseUrl();
 
   KIO::Job* job = KIO::storedPut( target->encodedContent( true ), url, -1, KIO::Overwrite | KIO::HideProgressInfo );
   connect( job, SIGNAL(result(KJob*)), SLOT(slotResult(KJob*)) );

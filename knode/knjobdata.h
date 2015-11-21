@@ -15,15 +15,12 @@
 #ifndef KNJOBDATA_H
 #define KNJOBDATA_H
 
-#include "knserverinfo.h"
-
 #include <Libkdepim/ProgressManager>
-#include <QPointer>
-#include <kurl.h>
-#include <kio/global.h>
-#include <QObject>
 #include <QList>
+#include <QPointer>
+#include <QUrl>
 
+#include "knserverinfo.h"
 
 class KJob;
 
@@ -181,10 +178,10 @@ class KNJobData : public QObject
     /** Emits the finished() signal via a single-shot timer. */
     void emitFinished();
 
-    /** Returns a correctly set up KUrl according to the encryption and
+    /** Returns a correctly set up QUrl according to the encryption and
      *  authentication settings for KIO slave operations.
      */
-    KUrl baseUrl() const;
+    QUrl baseUrl() const;
 
     /**
       Connects progress signals.

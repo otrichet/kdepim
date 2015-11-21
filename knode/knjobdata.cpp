@@ -12,6 +12,7 @@
     Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, US
 */
 
+#include "knjobdata.h"
 
 #include <klocale.h>
 #include <kio/job.h>
@@ -181,18 +182,18 @@ void KNJobData::slotEmitFinished( )
   emit finished( this );
 }
 
-KUrl KNJobData::baseUrl() const
+QUrl KNJobData::baseUrl() const
 {
-  KUrl url;
+  QUrl url;
   if ( account()->encryption() == KNServerInfo::SSL )
-    url.setProtocol( "nntps" );
+    url.setScheme( "nntps" );
   else
-    url.setProtocol( "nntp" );
+    url.setScheme( "nntp" );
   url.setHost( account()->server() );
   url.setPort( account()->port() );
   if ( account()->needsLogon() ) {
     url.setUserName( account()->user() );
-    url.setPass( account()->pass() );
+    url.setPassword( account()->pass() );
   }
   return url;
 }

@@ -15,10 +15,12 @@
 #ifndef UTILITIES_H
 #define UTILITIES_H
 
-#include <kurl.h>
+#include <QtCore/QSize>
+#include <QtCore/QUrl>
 
 class QFile;
 class QTemporaryFile;
+class QWidget;
 
 //*****************************************************************************
 // utility classes
@@ -40,7 +42,7 @@ private:
 
   QWidget *p_arent;
   QString s_aveName;
-  KUrl url;
+  QUrl url;
   QFile* file;
   QTemporaryFile* tmpFile;
   static QString lastPath;
@@ -63,18 +65,18 @@ public:
   QFile* getFile( const QString &dialogTitle );
   /** tries to access the file specified by the url and returns
       a file open for reading */
-  QFile* setURL(const KUrl& url);
+  QFile* setURL(const QUrl& url);
   /** returns the file after getFile(QString) of setURL(url) was called */
   QFile* getFile()const { return f_ile; }
-  KUrl getURL() const    { return u_rl; }
+  QUrl getURL() const    { return u_rl; }
 
 private:
 
   QWidget *p_arent;
-  KUrl u_rl;
+  QUrl u_rl;
   QFile *f_ile;
   QString t_empName;
-  static KUrl l_astPath;
+  static QUrl l_astPath;
 
 };
 

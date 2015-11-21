@@ -19,7 +19,6 @@
 
 #include "resource.h"
 
-class KUrl;
 
 namespace KPIM {
   class StatusbarProgressWidget;
@@ -40,7 +39,6 @@ class KNMainWindow : public KXmlGuiWindow
 public:
   explicit KNMainWindow( QWidget* parent = 0 );
   ~KNMainWindow();
-  void openURL( const KUrl& );
   KNMainWidget *mainWidget() { return m_mainWidget; }
 
 public slots:

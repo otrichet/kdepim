@@ -16,7 +16,6 @@
 #include <kmessagebox.h>
 #include <kglobalsettings.h>
 #include <kio/netaccess.h>
-#include <kfiledialog.h>
 #include <kdialog.h>
 #include <QByteArray>
 #include <QCursor>
@@ -24,6 +23,8 @@
 #include <QListWidget>
 #include <QRegExp>
 #include <QTemporaryFile>
+#include <QtCore/QDir>
+#include <QtWidgets/QFileDialog>
 
 #include "knglobals.h"
 #include "knode_debug.h"
@@ -31,7 +32,7 @@
 
 
 
-QString KNSaveHelper::lastPath;
+QString KNSaveHelper::lastPath = QDir::homePath();
 
 KNSaveHelper::KNSaveHelper(QString saveName, QWidget *parent)
   : p_arent(parent), s_aveName(saveName), file(0), tmpFile(0)
@@ -55,12 +56,13 @@ KNSaveHelper::~KNSaveHelper()
 
 QFile* KNSaveHelper::getFile(const QString &dialogTitle)
 {
-  url = KFileDialog::getSaveUrl(QString(lastPath + s_aveName), QString(), p_arent, dialogTitle);
+  url = QFileDialog::getSaveFileUrl(p_arent, dialogTitle,
+                                    QUrl::fromUserInput(s_aveName, lastPath, QUrl::AssumeLocalFile));
 
   if (url.isEmpty())
     return 0;
 
-  lastPath = url.upUrl().url();
+  lastPath = KIO::upUrl(url).toString();
 
   if (url.isLocalFile()) {
     if (QFileInfo(url.toLocalFile()).exists() &&
@@ -92,7 +94,7 @@ QFile* KNSaveHelper::getFile(const QString &dialogTitle)
 
 //===============================================================================
 
-KUrl KNLoadHelper::l_astPath;
+QUrl KNLoadHelper::l_astPath;
 
 KNLoadHelper::KNLoadHelper(QWidget *parent)
   : p_arent(parent), f_ile(0)
@@ -113,7 +115,7 @@ QFile* KNLoadHelper::getFile( const QString &dialogTitle )
   if (f_ile)
     return f_ile;
 
-  KUrl url = KFileDialog::getOpenUrl( l_astPath, QString(), p_arent, dialogTitle );
+  QUrl url = QFileDialog::getOpenFileUrl(p_arent, dialogTitle, l_astPath);
 
   if (url.isEmpty())
     return 0;
@@ -124,7 +126,7 @@ QFile* KNLoadHelper::getFile( const QString &dialogTitle )
 }
 
 
-QFile* KNLoadHelper::setURL(const KUrl& url)
+QFile* KNLoadHelper::setURL(const QUrl& url)
 {
   if (f_ile)
     return f_ile;
