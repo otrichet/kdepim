@@ -15,7 +15,7 @@
 
 #include "knarticlefactory.h"
 
-#include <KDE/KGlobal>
+#include <KDE/KLocale>
 #include <KIdentityManagement/Identity>
 #include <KIdentityManagement/IdentityManager>
 #include <QDebug>
@@ -42,7 +42,6 @@
 // #include <KPIMUtils/Email>
 #include <QLabel>
 #include <kiconloader.h>
-#include <klocale.h>
 #include <kmessagebox.h>
 #include <kwindowsystem.h>
 #include <ktoolinvocation.h>
@@ -226,10 +225,7 @@ void KNArticleFactory::createReply( KNRemoteArticle::Ptr a, const QString &selec
   attribution.replace(QRegExp("%NAME"),name);
   if ( !a->from()->isEmpty() )
     attribution.replace(QRegExp("%EMAIL"), QString::fromLatin1(a->from()->addresses().first()));
-  qCDebug(KNODE_LOG) << "Port";
-#if 0
-  attribution.replace( QRegExp("%DATE"), KGlobal::locale()->formatDateTime(a->date()->dateTime().toLocalZone().dateTime(), KLocale::LongDate) );
-#endif
+  attribution.replace( QRegExp("%DATE"), KLocale::global()->formatDateTime(a->date()->dateTime().toLocalTime(), KLocale::LongDate) );
   QString msid = a->messageID()->identifier();
   attribution.replace( QRegExp("%MSIDX"), msid );
   attribution.replace( QRegExp("%MSID"), QLatin1Char('<') + msid + QLatin1Char('>') );

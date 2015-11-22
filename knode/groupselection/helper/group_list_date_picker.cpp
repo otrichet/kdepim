@@ -25,7 +25,7 @@
 
 #include "group_list_date_picker.h"
 
-#include <KDE/KGlobal>
+#include <KDE/KLocale>
 
 namespace KNode {
 namespace GroupSelection {
@@ -37,7 +37,7 @@ GroupListDatePicker::GroupListDatePicker(QWidget* parent, KNNntpAccount::Ptr acc
     setupUi(this);
     setMainWidget(mPage);
     setCaption(i18nc("@title:window", "Check for New Groups"));
-    mLastCheckButton->setText(KGlobal::locale()->formatDate(mLastFetchDate, KLocale::FancyLongDate));
+    mLastCheckButton->setText(KLocale::global()->formatDate(mLastFetchDate, KLocale::FancyLongDate));
     resetDatePicker();
 
     resize(sizeHint());

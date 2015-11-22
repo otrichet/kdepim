@@ -14,7 +14,7 @@
 
 #include "knconfigwidgets.h"
 
-#include <KDE/KGlobal>
+#include <KCodecs/KCharsets>
 #include <KDE/KHBox>
 #include <KIconThemes/KIconLoader>
 #include <QDebug>
@@ -38,7 +38,6 @@
 #include "utils/locale.h"
 
 #include <QPainter>
-#include <kcharsets.h>
 #include <kio/ioslave_defaults.h>
 #include <kmessagebox.h>
 #include <kcolordialog.h>
@@ -1278,7 +1277,7 @@ void KNode::PostNewsTechnicalWidget::load()
 {
   KCModule::load();
 
-  QString charsetDesc = KGlobal::charsets()->descriptionForEncoding( knGlobals.settings()->charset() );
+  const QString charsetDesc = KCharsets::charsets()->descriptionForEncoding( knGlobals.settings()->charset() );
   mCharset->setCurrentIndex( mCharset->findText( charsetDesc ) );
   mEncoding->setCurrentIndex( knGlobals.settings()->allow8BitBody() ? 0 : 1 );
 
@@ -1291,7 +1290,7 @@ void KNode::PostNewsTechnicalWidget::load()
 
 void KNode::PostNewsTechnicalWidget::save()
 {
-  QString charset = KGlobal::charsets()->encodingForName( mCharset->currentText() );
+  const QString charset = KCharsets::charsets()->encodingForName( mCharset->currentText() );
   knGlobals.settings()->setCharset( charset );
   knGlobals.settings()->setAllow8BitBody( mEncoding->currentIndex() == 0 );
 

@@ -14,7 +14,6 @@
 #include "articlewidget.h"
 
 #include <KConfigWidgets/KStandardAction>
-#include <KDE/KGlobal>
 #include <KDE/KMimeType>
 #include <KHtml/KHTMLPart>
 #include <KHtml/KHTMLView>
@@ -493,9 +492,9 @@ void ArticleWidget::displayArticle()
     QList<QByteArray>::Iterator npbit = nonPgpBlocks.begin();
     QTextCodec *codec;
     if ( text )
-      codec = KGlobal::charsets()->codecForName( text->contentType()->charset() );
+      codec = KCharsets::charsets()->codecForName( text->contentType()->charset() );
     else
-      codec = KGlobal::locale()->codecForEncoding();
+      codec = KCharsets::locale()->codecForEncoding();
 
     for( ; pbit != pgpBlocks.end(); ++pbit, ++npbit ) {
       // handle non-pgp block
@@ -681,7 +680,7 @@ void ArticleWidget::displayHeader()
       qCDebug(KNODE_LOG) << "Port";
 #if 0
       KMime::Headers::Date *date=static_cast<KMime::Headers::Date*>(hb);
-      headerHtml += toHtmlString( KGlobal::locale()->formatDateTime(date->dateTime().toLocalZone().dateTime(), KLocale::LongDate, true), None );
+      headerHtml += toHtmlString( KLocale::global()->formatDateTime(date->dateTime().toLocalZone().dateTime(), KLocale::LongDate, true), None );
 #endif
     } else if ( hb->is("Newsgroups") ) {
       QString groups = hb->asUnicodeString();
@@ -1041,7 +1040,7 @@ bool ArticleWidget::canDecodeText( const QByteArray &charset ) const
   if ( charset.isEmpty() )
     return false;
   bool ok = true;
-  KGlobal::charsets()->codecForName( charset, ok );
+  KCharsets::charsets()->codecForName( charset, ok );
   return ok;
 }
 
@@ -1464,7 +1463,7 @@ void ArticleWidget::slotSetCharset( const QString &charset )
     mOverrideCharset = "iso-8859-1";
   } else {
     mForceCharset = true;
-    mOverrideCharset = KGlobal::charsets()->encodingForName( charset ).toLatin1();
+    mOverrideCharset = KCharsets::charsets()->encodingForName( charset ).toLatin1();
   }
 
   if ( mArticle && mArticle->hasContent() ) {

@@ -857,9 +857,9 @@ bool KNComposer::applyChanges()
           QString tmpText = tmp;
           Kpgp::Block block;
           bool ok=true;
-          QTextCodec *codec=KGlobal::charsets()->codecForName( mCharset, ok);
+          QTextCodec *codec = KCharsets::charsets()->codecForName( mCharset, ok);
           if(!ok) // no suitable codec found => try local settings and hope the best ;-)
-              codec=KGlobal::locale()->codecForEncoding();
+              codec = KLocale::global()->codecForEncoding();
 
           block.setText( codec->fromUnicode(tmpText) );
           qCDebug(KNODE_LOG) <<"signing article from" << article()->from()->addresses();
@@ -984,7 +984,7 @@ void KNComposer::initData(const QString &text)
     setCharset( knGlobals.settings()->charset() );
   }
 
-  QString charsetDesc = KGlobal::charsets()->descriptionForEncoding( mCharset );
+  const QString charsetDesc = KCharsets::charsets()->descriptionForEncoding( mCharset );
   a_ctSetCharset->setCurrentItem( a_ctSetCharset->items().indexOf( charsetDesc ) );
 
   // initialize the message type select action
@@ -1013,7 +1013,7 @@ void KNComposer::insertFile( QFile *file, bool clear, bool box, const QString &b
 {
   QString temp;
   bool ok=true;
-  QTextCodec *codec=KGlobal::charsets()->codecForName( mCharset, ok);
+  QTextCodec *codec = KCharsets::charsets()->codecForName( mCharset, ok);
   QTextStream ts(file);
   ts.setCodec(codec);
 
@@ -1235,7 +1235,7 @@ void KNComposer::slotSetCharset(const QString &s)
   if(s.isEmpty())
     return;
 
-  QString charset = KGlobal::charsets()->encodingForName( s );
+  const QString charset = KCharsets::charsets()->encodingForName( s );
   setCharset( charset );
 }
 
@@ -1245,7 +1245,7 @@ void KNComposer::slotSetCharsetKeyboard()
   int newCS = KNHelper::selectDialog(this, i18n("Select Charset"), a_ctSetCharset->items(), a_ctSetCharset->currentItem());
   if (newCS != -1) {
     a_ctSetCharset->setCurrentItem(newCS);
-    QString charset = KGlobal::charsets()->encodingForName( a_ctSetCharset->items()[ newCS ] );
+    const QString charset = KCharsets::charsets()->encodingForName( a_ctSetCharset->items()[ newCS ] );
     setCharset( charset );
   }
 }
@@ -1294,7 +1294,7 @@ void KNComposer::slotExternalEditor()
   }
 
   bool ok=true;
-  QTextCodec *codec=KGlobal::charsets()->codecForName( mCharset, ok );
+  QTextCodec *codec = KCharsets::charsets()->codecForName( mCharset, ok );
 
   QString tmp = v_iew->editor()->toWrappedPlainText();
 

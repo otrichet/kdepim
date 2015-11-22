@@ -22,16 +22,14 @@
 
 #include "knodetest.h"
 
-#include "utils/locale.h"
-using namespace KNode::Utilities;
-
-
 #include <qtest_kde.h>
-#include <KCharsets>
-#include <KGlobal>
+#include <KCodecs/KCharsets>
 #include <KLocale>
 #include <QMap>
 #include <QTest>
+
+#include "utils/locale.h"
+using namespace KNode::Utilities;
 
 
 
@@ -82,14 +80,14 @@ void KNodeTest::testUtilitiesLocale()
   kcharsetVsMime.insert( "TSCII", "TSCII" );
   kcharsetVsMime.insert( "ucs2", "UTF-8" ); // wondering what is the difference between "ucs2" and "ISO 10646-UCS-2" above
   kcharsetVsMime.insert( "UTF-16", "UTF-16" );
-  kcharsetVsMime.insert( "utf7", "UTF-8" ); // KGlobal::charsets()->codecForName() do not returns a valid codec for "utf7" so "UTF-8" is returned.
+  kcharsetVsMime.insert( "utf7", "UTF-8" ); // KCharsets::charsets()->codecForName() do not returns a valid codec for "utf7" so "UTF-8" is returned.
   kcharsetVsMime.insert( "UTF-8", "UTF-8" );
   kcharsetVsMime.insert( "windows-1258", "WINDOWS-1258" );
   kcharsetVsMime.insert( "winsami2", "WINSAMI2" );
 
   // Check that every name from "KCharsets::availableEncodingNames()" will be taken into account
   QStringList kcharsetNames = kcharsetVsMime.keys();
-  foreach( const QString &encName, KGlobal::charsets()->availableEncodingNames() ) {
+  foreach( const QString &encName, KCharsets::charsets()->availableEncodingNames() ) {
     if ( !kcharsetNames.contains( encName ) ) {
       qWarning() << "Failing charset is: " << encName << "; mime charset=" << Locale::toMimeCharset( encName );
       QVERIFY( false );
@@ -97,7 +95,7 @@ void KNodeTest::testUtilitiesLocale()
   }
 
   // Check that the convertion in Locale::toMimeCharset() is correct for these
-  foreach ( const QString &encName, KGlobal::charsets()->availableEncodingNames() ) {
+  foreach ( const QString &encName, KCharsets::charsets()->availableEncodingNames() ) {
     qDebug() << "Current encoding:" << encName;
     QCOMPARE( Locale::toMimeCharset( encName ), kcharsetVsMime.value( encName ) );
   }

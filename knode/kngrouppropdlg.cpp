@@ -14,7 +14,7 @@
 
 #include "kngrouppropdlg.h"
 
-#include <KDE/KGlobal>
+#include <KCodecs/KCharsets>
 #include <QDebug>
 
 #include "configuration/identity_widget.h"
@@ -33,7 +33,6 @@
 #include <QGridLayout>
 #include <QComboBox>
 
-#include <KCharsets>
 #include <klocale.h>
 #include <klineedit.h>
 #include <kvbox.h>
@@ -83,7 +82,7 @@ KNGroupPropDlg::KNGroupPropDlg( KNGroup *group, QWidget *parent )
   c_harset=new QComboBox(gb);
   c_harset->setEditable(false);
   c_harset->addItems( KNode::Utilities::Locale::encodings() );
-  QString defaultCsDesc = KGlobal::charsets()->descriptionForEncoding( QString::fromLatin1( g_rp->defaultCharset() ) );
+  const QString defaultCsDesc = KCharsets::charsets()->descriptionForEncoding( QString::fromLatin1( g_rp->defaultCharset() ) );
   c_harset->setCurrentIndex( c_harset->findText( defaultCsDesc ) );
   c_harset->setEnabled(g_rp->useCharset());
   connect(u_seCharset, SIGNAL(toggled(bool)), c_harset, SLOT(setEnabled(bool)));
@@ -202,7 +201,7 @@ void KNGroupPropDlg::slotOk()
   mCleanupWidget->save();
 
   g_rp->setUseCharset(u_seCharset->isChecked());
-  g_rp->setDefaultCharset( KGlobal::charsets()->encodingForName( c_harset->currentText() ).toLatin1() );
+  g_rp->setDefaultCharset( KCharsets::charsets()->encodingForName( c_harset->currentText() ).toLatin1() );
 
   accept();
 }

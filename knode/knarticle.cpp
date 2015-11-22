@@ -15,7 +15,7 @@
 #include "knarticle.h"
 
 #include <kcodecs.h>
-#include <KDE/KGlobal>
+#include <KDE/KLocale>
 #include <kmimetype.h>
 #include <QDebug>
 
@@ -220,7 +220,7 @@ QString KNAttachment::contentSize() const
       s=f_ile->size();
   }
 
-  return KGlobal::locale()->formatByteSize( s );
+  return KLocale::global()->formatByteSize( s );
 }
 
 

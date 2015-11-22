@@ -14,7 +14,7 @@
 
 #include "kngroupmanager.h"
 
-#include <KDE/KGlobal>
+#include <KCodecs/KCharsets>
 
 #include "articlewidget.h"
 #include "knmainwidget.h"
@@ -40,7 +40,6 @@
 #include <klocale.h>
 #include <kmessagebox.h>
 #include <kiconloader.h>
-#include <kcharsets.h>
 
 #include "groupselection/group_subscription_dialog.h"
 #include "knaccountmanager.h"
@@ -695,7 +694,7 @@ void KNGroupManager::slotFetchGroupList( KNNntpAccount::Ptr a )
   d->path = a->path();
   getSubscribed(a,d->subscribed);
   d->getDescriptions = a->fetchDescriptions();
-  d->codecForDescriptions = KGlobal::charsets()->codecForName( Locale::defaultCharset() );
+  d->codecForDescriptions = KCharsets::charsets()->codecForName( Locale::defaultCharset() );
 
   emitJob( new GroupListJob( this, a, d ) );
 }
@@ -709,7 +708,7 @@ void KNGroupManager::slotCheckForNewGroups( KNNntpAccount::Ptr a, QDate date )
   getSubscribed(a,d->subscribed);
   d->getDescriptions = a->fetchDescriptions();
   d->fetchSince = date;
-  d->codecForDescriptions = KGlobal::charsets()->codecForName( Locale::defaultCharset() );
+  d->codecForDescriptions = KCharsets::charsets()->codecForName( Locale::defaultCharset() );
 
   emitJob( new GroupListJob( this, a, d, true ) );
 }

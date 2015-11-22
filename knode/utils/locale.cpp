@@ -22,6 +22,7 @@
 
 #include "locale.h"
 
+#include <KCodecs/KCodecs>
 #include <QDebug>
 
 #include "knglobals.h"
@@ -30,8 +31,6 @@
 #include "settings.h"
 
 #include <KCharsets>
-#include <KGlobal>
-// #include <kmime/kmime_charfreq.h>
 #include <KLocale>
 #include <QTextCodec>
 
@@ -41,11 +40,11 @@ using namespace KNode::Utilities;
 
 QString Locale::toMimeCharset( const QString &charset )
 {
-  QString c = charset;
+  QByteArray c = charset.toAscii();
 
   // First, get the user preferred encoding
   if ( c.isEmpty() ) {
-    c = KGlobal::locale()->encoding();
+    c = KLocale::global()->encoding();
     if ( c.isEmpty() ) { // Let's test to be really sure...
       return "UTF-8";
     }
@@ -53,7 +52,7 @@ QString Locale::toMimeCharset( const QString &charset )
 
   // Second, convert to something sensible
   bool ok;
-  QTextCodec *codec = KGlobal::charsets()->codecForName( c, ok );
+  QTextCodec *codec = KCharsets::charsets()->codecForName( c, ok );
   if ( ok && !codec->name().isEmpty() ) {
     c = codec->name();
   } else {
@@ -107,27 +106,21 @@ void Locale::encodeTo7Bit( const QByteArray &raw, const QByteArray &charset, QBy
     return;
   }
 
-  qCDebug(KNODE_LOG) << "Port";
-#if 0
-  KMime::CharFreq cf( raw );
-  if ( cf.isSevenBitText() ) {
+  QVector<KMime::Headers::contentEncoding> encodings = KMime::encodingsForData(raw);
+  if(KMime::encodingsForData(raw).contains(KMime::Headers::CE7Bit)) {
     result = raw;
     return;
   }
-#endif
 
   // Transform 8-bit data
   QString properData = QTextCodec::codecForName( charset )->toUnicode( raw );
-  qCDebug(KNODE_LOG) << "Port";
-#if 0
-  result = KMime::encodeRFC2047String( properData, "UTF-8" );
-#endif
+  result = KCodecs::encodeRFC2047String( properData, "UTF-8" );
 }
 
 
 QStringList Locale::encodings()
 {
-  QStringList encodings = KGlobal::charsets()->availableEncodingNames();
+  const QStringList encodings = KCharsets::charsets()->availableEncodingNames();
   QStringList ret;
   QStringList seenEncs;
 
@@ -138,7 +131,7 @@ QStringList Locale::encodings()
     // Valid codec only
     bool ok;
 
-    KGlobal::charsets()->codecForName( enc, ok );
+    KCharsets::charsets()->codecForName( enc, ok );
     if ( !ok ) {
       continue;
     }
@@ -147,7 +140,7 @@ QStringList Locale::encodings()
     QString mimeEnc = toMimeCharset( enc );
     if ( !seenEncs.contains( mimeEnc ) ) {
       seenEncs << mimeEnc;
-      ret << KGlobal::charsets()->descriptionForEncoding( enc );
+      ret << KCharsets::charsets()->descriptionForEncoding( enc );
     }
   }
 
