@@ -198,7 +198,7 @@ void SendLaterWidget::save()
     for (int i = 0; i < numberOfItem; ++i) {
         SendLaterItem *mailItem = static_cast<SendLaterItem *>(mWidget->treeWidget->topLevelItem(i));
         if (mailItem->info()) {
-            KConfigGroup group = config->group(SendLater::SendLaterUtil::sendLaterPattern.arg(mailItem->info()->itemId()));
+            KConfigGroup group = config->group(SendLater::SendLaterUtil::sendLaterPattern().arg(mailItem->info()->itemId()));
             mailItem->info()->writeConfig(group);
         }
     }
@@ -209,7 +209,12 @@ void SendLaterWidget::save()
 void SendLaterWidget::slotRemoveItem()
 {
     const QList<QTreeWidgetItem *> listItems = mWidget->treeWidget->selectedItems();
-    if (KMessageBox::warningYesNo(this, i18n("Do you want to delete selected items? Do you want to continue?"), i18n("Remove items")) == KMessageBox::No) {
+
+    if (listItems.isEmpty()) {
+        return;
+    }
+    const int numberOfItems(listItems.count());
+    if (KMessageBox::warningYesNo(this, i18np("Do you want to delete selected item? Do you want to continue?", "Do you want to delete selected items? Do you want to continue?", numberOfItems), i18n("Remove items")) == KMessageBox::No) {
         return;
     }
 
@@ -239,7 +244,7 @@ void SendLaterWidget::slotModifyItem()
 {
     const QList<QTreeWidgetItem *> listItems = mWidget->treeWidget->selectedItems();
     if (listItems.count() == 1) {
-        QTreeWidgetItem *item = listItems.first();
+        QTreeWidgetItem *item = listItems.at(0);
         if (!item) {
             return;
         }

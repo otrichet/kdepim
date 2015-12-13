@@ -5,6 +5,7 @@
   <project_license>GPL-2.0+</project_license>
   <name>KAddressBook</name>
   <name xml:lang="ar">دفتر عناوينك</name>
+  <name xml:lang="ast">KAddressBook</name>
   <name xml:lang="bs">KAddressBook</name>
   <name xml:lang="ca">KAddressBook</name>
   <name xml:lang="ca-valencia">KAddressBook</name>
@@ -80,6 +81,7 @@
     <p xml:lang="ca">Característiques:</p>
     <p xml:lang="ca-valencia">Característiques:</p>
     <p xml:lang="cs">Vlastnosti:</p>
+    <p xml:lang="da">Funktioner:</p>
     <p xml:lang="de">Funktionen:</p>
     <p xml:lang="en-GB">Features:</p>
     <p xml:lang="es">Características:</p>

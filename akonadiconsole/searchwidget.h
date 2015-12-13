@@ -32,7 +32,10 @@ class KTextEdit;
 class QListView;
 class QModelIndex;
 class QStringListModel;
-
+namespace KPIMTextEdit
+{
+class PlainTextEditorWidget;
+}
 class SearchWidget : public QWidget
 {
     Q_OBJECT
@@ -51,7 +54,7 @@ private Q_SLOTS:
 private:
     KComboBox *mQueryCombo;
     QTextBrowser *mItemView;
-    KTextEdit *mQueryWidget;
+    KPIMTextEdit::PlainTextEditorWidget *mQueryWidget;
     QListView *mResultView;
     QStringListModel *mResultModel;
 };

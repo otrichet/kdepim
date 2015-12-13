@@ -31,7 +31,6 @@
 #include <QProcess>
 #include "kmail_debug.h"
 #include <QStandardPaths>
-#include <antispam-virus/antispamwizard.h>
 
 KMLaunchExternalComponent::KMLaunchExternalComponent(QWidget *parentWidget, QObject *parent)
     : QObject(parent),
@@ -143,18 +142,6 @@ void KMLaunchExternalComponent::slotAccountWizard()
                                                "Please check your installation."),
                            i18n("Unable to start account wizard"));
     }
-}
-
-void KMLaunchExternalComponent::slotAntiSpamWizard()
-{
-    KMail::AntiSpamWizard wiz(KMail::AntiSpamWizard::AntiSpam, mParentWidget);
-    wiz.exec();
-}
-
-void KMLaunchExternalComponent::slotAntiVirusWizard()
-{
-    KMail::AntiSpamWizard wiz(KMail::AntiSpamWizard::AntiVirus, mParentWidget);
-    wiz.exec();
 }
 
 void KMLaunchExternalComponent::slotFilterLogViewer()

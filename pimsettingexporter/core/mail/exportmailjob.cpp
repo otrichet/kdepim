@@ -182,6 +182,9 @@ void ExportMailJob::slotWriteNextArchiveResource()
                             connect(resourceJob, &ExportResourceArchiveJob::terminated, this, &ExportMailJob::slotMailsJobTerminated);
                             connect(this, &ExportMailJob::taskCanceled, resourceJob, &ExportResourceArchiveJob::slotTaskCanceled);
                             resourceJob->start();
+                        } else {
+                            qCDebug(PIMSETTINGEXPORTERCORE_LOG) << "Url is empty for " << identifier;
+                            QTimer::singleShot(0, this, SLOT(slotMailsJobTerminated()));
                         }
                     } else {
                         QTimer::singleShot(0, this, SLOT(slotMailsJobTerminated()));
@@ -298,8 +301,14 @@ void ExportMailJob::backupConfig()
     backupUiRcFile(QStringLiteral("kmcomposerui.rc"), QStringLiteral("kmail2"));
     backupUiRcFile(QStringLiteral("kmmainwin.rc"), QStringLiteral("kmail2"));
     backupUiRcFile(QStringLiteral("kmail_part.rc"), QStringLiteral("kmail2"));
+    backupUiRcFile(QStringLiteral("kontactsummary_part.rc"), QStringLiteral("kontactsummary"));
     backupUiRcFile(QStringLiteral("kontactui.rc"), QStringLiteral("kontact"));
     backupUiRcFile(QStringLiteral("kleopatra.rc"), QStringLiteral("kleopatra"));
+    backupUiRcFile(QStringLiteral("headerthemeeditorui.rc"), QStringLiteral("headerthemeeditor"));
+    backupUiRcFile(QStringLiteral("contactthemeeditorui.rc"), QStringLiteral("contactthemeeditor"));
+    backupUiRcFile(QStringLiteral("contactprintthemeeditorui.rc"), QStringLiteral("contactprintthemeeditor"));
+    backupUiRcFile(QStringLiteral("kwatchgnupgui.rc"), QStringLiteral("kwatchgnupg"));
+    backupUiRcFile(QStringLiteral("akonadiconsoleui.rc"), QStringLiteral("akonadiconsole"));
 
     backupConfigFile(QStringLiteral("kabldaprc"));
     backupConfigFile(QStringLiteral("kmailsnippetrc"));
@@ -311,6 +320,7 @@ void ExportMailJob::backupConfig()
     backupConfigFile(QStringLiteral("kpimbalooblacklist"));
     backupConfigFile(QStringLiteral("kleopatrarc"));
     backupConfigFile(QStringLiteral("sieveeditorrc"));
+    backupConfigFile(QStringLiteral("kwatchgnupgrc"));
 
     //Notify file config
     backupConfigFile(QStringLiteral("akonadi_mailfilter_agent.notifyrc"));
@@ -322,6 +332,34 @@ void ExportMailJob::backupConfig()
     backupConfigFile(QStringLiteral("akonadi_followupreminder_agent.notifyrc"));
     backupConfigFile(QStringLiteral("messagevieweradblockrc"));
     backupConfigFile(QStringLiteral("messageviewer.notifyrc"));
+    backupConfigFile(QStringLiteral("storageservicemanager.notifyrc"));
+
+    const QString folderMailArchiveStr(QStringLiteral("foldermailarchiverc"));
+    const QString folderMailArchiverc = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QLatin1Char('/') + folderMailArchiveStr;
+    if (QFile(folderMailArchiverc).exists()) {
+        KSharedConfigPtr archivemailrc = KSharedConfig::openConfig(folderMailArchiveStr);
+
+        QTemporaryFile tmp;
+        tmp.open();
+
+        KConfig *archiveConfig = archivemailrc->copyTo(tmp.fileName());
+        const QStringList archiveList = archiveConfig->groupList().filter(QRegularExpression(QStringLiteral("FolderArchiveAccount")));
+
+        Q_FOREACH (const QString &str, archiveList) {
+            KConfigGroup oldGroup = archiveConfig->group(str);
+            qint64 id = oldGroup.readEntry("topLevelCollectionId", -1);
+            if (id != -1)  {
+                const QString realPath = MailCommon::Util::fullCollectionPath(Akonadi::Collection(id));
+                if (!realPath.isEmpty()) {
+                    oldGroup.writeEntry(QStringLiteral("topLevelCollectionId"), realPath);
+                }
+            }
+        }
+        archiveConfig->sync();
+
+        backupFile(tmp.fileName(), Utils::configsPath(), folderMailArchiveStr);
+        delete archiveConfig;
+    }
 
     const QString archiveMailAgentConfigurationStr(QStringLiteral("akonadi_archivemail_agentrc"));
     const QString archiveMailAgentconfigurationrc = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + QLatin1Char('/') + archiveMailAgentConfigurationStr;
@@ -472,7 +510,7 @@ void ExportMailJob::backupConfig()
                 if (found) {
                     const QString realPath = MailCommon::Util::fullCollectionPath(Akonadi::Collection(collectionId));
                     if (!realPath.isEmpty()) {
-                        storageGroup.writeEntry(QStringLiteral("%1%2").arg(storageModelSelectedPattern).arg(realPath), oldValue);
+                        storageGroup.writeEntry(QStringLiteral("%1%2").arg(storageModelSelectedPattern, realPath), oldValue);
                         storageGroup.deleteEntry(str);
                     }
                 }

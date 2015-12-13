@@ -64,7 +64,7 @@ class XXPortManager;
 class QActionGroup;
 class CategorySelectWidget;
 class CategoryFilterProxyModel;
-
+class PluginInterface;
 class KADDRESSBOOK_EXPORT MainWidget : public QWidget
 {
     Q_OBJECT
@@ -75,6 +75,7 @@ public:
 
     XXPortManager *importManager() const;
     void updateQuickSearchText();
+    Akonadi::Item::List collectSelectedContactsItem() const;
 
 public Q_SLOTS:
     void newContact();
@@ -82,8 +83,6 @@ public Q_SLOTS:
     void print();
     void printPreview();
     void configure();
-    void mergeContacts();
-    void slotSearchDuplicateContacts();
 
     void handleCommandLine(const QStringList &arguments);
 
@@ -118,6 +117,7 @@ private Q_SLOTS:
     void slotModifyContactFinished(KJob *job);
     void slotSelectionChanged();
 private:
+    void initializePluginActions();
     const Akonadi::Item::List collectSelectedAllContactsItem(QItemSelectionModel *model);
     void initGrantleeThemeName();
     void setupGui();
@@ -173,6 +173,7 @@ private:
     QAction *mSearchGravatarAction;
     QAction *mSendVcardAction;
     QAction *mSendEmailAction;
+    PluginInterface *mPluginInterface;
 };
 
 #endif

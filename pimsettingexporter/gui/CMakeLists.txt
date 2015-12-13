@@ -4,9 +4,15 @@ include_directories(
 )
 
 
+set( pimsettingexporter_kcfg_SRCS settings/pimsettingexporterglobalconfig.kcfgc )
+
+kconfig_add_kcfg_files(pimsettingexporter_kcfg_SRCS ${pimsettingexporter_kcfg_SRCS})
+
+
 set(pimsettingexporter_widget_SRCS
   widgets/selectiontypetreewidget.cpp
   widgets/logwidget.cpp
+  widgets/pimsettingexporterconfigurewidget.cpp
 )
 
 set(pimsettingexporter_dialog_SRCS
@@ -14,10 +20,12 @@ set(pimsettingexporter_dialog_SRCS
   dialog/backupfilestructureinfodialog.cpp
   dialog/showarchivestructuredialog.cpp
   dialog/synchronizeresourcedialog.cpp
+  dialog/pimsettingexporterconfiguredialog.cpp
 )
 
 
 set(pimsettingexporter_SRCS
+    ${pimsettingexporter_kcfg_SRCS}
     ${pimsettingexporter_widget_SRCS}
     ${pimsettingexporter_dialog_SRCS}
     pimsettingsbackuprestoreui.cpp

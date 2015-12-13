@@ -785,6 +785,9 @@ void ImportMailJob::restoreConfig()
 
     restoreUiRcFile(QStringLiteral("sieveeditorui.rc"), QStringLiteral("sieveeditor"));
     restoreUiRcFile(QStringLiteral("storageservicemanagerui.rc"), QStringLiteral("storageservicemanager"));
+    restoreUiRcFile(QStringLiteral("headerthemeeditorui.rc"), QStringLiteral("headerthemeeditor"));
+    restoreUiRcFile(QStringLiteral("contactthemeeditorui.rc"), QStringLiteral("contactthemeeditor"));
+    restoreUiRcFile(QStringLiteral("contactprintthemeeditorui.rc"), QStringLiteral("contactprintthemeeditor"));
 
     restoreUiRcFile(QStringLiteral("kmreadermainwin.rc"), QStringLiteral("kmail2"));
     restoreUiRcFile(QStringLiteral("kmcomposerui.rc"), QStringLiteral("kmail2"));
@@ -792,6 +795,9 @@ void ImportMailJob::restoreConfig()
     restoreUiRcFile(QStringLiteral("kmail_part.rc"), QStringLiteral("kmail2"));
     restoreUiRcFile(QStringLiteral("kontactui.rc"), QStringLiteral("kontact"));
     restoreUiRcFile(QStringLiteral("kleopatra.rc"), QStringLiteral("kleopatra"));
+    restoreUiRcFile(QStringLiteral("kontactsummary_part.rc"), QStringLiteral("kontactsummary"));
+    restoreUiRcFile(QStringLiteral("kwatchgnupgui.rc"), QStringLiteral("kwatchgnupg"));
+    restoreUiRcFile(QStringLiteral("akonadiconsoleui.rc"), QStringLiteral("akonadiconsole"));
 
     restoreConfigFile(QStringLiteral("kontactrc"));
 
@@ -800,6 +806,7 @@ void ImportMailJob::restoreConfig()
     restoreConfigFile(QStringLiteral("kpimbalooblacklist"));
     restoreConfigFile(QStringLiteral("kleopatrarc"));
     restoreConfigFile(QStringLiteral("sieveeditorrc"));
+    restoreConfigFile(QStringLiteral("kwatchgnupgrc"));
     //Restore notify file
     QStringList lstNotify;
     lstNotify << QStringLiteral("akonadi_mailfilter_agent.notifyrc")
@@ -809,7 +816,8 @@ void ImportMailJob::restoreConfig()
               << QStringLiteral("akonadi_newmailnotifier_agent.notifyrc")
               << QStringLiteral("akonadi_maildispatcher_agent.notifyrc")
               << QStringLiteral("akonadi_followupreminder_agent.notifyrc")
-              << QStringLiteral("messageviewer.notifyrc");
+              << QStringLiteral("messageviewer.notifyrc")
+              << QStringLiteral("storageservicemanager.notifyrc");
 
     //We can't merge it.
     Q_FOREACH (const QString &filename, lstNotify) {

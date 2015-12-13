@@ -1408,12 +1408,12 @@ void KMComposeWin::setupActions(void)
     connect(mZoomOutAction, &QAction::triggered, this, &KMComposeWin::slotZoomOut);
     actionCollection()->setDefaultShortcut(mZoomOutAction, QKeySequence(Qt::CTRL | Qt::Key_Minus));
 
+    zoomMenu->addSeparator();
     mZoomResetAction = new QAction(i18n("Reset"), this);
     zoomMenu->addAction(mZoomResetAction);
     actionCollection()->addAction(QStringLiteral("zoom_reset"), mZoomResetAction);
     connect(mZoomResetAction, &QAction::triggered, this, &KMComposeWin::slotZoomReset);
     actionCollection()->setDefaultShortcut(mZoomResetAction, QKeySequence(Qt::CTRL | Qt::Key_0));
-
 
     createGUI(QStringLiteral("kmcomposerui.rc"));
     connect(toolBar(QStringLiteral("htmlToolBar"))->toggleViewAction(), &QAction::toggled,

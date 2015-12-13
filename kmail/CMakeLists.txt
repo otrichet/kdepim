@@ -28,7 +28,6 @@ include_directories(
 add_subdirectory(about)
 add_subdirectory(pics)
 add_subdirectory(icons)
-add_subdirectory(avscripts)
 add_subdirectory(kcm_kpimidentities)
 add_subdirectory(kontactplugin)
 add_subdirectory(kconf_update)
@@ -147,6 +146,7 @@ set(kmailprivate_job_LIB_SRCS
      job/saveasfilejob.cpp
      job/fetchrecursivecollectionsjob.cpp
      job/markallmessagesasreadinfolderandsubfolderjob.cpp
+     job/removeduplicatemessageinfolderandsubfolderjob.cpp
 )
  
 set(kmailprivate_widgets_LIB_SRCS
@@ -160,6 +160,11 @@ set(kmailprivate_widgets_LIB_SRCS
 set(kmailprivate_tag_LIB_SRCS
      tag/tagactionmanager.cpp
      tag/tagselectdialog.cpp
+)
+
+
+set(kmailprivate_plugininterface_LIB_SRCS
+     plugininterface/plugininterface.cpp
 )
 
 set(kmail_common_SRCS)
@@ -178,7 +183,6 @@ set(kmailprivate_LIB_SRCS
      kmmainwidget.cpp
      aboutdata.cpp
      mailserviceimpl.cpp
-     antispam-virus/antispamwizard.cpp
      secondarywindow.cpp
      util.cpp
      messageactions.cpp
@@ -201,6 +205,8 @@ set(kmailprivate_LIB_SRCS
      ${kmailprivate_identity_LIB_SRCS}
      ${kmailprivate_editor_LIB_SRCS}
      ${kmailprivate_editor_potentialphishingemail_SRCS}
+     ${kmailprivate_plugininterface_LIB_SRCS}
+  
 )
 
 qt5_generate_dbus_interface(editor/kmcomposewin.h org.kde.kmail.mailcomposer.xml OPTIONS -a)
@@ -211,9 +217,8 @@ qt5_add_dbus_adaptor(kmailprivate_LIB_SRCS
 qt5_add_dbus_adaptor(kmailprivate_LIB_SRCS
     ${CMAKE_BINARY_DIR}/kmail/org.kde.kmail.kmail.xml kmkernel.h KMKernel
 )
-#TODO fix me. We need to find a solution before to split lib.
 qt5_add_dbus_adaptor(kmailprivate_LIB_SRCS
-    ${CMAKE_SOURCE_DIR}/libkdepim/src/interfaces/org.kde.mailtransport.service.xml mailserviceimpl.h
+    ${MAILTRANSPORT_DBUS_SERVICE} mailserviceimpl.h
     KMail::MailServiceImpl
 )
 
@@ -374,7 +379,6 @@ install(FILES
     DESTINATION ${KDE_INSTALL_KCFGDIR}
 )
 install(FILES data/org.kde.kmail.appdata.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
-install(FILES antispam-virus/kmail.antispamrc antispam-virus/kmail.antivirusrc  DESTINATION ${KDE_INSTALL_CONFDIR})
 install(FILES
     data/kmail_config_misc.desktop
     data/kmail_config_appearance.desktop

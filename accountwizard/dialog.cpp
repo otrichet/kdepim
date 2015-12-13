@@ -38,12 +38,15 @@
 #include "accountwizard_debug.h"
 #include <kmessagebox.h>
 #include <qplatformdefs.h>
+#include <KAboutData>
 
-Dialog::Dialog(QWidget *parent, Qt::WindowFlags flags) :
-    KAssistantDialog(parent, flags)
+#include <KHelpMenu>
+
+Dialog::Dialog(QWidget *parent)
+    : KAssistantDialog(parent)
 {
     mSetupManager = new SetupManager(this);
-    const bool showPersonalDataPage = Global::typeFilter().size() == 1 && Global::typeFilter().first() == KMime::Message::mimeType();
+    const bool showPersonalDataPage = Global::typeFilter().size() == 1 && Global::typeFilter().at(0) == KMime::Message::mimeType();
 
     if (showPersonalDataPage) {
         // todo: don't ask these details based on a setting of the desktop file.
@@ -92,6 +95,12 @@ Dialog::Dialog(QWidget *parent, Qt::WindowFlags flags) :
     page->enterPageNext();
     Q_EMIT page->pageEnteredNext();
     connect(button(QDialogButtonBox::Cancel), &QPushButton::clicked, this, &Dialog::accept);
+    KHelpMenu *helpMenu = new KHelpMenu(this, KAboutData::applicationData(), true);
+    //Initialize menu
+    QMenu *menu = helpMenu->menu();
+    helpMenu->action(KHelpMenu::menuAboutApp)->setIcon(QIcon::fromTheme(QStringLiteral("akonadi")));
+    button(QDialogButtonBox::Help)->setMenu(menu);
+
 }
 
 KPageWidgetItem *Dialog::addPage(Page *page, const QString &title)

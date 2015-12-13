@@ -199,12 +199,12 @@ void KTNEFMain::loadFile(const QString &filename)
     mFilename = filename;
     setCaption(mFilename);
     if (!mParser->openFile(filename)) {
+        mView->setAttachments(QList<KTNEFAttach *>());
+        enableExtractAll(false);
         KMessageBox::error(
             this,
             i18nc("@info",
                   "Unable to open file \"%1\".", filename));
-        mView->setAttachments(QList<KTNEFAttach *>());
-        enableExtractAll(false);
     } else {
         addRecentFile(QUrl::fromLocalFile(filename));
         QList<KTNEFAttach *> list = mParser->message()->attachmentList();
@@ -242,7 +242,7 @@ void KTNEFMain::addRecentFile(const QUrl &url)
 void KTNEFMain::viewFile()
 {
     if (!mView->getSelection().isEmpty()) {
-        KTNEFAttach *attach = mView->getSelection().first();
+        KTNEFAttach *attach = mView->getSelection().at(0);
         QUrl url = QUrl::fromLocalFile(extractTemp(attach));
         QString mimename(attach->mimeTag());
 
@@ -283,7 +283,7 @@ void KTNEFMain::viewFileAs()
 {
     if (!mView->getSelection().isEmpty()) {
         QList<QUrl> list;
-        list.append(QUrl::fromLocalFile(extractTemp(mView->getSelection().first())));
+        list.append(QUrl::fromLocalFile(extractTemp(mView->getSelection().at(0))));
 
         if (!list.isEmpty()) {
             KRun::displayOpenWithDialog(list, this);
@@ -333,7 +333,7 @@ void KTNEFMain::extractAllFiles()
 
 void KTNEFMain::propertiesFile()
 {
-    KTNEFAttach *attach = mView->getSelection().first();
+    KTNEFAttach *attach = mView->getSelection().at(0);
     AttachPropertyDialog dlg(this);
     dlg.setAttachment(attach);
     dlg.exec();
@@ -546,7 +546,7 @@ void KTNEFMain::slotSaveMessageText()
 void KTNEFMain::openWith(const KService::Ptr &offer)
 {
     if (!mView->getSelection().isEmpty()) {
-        KTNEFAttach *attach = mView->getSelection().first();
+        KTNEFAttach *attach = mView->getSelection().at(0);
         QUrl url = QUrl::fromLocalFile(QLatin1String("file:") + extractTemp(attach));
         QList<QUrl> lst;
         lst.append(url);
@@ -580,7 +580,7 @@ void KTNEFMain::createOpenWithMenu(QMenu *topMenu)
     if (mView->getSelection().isEmpty()) {
         return;
     }
-    KTNEFAttach *attach = mView->getSelection().first();
+    KTNEFAttach *attach = mView->getSelection().at(0);
     QString mimename(attach->mimeTag());
 
     const KService::List offers = KFileItemActions::associatedApplications(QStringList() << mimename, QString());

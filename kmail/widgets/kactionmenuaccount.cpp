@@ -39,6 +39,14 @@ KActionMenuAccount::~KActionMenuAccount()
 
 }
 
+void KActionMenuAccount::setAccountOrder(const QStringList &identifier)
+{
+    if (mOrderIdentifier != identifier) {
+        mOrderIdentifier = identifier;
+        mInitialized = false;
+    }
+}
+
 void KActionMenuAccount::slotSelectAccount(QAction *act)
 {
     if (!act) {
@@ -64,16 +72,40 @@ void KActionMenuAccount::slotCheckTransportMenu()
     }
 }
 
+bool orderAgentIdentifier(const AgentIdentifier &lhs, const AgentIdentifier &rhs)
+{
+    if ((lhs.mIndex == -1) && (rhs.mIndex == -1)) {
+        return lhs.mName < rhs.mName;
+    }
+    if (lhs.mIndex != rhs.mIndex) {
+        return lhs.mIndex < rhs.mIndex;
+    }
+    // we can't have same index but fallback
+    return true;
+}
+
 void KActionMenuAccount::updateAccountMenu()
 {
     if (mInitialized) {
         menu()->clear();
         const Akonadi::AgentInstance::List lst = MailCommon::Util::agentInstances();
+        QVector<AgentIdentifier> agentIdentifierList;
+        agentIdentifierList.reserve(lst.count());
+
         Q_FOREACH (const Akonadi::AgentInstance &type, lst) {
             // Explicitly make a copy, as we're not changing values of the list but only
             // the local copy which is passed to action.
-            QAction *action = menu()->addAction(QString(type.name()).replace(QLatin1Char('&'), QStringLiteral("&&")));
-            action->setData(type.identifier());
+            const QString identifierName = type.identifier();
+            const int index = mOrderIdentifier.indexOf(identifierName);
+            const AgentIdentifier id(identifierName, QString(type.name()).replace(QLatin1Char('&'), QStringLiteral("&&")), index);
+            agentIdentifierList << id;
+        }
+        qSort(agentIdentifierList.begin(), agentIdentifierList.end(), orderAgentIdentifier);
+        const int numberOfAccount(agentIdentifierList.size());
+        for (int i = 0; i < numberOfAccount; ++i) {
+            const AgentIdentifier id = agentIdentifierList.at(i);
+            QAction *action = menu()->addAction(id.mName);
+            action->setData(id.mIdentifier);
         }
     }
 }

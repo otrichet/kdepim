@@ -56,6 +56,7 @@ NewThemeDialog::NewThemeDialog(QWidget *parent)
     lay->addWidget(lab);
 
     d->mThemeName = new KLineEdit;
+    d->mThemeName->setClearButtonEnabled(true);
     d->mThemeName->setTrapReturnKey(true);
     connect(d->mThemeName, &KLineEdit::textChanged, this, &NewThemeDialog::slotUpdateOkButton);
     lay->addWidget(d->mThemeName);
@@ -112,6 +113,7 @@ QString NewThemeDialog::directory() const
 
 void NewThemeDialog::slotUpdateOkButton()
 {
-    d->mOkButton->setEnabled(!d->mUrlRequester->lineEdit()->text().isEmpty() && !d->mThemeName->text().isEmpty());
+    d->mOkButton->setEnabled(!d->mUrlRequester->lineEdit()->text().trimmed().isEmpty()
+                             && !d->mThemeName->text().trimmed().isEmpty());
 }
 

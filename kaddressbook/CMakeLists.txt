@@ -70,33 +70,14 @@ set(kaddressbook_xxport_SRCS
   xxport/contactselectiondialog.cpp
 )
 
-set(kaddressbook_merge_SRCS
-   merge/job/searchpotentialduplicatecontactjob.cpp
-   merge/job/mergecontactsjob.cpp
-   merge/job/mergecontacts.cpp
-
-   merge/manualmerge/mergecontactsdialog.cpp
-   merge/manualmerge/mergecontactwidget.cpp
-   merge/manualmerge/mergecontactwidgetlist.cpp
-
-   merge/searchduplicate/searchandmergecontactduplicatecontactdialog.cpp
-   merge/searchduplicate/searchduplicateresultwidget.cpp
-   merge/searchduplicate/resultduplicatetreewidget.cpp
-   merge/searchduplicate/mergecontactselectinformationtabwidget.cpp
-
-   merge/widgets/mergecontactinfowidget.cpp
-   merge/widgets/mergecontactshowresulttabwidget.cpp
-   merge/widgets/mergecontactselectinformationwidget.cpp
-   merge/widgets/mergecontactselectlistwidget.cpp
-   merge/widgets/mergecontactloseinformationwarning.cpp
-   merge/widgets/mergecontactselectinformationscrollarea.cpp
-   merge/widgets/mergecontacterrorlabel.cpp
-)
-
 set(kaddressbook_gravatar_SRCS
    gravatar/job/gravatarupdatejob.cpp
    gravatar/widgets/gravatarupdatedialog.cpp
    gravatar/widgets/gravatarupdatewidget.cpp
+)
+
+set(kaddressbook_plugin_SRCS
+   plugininterface/plugininterface.cpp
 )
 
 set(kaddressbook_LIB_SRCS
@@ -114,12 +95,12 @@ set(kaddressbook_LIB_SRCS
   quicksearchwidget.cpp
   utils.cpp
   kaddressbookmigrateapplication.cpp
-  ${kaddressbook_merge_SRCS}
   ${kaddressbook_printing_SRCS}
   ${kaddressbook_xxport_SRCS}
   ${kaddressbook_sendmail_SRCS}
   ${kaddressbook_sendvcards_SRCS}
-  ${kaddressbook_gravatar_SRCS}
+  ${kaddressbook_gravatar_SRCS} 
+  ${kaddressbook_plugin_SRCS}
 )
 
 ecm_qt_declare_logging_category(kaddressbook_LIB_SRCS HEADER kaddressbook_debug.h IDENTIFIER KADDRESSBOOK_LOG CATEGORY_NAME log_kaddressbook)
@@ -153,7 +134,6 @@ else()
    target_link_libraries(kaddressbookprivate PRIVATE KF5::Gpgmepp-pthread)
 endif()
 if (BUILD_TESTING)
-   add_subdirectory(merge/autotests)
    add_subdirectory(sendmail/autotests)
    add_subdirectory(sendvcards/autotests)
    add_subdirectory(gravatar/autotests)

@@ -1,4 +1,4 @@
-2015-11-09:
+2015-11-20:
 -----------
 
 2015-1-29: New VERSION for archive => VERSION_2 => knote-akonadi
@@ -67,6 +67,7 @@ Root
 |       |---------akonadi_maildispatcher_agent.notifyrc
 |       |---------akonadi_newmailnotifier_agent.notifyrc
 |       |---------akonadi_followupreminder_agent.notifyrc
+|       |---------storageservicemanager.notifyrc
 |       |---------messagevieweradblockrc
 |       |---------knotesrc
 |       |---------akregatorrc
@@ -99,6 +100,16 @@ Root
 |       |---------knotesappui.rc
 |       |---------knotesui.rc
 |       |---------knotes_part.rc
+|       |---------akonadi_notes_agent.notifyrc
+|       |---------akregator.notifyrc
+|       |---------kontactsummary_part.rc
+|       |---------headerthemeeditorui.rc
+|       |---------contactprintthemeeditorui.rc    
+|       |---------contactthemeeditorui.rc
+|       |---------kwatchgnupgrc
+|       |---------kwatchgnupgui.rc
+|       |---------akonadiconsoleui.rc
+|       |---------foldermailarchiverc
 |
 |-----akonadi
 |       |---------<archive akonadi>

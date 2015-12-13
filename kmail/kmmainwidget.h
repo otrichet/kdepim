@@ -66,6 +66,8 @@ class KMMoveCommand;
 class KRecentFilesAction;
 class ManageShowCollectionProperties;
 class KActionMenuTransport;
+class KActionMenuAccount;
+class PluginInterface;
 template <typename T, typename S> class QMap;
 
 namespace KIO
@@ -199,6 +201,7 @@ public:
     void updateQuickSearchLineText();
 
     void populateMessageListStatusFilterCombo();
+    void initializePluginActions();
 public Q_SLOTS:
     // Moving messages around
     /**
@@ -440,7 +443,7 @@ protected Q_SLOTS:
     void slotItemAdded(const Akonadi::Item &, const Akonadi::Collection &col);
     void slotItemRemoved(const Akonadi::Item &);
     void slotItemMoved(const Akonadi::Item &item, const Akonadi::Collection &from, const Akonadi::Collection &to);
-    void slotCollectionStatisticsChanged(const Akonadi::Collection::Id, const Akonadi::CollectionStatistics &);
+    void slotCollectionStatisticsChanged(Akonadi::Collection::Id, const Akonadi::CollectionStatistics &);
 
     void slotAkonadiStandardActionUpdated();
     void slotCollectionChanged(const Akonadi::Collection &, const QSet<QByteArray> &);
@@ -550,6 +553,7 @@ private Q_SLOTS:
     void slotDeleteMessages();
 
     void slotMarkAllMessageAsReadInCurrentFolderAndSubfolder();
+    void slotRemoveDuplicateRecursive();
 private:
     // Message actions
     QAction *mDeleteAction;
@@ -659,6 +663,9 @@ private:
     QAction *mShowIntroductionAction;
     KToggleAction *mLowBandwithAction;
     QAction *mMarkAllMessageAsReadAndInAllSubFolder;
+    KActionMenuAccount *mAccountActionMenu;
+    QAction *mRemoveDuplicateRecursiveAction;
+    PluginInterface *mPluginInterface;
 };
 
 #endif

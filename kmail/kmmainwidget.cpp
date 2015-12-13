@@ -23,7 +23,6 @@
 #include "kmreadermainwin.h"
 #include "editor/composer.h"
 #include "searchdialog/searchwindow.h"
-#include "antispam-virus/antispamwizard.h"
 #include "widgets/vacationscriptindicatorwidget.h"
 #include "undostack.h"
 #include "kmcommands.h"
@@ -45,9 +44,11 @@
 #include "widgets/kactionmenutransport.h"
 #include "widgets/kactionmenuaccount.h"
 #include "mailcommon/searchrulestatus.h"
+#include "plugininterface/plugininterface.h"
 #include "PimCommon/NetworkUtil"
 #include "kpimtextedit/texttospeech.h"
 #include "job/markallmessagesasreadinfolderandsubfolderjob.h"
+#include "job/removeduplicatemessageinfolderandsubfolderjob.h"
 #if !defined(NDEBUG)
 #include <ksieveui/sievedebugdialog.h>
 using KSieveUi::SieveDebugDialog;
@@ -131,7 +132,6 @@ using KSieveUi::SieveDebugDialog;
 #include <AkonadiCore/collectionstatistics.h>
 #include <AkonadiCore/EntityMimeTypeFilterModel>
 #include <Akonadi/KMime/MessageFlags>
-#include <Akonadi/KMime/RemoveDuplicatesJob>
 #include <AkonadiCore/CachePolicy>
 
 #include <kidentitymanagement/identity.h>
@@ -196,7 +196,6 @@ using namespace MailCommon;
 using KPIM::ProgressManager;
 using KPIM::BroadcastStatus;
 using KMail::SearchWindow;
-using KMail::AntiSpamWizard;
 using KMime::Types::AddrSpecList;
 using MessageViewer::AttachmentStrategy;
 
@@ -224,7 +223,9 @@ KMMainWidget::KMMainWidget(QWidget *parent, KXMLGUIClient *aGUIClient,
     mSearchMessages(Q_NULLPTR),
     mManageShowCollectionProperties(new ManageShowCollectionProperties(this, this)),
     mShowIntroductionAction(Q_NULLPTR),
-    mMarkAllMessageAsReadAndInAllSubFolder(Q_NULLPTR)
+    mMarkAllMessageAsReadAndInAllSubFolder(Q_NULLPTR),
+    mAccountActionMenu(Q_NULLPTR),
+    mRemoveDuplicateRecursiveAction(Q_NULLPTR)
 {
     mLaunchExternalComponent = new KMLaunchExternalComponent(this, this);
     // must be the first line of the constructor:
@@ -247,6 +248,8 @@ KMMainWidget::KMMainWidget(QWidget *parent, KXMLGUIClient *aGUIClient,
 
     mToolbarActionSeparator = new QAction(this);
     mToolbarActionSeparator->setSeparator(true);
+
+    mPluginInterface = new PluginInterface(mActionCollection, this);
 
     theMainWidgetList->append(this);
 
@@ -857,6 +860,7 @@ void KMMainWidget::readConfig()
     updateMessageMenu();
     updateFileMenu();
     kmkernel->toggleSystemTray();
+    mAccountActionMenu->setAccountOrder(MailCommon::MailCommonSettings::self()->order());
 
     connect(Akonadi::AgentManager::self(), &AgentManager::instanceAdded,
             this, &KMMainWidget::updateFileMenu);
@@ -1184,7 +1188,7 @@ void KMMainWidget::updateAllToTrashAction(int statistics)
     }
 }
 
-void KMMainWidget::slotCollectionStatisticsChanged(const Akonadi::Collection::Id id, const Akonadi::CollectionStatistics &statistic)
+void KMMainWidget::slotCollectionStatisticsChanged(Akonadi::Collection::Id id, const Akonadi::CollectionStatistics &statistic)
 {
     if (id == CommonKernel->outboxCollectionFolder().id()) {
         const bool enableAction = (statistic.count() > 0);
@@ -2827,6 +2831,8 @@ void KMMainWidget::showMessagePopup(const Akonadi::Item &msg, const QUrl &url, c
 
 void KMMainWidget::setupActions()
 {
+    mPluginInterface->setParentWidget(this);
+    mPluginInterface->createPluginInterface();
     mMsgActions = new KMail::MessageActions(actionCollection(), this);
     mMsgActions->setMessageView(mMsgView);
 
@@ -2856,14 +2862,14 @@ void KMMainWidget::setupActions()
         actionCollection()->setDefaultShortcut(action, QKeySequence(Qt::CTRL + Qt::Key_L));
     }
 
-    KActionMenuAccount *actActionMenu = new KActionMenuAccount(this);
-    actActionMenu->setIcon(QIcon::fromTheme(QStringLiteral("mail-receive")));
-    actActionMenu->setText(i18n("Check Mail In"));
+    mAccountActionMenu = new KActionMenuAccount(this);
+    mAccountActionMenu->setIcon(QIcon::fromTheme(QStringLiteral("mail-receive")));
+    mAccountActionMenu->setText(i18n("Check Mail In"));
 
-    actActionMenu->setIconText(i18n("Check Mail"));
-    actActionMenu->setToolTip(i18n("Check Mail"));
-    actionCollection()->addAction(QStringLiteral("check_mail_in"), actActionMenu);
-    connect(actActionMenu, &KActionMenu::triggered, this, &KMMainWidget::slotCheckMail);
+    mAccountActionMenu->setIconText(i18n("Check Mail"));
+    mAccountActionMenu->setToolTip(i18n("Check Mail"));
+    actionCollection()->addAction(QStringLiteral("check_mail_in"), mAccountActionMenu);
+    connect(mAccountActionMenu, &KActionMenu::triggered, this, &KMMainWidget::slotCheckMail);
 
     mSendQueued = new QAction(QIcon::fromTheme(QStringLiteral("mail-send")), i18n("&Send Queued Messages"), this);
     actionCollection()->addAction(QStringLiteral("send_queued"), mSendQueued);
@@ -2937,16 +2943,6 @@ void KMMainWidget::setupActions()
         QAction *action = new QAction(i18n("Filter &Log Viewer..."), this);
         actionCollection()->addAction(QStringLiteral("filter_log_viewer"), action);
         connect(action, &QAction::triggered, mLaunchExternalComponent, &KMLaunchExternalComponent::slotFilterLogViewer);
-    }
-    {
-        QAction *action = new QAction(i18n("&Anti-Spam Wizard..."), this);
-        actionCollection()->addAction(QStringLiteral("antiSpamWizard"), action);
-        connect(action, &QAction::triggered, mLaunchExternalComponent, &KMLaunchExternalComponent::slotAntiSpamWizard);
-    }
-    {
-        QAction *action = new QAction(i18n("&Anti-Virus Wizard..."), this);
-        actionCollection()->addAction(QStringLiteral("antiVirusWizard"), action);
-        connect(action, &QAction::triggered, mLaunchExternalComponent, &KMLaunchExternalComponent::slotAntiVirusWizard);
     }
     {
         QAction *action = new QAction(i18n("&Account Wizard..."), this);
@@ -3561,6 +3557,10 @@ void KMMainWidget::setupActions()
     actionCollection()->addAction(QStringLiteral("markallmessagereadcurentfolderandsubfolder"), mMarkAllMessageAsReadAndInAllSubFolder);
     connect(mMarkAllMessageAsReadAndInAllSubFolder, &KToggleAction::triggered, this, &KMMainWidget::slotMarkAllMessageAsReadInCurrentFolderAndSubfolder);
 
+    mRemoveDuplicateRecursiveAction = new QAction(i18n("Remove Duplicates in This Folder and All its Subfolder"), this);
+    actionCollection()->addAction(QStringLiteral("remove_duplicate_recursive"), mRemoveDuplicateRecursiveAction);
+    connect(mRemoveDuplicateRecursiveAction, &KToggleAction::triggered, this, &KMMainWidget::slotRemoveDuplicateRecursive);
+
 }
 
 void KMMainWidget::slotAddFavoriteFolder()
@@ -4071,6 +4071,7 @@ void KMMainWidget::slotShowStartupFolder()
     mFolderShortcutActionManager->createActions();
     mTagActionManager->createActions();
     messageActions()->setupForwardingActionsList(mGUIClient);
+    initializePluginActions();
 
     QString newFeaturesMD5 = KMReaderWin::newFeaturesMD5();
     if (kmkernel->firstStart() ||
@@ -4143,6 +4144,16 @@ void KMMainWidget::clearFilterActions()
 
     qDeleteAll(mFilterCommands);
     mFilterCommands.clear();
+}
+
+void KMMainWidget::initializePluginActions()
+{
+    const QHash<PimCommon::ActionType::Type, QList<QAction *> > localActionsType = mPluginInterface->actionsType();
+    QList<QAction *> lstTools = localActionsType.value(PimCommon::ActionType::Tools);
+    if (!lstTools.isEmpty() && mGUIClient->factory()) {
+        mGUIClient->unplugActionList(QStringLiteral("kmail_plugins_tools"));
+        mGUIClient->plugActionList(QStringLiteral("kmail_plugins_tools"), lstTools);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -4542,6 +4553,15 @@ void KMMainWidget::slotMarkAllMessageAsReadInCurrentFolderAndSubfolder()
 {
     if (mCurrentFolder && mCurrentFolder->collection().isValid()) {
         MarkAllMessagesAsReadInFolderAndSubFolderJob *job = new MarkAllMessagesAsReadInFolderAndSubFolderJob(this);
+        job->setTopLevelCollection(mCurrentFolder->collection());
+        job->start();
+    }
+}
+
+void KMMainWidget::slotRemoveDuplicateRecursive()
+{
+    if (mCurrentFolder && mCurrentFolder->collection().isValid()) {
+        RemoveDuplicateMessageInFolderAndSubFolderJob *job = new RemoveDuplicateMessageInFolderAndSubFolderJob(this);
         job->setTopLevelCollection(mCurrentFolder->collection());
         job->start();
     }

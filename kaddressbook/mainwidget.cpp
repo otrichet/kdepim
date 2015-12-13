@@ -23,8 +23,6 @@
 #include "globalcontactmodel.h"
 #include "modelcolumnmanager.h"
 #include "printing/printingwizard.h"
-#include "merge/manualmerge/mergecontactsdialog.h"
-#include "merge/searchduplicate/searchandmergecontactduplicatecontactdialog.h"
 #include "quicksearchwidget.h"
 #include "settings.h"
 #include "xxport/xxportmanager.h"
@@ -99,6 +97,8 @@
 #include <QDesktopServices>
 #include <ItemModifyJob>
 
+#include <plugininterface/plugininterface.h>
+
 namespace
 {
 static bool isStructuralCollection(const Akonadi::Collection &collection)
@@ -151,7 +151,8 @@ MainWidget::MainWidget(KXMLGUIClient *guiClient, QWidget *parent)
       mServerSideSubscription(Q_NULLPTR),
       mSearchGravatarAction(Q_NULLPTR),
       mSendVcardAction(Q_NULLPTR),
-      mSendEmailAction(Q_NULLPTR)
+      mSendEmailAction(Q_NULLPTR),
+      mPluginInterface(Q_NULLPTR)
 {
 
     (void) new KaddressbookAdaptor(this);
@@ -160,8 +161,10 @@ MainWidget::MainWidget(KXMLGUIClient *guiClient, QWidget *parent)
     mXXPortManager = new XXPortManager(this);
     Akonadi::AttributeFactory::registerAttribute<PimCommon::ImapAclAttribute>();
 
+    mPluginInterface = new PluginInterface(guiClient->actionCollection(), this);
     setupGui();
     setupActions(guiClient->actionCollection());
+
 
     /*
     *  The item models, proxies and views have the following structure:
@@ -388,9 +391,7 @@ void MainWidget::delayedInit()
     KPIM::UiStateSaver::restoreState(mItemView, group);
 
 #if defined(HAVE_PRISON)
-    mXmlGuiClient->
-    actionCollection()->
-    action(QStringLiteral("options_show_qrcodes"))->setChecked(showQRCodes());
+    mXmlGuiClient->actionCollection()->action(QStringLiteral("options_show_qrcodes"))->setChecked(showQRCodes());
 #endif
 
     connect(GlobalContactModel::instance()->model(), &QAbstractItemModel::modelAboutToBeReset,
@@ -401,6 +402,7 @@ void MainWidget::delayedInit()
 
     restoreState();
     updateQuickSearchText();
+    initializePluginActions();
 }
 
 MainWidget::~MainWidget()
@@ -570,8 +572,22 @@ void MainWidget::setupGui()
     mContactGroupDetails->setContactGroupFormatter(mGroupFormatter);
 }
 
+void MainWidget::initializePluginActions()
+{
+    const QHash<PimCommon::ActionType::Type, QList<QAction *> > localActionsType = mPluginInterface->actionsType();
+    QList<QAction *> lstTools = localActionsType.value(PimCommon::ActionType::Tools);
+    if (!lstTools.isEmpty() && mXmlGuiClient->factory()) {
+        mXmlGuiClient->unplugActionList(QStringLiteral("kaddressbook_plugins_tools"));
+        mXmlGuiClient->plugActionList(QStringLiteral("kaddressbook_plugins_tools"), lstTools);
+    }
+}
+
+
 void MainWidget::setupActions(KActionCollection *collection)
 {
+    mPluginInterface->setParentWidget(this);
+    mPluginInterface->setMainWidget(this);
+    mPluginInterface->createPluginInterface();
     mGrantleeThemeManager = new GrantleeTheme::ThemeManager(QStringLiteral("addressbook"),
             QStringLiteral("theme.desktop"),
             collection,
@@ -705,14 +721,6 @@ void MainWidget::setupActions(KActionCollection *collection)
     if (actTheme) {
         actTheme->setChecked(true);
     }
-
-    action = collection->addAction(QStringLiteral("merge_contacts"));
-    action->setText(i18n("Merge Contacts..."));
-    connect(action, &QAction::triggered, this, &MainWidget::mergeContacts);
-
-    action = collection->addAction(QStringLiteral("search_duplicate_contacts"));
-    action->setText(i18n("Search Duplicate Contacts..."));
-    connect(action, &QAction::triggered, this, &MainWidget::slotSearchDuplicateContacts);
 
     mQuickSearchAction = new QAction(i18n("Set Focus to Quick Search"), this);
     //If change shortcut change in quicksearchwidget->lineedit->setPlaceholderText
@@ -857,8 +865,10 @@ void MainWidget::setQRCodeShow(bool on)
     KConfig config(QStringLiteral("akonadi_contactrc"));
     KConfigGroup group(&config, QStringLiteral("View"));
     group.writeEntry("QRCodes", on);
-    if (mItemView->model()) {
-        mItemView->setCurrentIndex(mItemView->model()->index(0, 0));
+    group.sync();
+    if (mDetailsViewStack->currentWidget() == mContactDetails) {
+        mFormatter->setShowQRCode(on);
+        mContactDetails->setShowQRCode(on);
     }
 #else
     Q_UNUSED(on);
@@ -992,22 +1002,9 @@ void MainWidget::slotGrantleeThemesUpdated()
     }
 }
 
-void MainWidget::mergeContacts()
+Akonadi::Item::List MainWidget::collectSelectedContactsItem() const
 {
-    const Akonadi::Item::List lst = Utils::collectSelectedContactsItem(mItemView->selectionModel());
-    QPointer<KABMergeContacts::MergeContactsDialog> dlg = new KABMergeContacts::MergeContactsDialog(this);
-    dlg->setContacts(lst);
-    dlg->exec();
-    delete dlg;
-}
-
-void MainWidget::slotSearchDuplicateContacts()
-{
-    const Akonadi::Item::List lst = Utils::collectSelectedContactsItem(mItemView->selectionModel());
-    QPointer<KABMergeContacts::SearchAndMergeContactDuplicateContactDialog> dlg = new KABMergeContacts::SearchAndMergeContactDuplicateContactDialog(this);
-    dlg->searchPotentialDuplicateContacts(lst);
-    dlg->exec();
-    delete dlg;
+    return Utils::collectSelectedContactsItem(mItemView->selectionModel());
 }
 
 Akonadi::EntityTreeModel *MainWidget::entityTreeModel() const
