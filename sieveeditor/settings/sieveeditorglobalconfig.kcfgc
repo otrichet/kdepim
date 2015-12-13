@@ -1,5 +1,0 @@
-File=sieveeditorglobalconfig.kcfg
-ClassName=SieveEditorGlobalConfig
-Mutators=true
-Singleton=true
-ItemAccessors=true

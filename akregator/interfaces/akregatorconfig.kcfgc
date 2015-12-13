@@ -1,9 +1,0 @@
-# Code generation options for kconfig_compiler
-File=akregator.kcfg
-ClassName=Settings
-NameSpace=Akregator
-Singleton=true
-Mutators=true
-IncludeFiles=akregatorinterfaces_export.h
-Visibility=AKREGATORINTERFACES_EXPORT
-MemberVariables=private
